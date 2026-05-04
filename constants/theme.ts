@@ -65,10 +65,10 @@ export const Colors = {
     // Tab colors
     tabIconDefault: "#64748b",
     tabIconSelected: primary,
-    tabBackground: "#f8fafc",
+    tabBackground: "#DAE3EA",
     
     // Special backgrounds
-    headerBackground: "#ffffff",
+    headerBackground: "#DAE3EA",
     headerBorder: "#e2e8f0",
     
     // Status colors

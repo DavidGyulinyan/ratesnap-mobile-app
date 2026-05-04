@@ -31,6 +31,7 @@ interface SavedRatesProps {
   title?: string;
   inModal?: boolean; // Hide header when used inside DashboardModal
   forceUseHook?: boolean; // Force use hook data instead of prop
+  showDeleteButtons?: boolean; // Show delete buttons for each item
 }
 
 export default function SavedRates({
@@ -47,6 +48,7 @@ export default function SavedRates({
   title,
   inModal = false,
   forceUseHook = false,
+  showDeleteButtons = false,
 }: SavedRatesProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -140,33 +142,31 @@ export default function SavedRates({
     >
       <View style={styles.savedRateContent}>
         <View style={styles.savedRateHeader}>
-          <CurrencyFlag currency={rate.from_currency} size={16} />
+          <CurrencyFlag currency={rate.from_currency} size={20} />
           <ThemedText style={[{ color: textSecondaryColor }, styles.arrow]}>→</ThemedText>
-          <CurrencyFlag currency={rate.to_currency} size={16} />
-          <ThemedText style={[{ color: textColor }, styles.savedRateTitle]}>
-            {rate.from_currency} → {rate.to_currency}
-          </ThemedText>
+          <CurrencyFlag currency={rate.to_currency} size={20} />
         </View>
         <ThemedText style={[{ color: primaryColor }, styles.rateValue]}>
-          {t('converter.rate')}: {rate.rate.toFixed(6)}
+          {rate.rate.toFixed(4)}
         </ThemedText>
         <ThemedText style={[{ color: textSecondaryColor }, styles.savedRateDate]}>
-          {t('saved.savedOn')}: {new Date(rate.created_at).toLocaleDateString()} {t('saved.at')}{" "}
-          {new Date(rate.created_at).toLocaleTimeString()}
+          {new Date(rate.created_at).toLocaleDateString()}
         </ThemedText>
       </View>
-      <TouchableOpacity
-        style={[styles.deleteButton, deletingId === rate.id && styles.deleteButtonDisabled]}
-        onPress={() => handleDeleteRate(rate.id)}
-        disabled={deletingId === rate.id}
-      >
-        <ThemedText style={[
-          styles.deleteButtonText,
-          deletingId === rate.id && styles.deleteButtonTextDisabled
-        ]}>
-          {deletingId === rate.id ? t('saved.deletingIcon') : t('saved.deleteIcon')}
-        </ThemedText>
-      </TouchableOpacity>
+      {showDeleteButtons && (
+        <TouchableOpacity
+          style={[styles.deleteButton, deletingId === rate.id && styles.deleteButtonDisabled]}
+          onPress={() => handleDeleteRate(rate.id)}
+          disabled={deletingId === rate.id}
+        >
+          <ThemedText style={[
+            styles.deleteButtonText,
+            deletingId === rate.id && styles.deleteButtonTextDisabled
+          ]}>
+            {deletingId === rate.id ? "..." : "x"}
+          </ThemedText>
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 
@@ -222,7 +222,7 @@ export default function SavedRates({
         <View style={[
           inModal
             ? styles.fadeIn
-            : [{ backgroundColor: surfaceColor, borderColor: primaryColor, shadowColor: shadowColor }, styles.savedRatesList, styles.fadeIn]
+            : [{ borderColor: primaryColor, shadowColor: shadowColor }, styles.savedRatesList, styles.fadeIn]
         ]}>
           {savedRates.length === 0 ? (
             <View style={styles.emptySavedRates}>
@@ -235,9 +235,11 @@ export default function SavedRates({
             </View>
           ) : (
             <>
-              {visibleRates.map((rate, index) =>
-                renderSavedRateItem(rate, index)
-              )}
+              <View style={styles.gridContainer}>
+                {visibleRates.map((rate, index) =>
+                  renderSavedRateItem(rate, index)
+                )}
+              </View>
 
               {showMoreEnabled && savedRates.length > maxVisibleItems && (
                 <TouchableOpacity
@@ -250,7 +252,7 @@ export default function SavedRates({
                 </TouchableOpacity>
               )}
 
-              {savedRates.length > 1 && (
+              {showDeleteButtons && savedRates.length > 1 && (
                 <DeleteAllButton
                   onPress={handleDeleteAllRates}
                   count={savedRates.length}
@@ -281,6 +283,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
   },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 4,
+  },
   emptySavedRates: {
     padding: 20,
     alignItems: "center",
@@ -291,33 +298,30 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   savedRateItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: 16,
-    borderRadius: 12,
+    width: '48%',
+    aspectRatio: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 20,
     borderWidth: 1,
-    marginBottom: 12,
+    margin: 2,
   },
   savedRateContent: {
-    flex: 1,
+    alignItems: "center",
   },
   savedRateHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   arrow: {
-    marginHorizontal: 8,
-    fontSize: 14,
+    marginHorizontal: 6,
+    fontSize: 16,
     fontWeight: "bold",
   },
-  savedRateTitle: {
-    fontWeight: "600",
-    marginLeft: 8,
-  },
   rateValue: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
     marginBottom: 4,
   },
@@ -337,17 +341,28 @@ const styles = StyleSheet.create({
   showHideTextActive: {
   },
   savedRateDate: {
-    fontSize: 11,
+    fontSize: 10,
   },
   deleteButton: {
-    padding: 8,
-    marginLeft: 8,
+    width: 20,
+    height: 20,
+    position: "absolute",
+    top: 4,
+    right: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(239, 68, 68, 0.3)",
   },
   deleteButtonDisabled: {
     opacity: 0.5,
   },
   deleteButtonText: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#ef4444",
   },
   deleteButtonTextDisabled: {
     opacity: 0.5,
@@ -367,3 +382,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+

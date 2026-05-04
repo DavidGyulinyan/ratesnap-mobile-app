@@ -10,7 +10,7 @@ export default function ModalScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <Logo size={32} showText={true} textSize={24} />
+        <Logo size={48} showText={true} textSize={26} />
       </View>
       <ThemedText type="title">Settings & Info</ThemedText>
       <Link href="/" dismissTo style={styles.link}>

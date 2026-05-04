@@ -162,7 +162,7 @@ class NotificationService {
       const triggerTime = Date.now() + (60 * 60 * 1000); // 1 hour from now
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
-          title: '💰 RateSnap Alert',
+          title: '💰 ExRatio Alert',
           body: `Monitoring ${alert.fromCurrency} to ${alert.toCurrency}`,
           data: {
             type: 'rate_check',

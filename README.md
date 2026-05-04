@@ -1,8 +1,8 @@
-# RateSnap - Real-time Currency Converter 📱
+# ExRatio - Real-time Currency Converter 📱
 
 A modern, user-friendly mobile currency converter app built with React Native and Expo. Get real-time exchange rates for 160+ currencies with a clean, intuitive interface.
 
-![RateSnap Preview](https://via.placeholder.com/300x600/2563eb/ffffff?text=RateSnap+App)
+![ExRatio Preview](https://via.placeholder.com/300x600/2563eb/ffffff?text=ExRatio+App)
 
 ## ✨ Features
 
@@ -30,8 +30,8 @@ A modern, user-friendly mobile currency converter app built with React Native an
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/ratesnap-mobile.git
-   cd ratesnap-mobile
+   git clone https://github.com/yourusername/exratio-mobile.git
+   cd exratio-mobile
    ```
 
 2. **Install dependencies**
@@ -91,7 +91,7 @@ A modern, user-friendly mobile currency converter app built with React Native an
 ## 🏗️ Project Structure
 
 ```
-ratesnap-mobile/
+exratio-mobile/
 ├── app/                    # App screens (file-based routing)
 │   ├── _layout.tsx        # Root layout
 │   ├── modal.tsx          # Modal screens
@@ -158,7 +158,7 @@ This app uses the [ExchangeRate-API](https://www.exchangerate-api.com/) for curr
 
 The app supports multiple exchange rate providers:
 - **ExchangeRate-API** (Primary)
-- **RateSnap Provider** (Fallback)
+- **ExRatio Provider** (Fallback)
 
 Providers can be configured in the settings and will automatically switch if the primary provider is unavailable.
 
@@ -231,7 +231,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have any questions or issues:
 
-- Create an [issue](https://github.com/yourusername/ratesnap-mobile/issues) on GitHub
+- Create an [issue](https://github.com/yourusername/exratio-mobile/issues) on GitHub
 - Check the [Terms of Use](https://docs.google.com/document/d/e/2PACX-1vSqgDzlbEnxw-KoCS6ecj_tGzjSlkxDc7bUBMwzor65LKNLTEqzxm4q2iVvStCkmzo4N6dnVlcRGRuo/pub) for app usage guidelines
 
 ## 📝 Changelog

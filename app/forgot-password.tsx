@@ -239,7 +239,7 @@ export default function ForgotPasswordScreen() {
                 <Ionicons name="arrow-back" size={24} color={textColor} />
               </TouchableOpacity>
             </View>
-            <Logo size={48} showText={true} textSize={24} />
+            <Logo size={72} showText={true} textSize={26} />
             <Text style={styles.title}>Check Your Email</Text>
             <Text style={styles.subtitle}>
               We've sent password reset instructions to {email}
@@ -290,7 +290,7 @@ export default function ForgotPasswordScreen() {
               <Ionicons name="arrow-back" size={24} color={textColor} />
             </TouchableOpacity>
           </View>
-          <Logo size={48} showText={true} textSize={24} />
+          <Logo size={72} showText={true} textSize={36} />
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>
             Enter your email address and we'll send you a link to reset your password

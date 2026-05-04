@@ -434,7 +434,7 @@ export default function SignInScreen() {
               <Ionicons name="arrow-back" size={24} color={textColor} />
             </TouchableOpacity>
           </View>
-          <Logo size={48} showText={true} textSize={24} />
+          <Logo size={72} showText={true} textSize={26} />
            <Text style={styles.title}>{t(welcomeTitle)}</Text>
            <Text style={styles.subtitle}>{t('signin.subtitle')}</Text>
 

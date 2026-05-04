@@ -329,7 +329,7 @@ function SignUpScreen() {
                 <Ionicons name="arrow-back" size={24} color={textColor} />
               </TouchableOpacity>
             </View>
-            <Logo size={48} showText={true} textSize={24} />
+            <Logo size={72} showText={true} textSize={26} />
             <Text style={styles.title}>{t('signup.createAccount')}</Text>
             <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
 

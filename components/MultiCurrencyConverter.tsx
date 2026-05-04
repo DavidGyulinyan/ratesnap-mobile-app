@@ -13,7 +13,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemedText } from "./themed-text";
 import CurrencyFlag from "./CurrencyFlag";
 import CurrencyPicker from "./CurrencyPicker";
-import DeleteAllButton from "./DeleteAllButton";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useConverterHistory } from "@/hooks/useUserData";
@@ -1046,23 +1045,15 @@ export default function MultiCurrencyConverter({
                 {(() => {
                   const visibleTargets = showAllTargets
                     ? conversionTargets.slice(0, 20)
-                    : conversionTargets.slice(0, maxVisibleItems);
-                  console.log("🎨 Rendering targets:", {
-                    totalTargets: conversionTargets.length,
-                    showAllTargets,
-                    visibleCount: visibleTargets.length,
-                    maxVisible: maxVisibleItems,
-                    maxWhenExpanded: 20,
-                    shouldShowButton:
-                      showMoreEnabled &&
-                      !showAllTargets &&
-                      conversionTargets.length > maxVisibleItems,
-                    targetsList: visibleTargets.map((t) => t.currency),
-                  });
+                    : conversionTargets.slice(
+                        0,
+                        Math.min(maxVisibleItems, 20)
+                      );
 
-                  // Force a rerender by adding a key based on showAllTargets
                   return (
-                    <View key={`targets-${showAllTargets ? "all" : "limited"}`}>
+                    <View
+                      key={`targets-${showAllTargets ? "all" : "limited"}`}
+                    >
                       {visibleTargets.map((target) => (
                         <View
                           key={target.id}
@@ -1301,13 +1292,26 @@ const styles = StyleSheet.create({
   targetsList: {
     // Removed maxHeight for mobile compatibility - shows all items without scrolling
   },
-  targetItem: {
+  gridContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 4,
+  },
+  targetItem: {
+    width: '45%',
+    aspectRatio: 1,
+    justifyContent: "center",
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 12,
-    marginBottom: 8,
+    margin: 4,
     borderWidth: 1,
+  },
+  targetContent: {
+    alignItems: "center",
+  },
+  targetHeader: {
+    marginBottom: 8,
   },
   targetCurrencyButton: {
     flexDirection: "row",
@@ -1328,7 +1332,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   conversionAmount: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
   },
   removeButton: {

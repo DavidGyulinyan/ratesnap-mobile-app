@@ -268,7 +268,7 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
                   fontWeight: '600',
                   color: textSecondaryColor,
                 }}>
-                  RateSnap v1.0
+                  ExRatio v1.0
                 </ThemedText>
                 <ThemedText style={{
                   fontSize: 12,

@@ -47,7 +47,7 @@ export default function ContactSupportModal({
     try {
       const isAvailable = await MailComposer.composeAsync({
         recipients: ["davidguiyn@gmail.com"],
-        subject: "RateSnap Support Request",
+        subject: "ExRatio Support Request",
         body: `From: ${user?.email || userEmail || "Anonymous User"}\n\n${message}`,
       });
 

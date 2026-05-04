@@ -541,7 +541,11 @@ export function usePickedRates(): UsePickedRatesReturn {
     try {
       const newRecord = await UserDataService.trackPickedRate(fromCurrency, toCurrency, rate, type, context);
       if (newRecord) {
-        setPickedRates(prev => [newRecord, ...prev]);
+        setPickedRates(prev => {
+          const updated = [newRecord, ...prev];
+          // Keep only the most recent 20 items
+          return updated.slice(0, 20);
+        });
         return true;
       }
       return false;
