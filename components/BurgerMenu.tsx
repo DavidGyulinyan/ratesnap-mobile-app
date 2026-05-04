@@ -187,7 +187,7 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
             }}>
               <View style={{ flex: 1, paddingRight: 12 }}>
                 <ThemedText style={{ fontSize: 20, fontWeight: '700', color: textColor }}>
-                  RateSnap
+                  ExRatio
                 </ThemedText>
                 <ThemedText style={{ fontSize: 13, color: textSecondaryColor, marginTop: 4 }}>
                   {t('app.subtitle')}

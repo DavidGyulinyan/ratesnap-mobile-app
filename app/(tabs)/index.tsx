@@ -325,7 +325,7 @@ export default function HomeScreen() {
                   type="subtitle"
                   style={[styles.heroTitle, { color: textColor }]}
                 >
-                  RateSnap
+                  ExRatio
                 </ThemedText>
                 <ThemedText
                   type="caption"

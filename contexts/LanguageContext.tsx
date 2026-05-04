@@ -14,6 +14,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const translations = {
   en: {
+    'app.title': 'ExRatio',
+    'app.subtitle': 'Live rates & smart conversion',
     // App & Navigation    // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.quickActions': 'Quick Actions',
@@ -422,6 +424,8 @@ const translations = {
     'charts.title': 'Currency rate charts',
   },
   hy: {
+    'app.title': 'ExRatio',
+    'app.subtitle': 'Արժույթի գործիքներ',
     // Armenian    
     'dashboard.title': 'Վահանակ',
     'dashboard.quickActions': 'Արագ գործողություններ',
@@ -806,6 +810,8 @@ const translations = {
     'signup.selectLanguage': 'Ընտրել լեզու',
   },
   ru: {
+    'app.title': 'ExRatio',
+    'app.subtitle': 'Курсы и конвертация',
     // Russian    
     'dashboard.title': 'Панель',
     'dashboard.quickActions': 'Быстрые действия',
@@ -1162,6 +1168,8 @@ const translations = {
     'rateAlerts.reset': 'Сбросить',
   },
   es: {
+    'app.title': 'ExRatio',
+    'app.subtitle': 'Tipos y conversión',
     // Spanish    
     'dashboard.title': 'Panel',
     'dashboard.quickActions': 'Acciones Rápidas',
@@ -1518,6 +1526,8 @@ const translations = {
     'charts.title': 'Gráficos de Tipos de Cambio',
   },
   zh: {
+    'app.title': 'ExRatio',
+    'app.subtitle': '汇率与换算',
     // Chinese (Simplified)    
     'dashboard.title': '仪表板',
     'dashboard.quickActions': '快速操作',
@@ -1872,6 +1882,8 @@ const translations = {
     'charts.title': '汇率图表',
   },
   hi: {
+    'app.title': 'ExRatio',
+    'app.subtitle': 'दरें और रूपांतरण',
     // Hindi    
     'dashboard.title': 'डैशबोर्ड',
     'dashboard.quickActions': 'त्वरित कार्य',

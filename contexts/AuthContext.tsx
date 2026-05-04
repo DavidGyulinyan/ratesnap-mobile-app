@@ -277,7 +277,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Use the correct redirect URI format
       const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "ratesnap-mobile",
+        scheme: "exratio-mobile",
         path: "auth/callback",
       });
 
@@ -317,7 +317,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Use the correct redirect URI format
       const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "ratesnap-mobile",
+        scheme: "exratio-mobile",
         path: "auth/callback",
       });
 
