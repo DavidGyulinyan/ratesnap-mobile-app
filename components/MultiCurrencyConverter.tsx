@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemedText } from "./themed-text";
@@ -922,16 +923,14 @@ export default function MultiCurrencyConverter({
                   onClose();
                   setCloseButtonPressed(false);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
               >
-                <ThemedText
-                  style={[
-                    { color: textColor },
-                    styles.closeButtonText,
-                    closeButtonPressed && { color: textSecondaryColor },
-                  ]}
-                >
-                  ×
-                </ThemedText>
+                <Ionicons
+                  name="arrow-back"
+                  size={22}
+                  color={closeButtonPressed ? textSecondaryColor : textColor}
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -1231,20 +1230,13 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   closeButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
   },
   closeButtonActive: {},
-  closeButtonText: {
-    fontSize: 18,
-    color: "#6b7280",
-    fontWeight: "bold",
-  },
-  closeButtonTextActive: {},
   inputGroup: {
     marginBottom: 16,
   },

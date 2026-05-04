@@ -9,6 +9,7 @@ import {
   Modal,
   Switch,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "./themed-text";
 import CurrencyFlag from "./CurrencyFlag";
 import CurrencyPicker from "./CurrencyPicker";
@@ -524,9 +525,18 @@ export default function RateAlertManager({
           <View style={[{ backgroundColor: surfaceColor, borderBottomColor: borderColor }, styles.modalHeader]}>
             <TouchableOpacity
               onPress={() => setShowAlertModal(false)}
-              style={[{ backgroundColor: surfaceSecondaryColor }, styles.cancelButton]}
+              style={[
+                {
+                  backgroundColor: surfaceSecondaryColor,
+                  borderColor,
+                  borderWidth: StyleSheet.hairlineWidth,
+                },
+                styles.cancelButton,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t('rateAlerts.cancel')}
             >
-              <ThemedText style={[{ color: textSecondaryColor }, styles.cancelButtonText]}>{t('rateAlerts.cancel')}</ThemedText>
+              <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSaveAlert} style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.saveButton]}>
               <ThemedText style={[{ color: textColor }, styles.saveButtonText]}>{t('rateAlerts.save')}</ThemedText>
@@ -864,10 +874,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    padding: 8,
-  },
-  cancelButtonText: {
-    fontSize: 16,
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalTitle: {
     fontSize: 18,

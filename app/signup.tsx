@@ -71,9 +71,19 @@ function SignUpScreen() {
     content: {
       flex: 1,
       paddingHorizontal: 24,
-      paddingTop: 40, // Reduced top padding since SafeAreaView handles safe area
+      paddingTop: 16,
       paddingBottom: 40,
       alignItems: 'center',
+    },
+    topBar: {
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    backNavButton: {
+      padding: 8,
+      marginLeft: -8,
     },
     title: {
       fontSize: 28,
@@ -212,9 +222,9 @@ function SignUpScreen() {
     },
     modalHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 20,
+      padding: 16,
+      gap: 8,
       borderBottomWidth: 1,
       borderBottomColor: borderColor,
     },
@@ -309,6 +319,16 @@ function SignUpScreen() {
         <StatusBar barStyle="dark-content" />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.content}>
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backNavButton}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="arrow-back" size={24} color={textColor} />
+              </TouchableOpacity>
+            </View>
             <Logo size={48} showText={true} textSize={24} />
             <Text style={styles.title}>{t('signup.createAccount')}</Text>
             <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
@@ -431,13 +451,16 @@ function SignUpScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.languagePickerModal}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Language</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setShowLanguagePicker(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
               >
-                <Ionicons name="close" size={24} color={textSecondaryColor} />
+                <Ionicons name="arrow-back" size={24} color={textSecondaryColor} />
               </TouchableOpacity>
+              <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>Select Language</Text>
+              <View style={{ width: 36 }} />
             </View>
 
             <ScrollView style={styles.languageList}>

@@ -8,7 +8,9 @@ import {
   StyleSheet,
   Platform,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { ThemedView } from "./themed-view";
@@ -1093,7 +1095,10 @@ export default function CurrencyConverter({
   if (loading) {
     return (
       <ThemedView style={styles.loadingContainer}>
-        <ThemedText>{t("common.loading")}</ThemedText>
+        <ActivityIndicator size="large" color={primaryColor} />
+        <ThemedText type="defaultSemiBold" style={styles.loadingLabel}>
+          {t("common.loading")}
+        </ThemedText>
       </ThemedView>
     );
   }
@@ -1105,23 +1110,25 @@ export default function CurrencyConverter({
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {/* Modern Currency Converter - Complete Redesign */}
       <View
         style={[
-          { backgroundColor: surfaceColor, borderColor: borderColor }
+          styles.converterCard,
+          {
+            backgroundColor: surfaceColor,
+            borderColor,
+            marginBottom: inModal ? 0 : 16,
+          },
         ]}
       >
-
-        {/* Amount Input Section */}
         <View style={styles.amountSection}>
-          <ThemedText style={styles.amountLabel}>
+          <ThemedText type="defaultSemiBold" style={styles.amountLabel}>
             {t("converter.amountLabel")}
           </ThemedText>
           <View style={styles.amountInputWrapper}>
             <TextInput
               style={[
                 {
-                  backgroundColor: surfaceColor,
+                  backgroundColor: surfaceSecondaryColor,
                   borderColor: borderColor,
                   color: textColor,
                 },
@@ -1135,7 +1142,6 @@ export default function CurrencyConverter({
             />
           </View>
 
-          {/* Quick Amount Presets */}
           <View style={styles.quickAmounts}>
             {[1, 10, 100, 1000].map((preset) => (
               <TouchableOpacity
@@ -1160,7 +1166,6 @@ export default function CurrencyConverter({
           </View>
         </View>
 
-        {/* Currency Selection - Column Layout */}
         <View style={styles.currencySelection}>
           <TouchableOpacity
             style={[
@@ -1172,9 +1177,10 @@ export default function CurrencyConverter({
               styles.currencySelector,
             ]}
             onPress={() => setShowFromPicker(true)}
+            activeOpacity={0.85}
           >
             <View style={styles.currencyFlagContainer}>
-              <CurrencyFlag currency={fromCurrency} size={24} />
+              <CurrencyFlag currency={fromCurrency} size={28} />
             </View>
             <View style={styles.currencyInfo}>
               <ThemedText
@@ -1185,25 +1191,30 @@ export default function CurrencyConverter({
               <ThemedText style={[{ color: textColor }, styles.currencyCode]}>
                 {fromCurrency}
               </ThemedText>
-              <ThemedText
-                style={[{ color: textSecondaryColor }, styles.dropdownArrow]}
-              >
-                ▼
-              </ThemedText>
             </View>
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={textSecondaryColor}
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              { backgroundColor: primaryColor, shadowColor: primaryColor },
-              styles.swapButtonModern,
-            ]}
-            onPress={handleSwap}
-          >
-            <ThemedText style={[{ color: textInverseColor }, styles.swapIcon]}>
-              ⇄
-            </ThemedText>
-          </TouchableOpacity>
+          <View style={styles.swapRow}>
+            <TouchableOpacity
+              style={[
+                { backgroundColor: primaryColor, shadowColor: primaryColor },
+                styles.swapButtonModern,
+              ]}
+              onPress={handleSwap}
+              activeOpacity={0.88}
+            >
+              <Ionicons
+                name="swap-vertical"
+                size={22}
+                color={textInverseColor}
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             style={[
@@ -1215,9 +1226,10 @@ export default function CurrencyConverter({
               styles.currencySelector,
             ]}
             onPress={() => setShowToPicker(true)}
+            activeOpacity={0.85}
           >
             <View style={styles.currencyFlagContainer}>
-              <CurrencyFlag currency={toCurrency} size={24} />
+              <CurrencyFlag currency={toCurrency} size={28} />
             </View>
             <View style={styles.currencyInfo}>
               <ThemedText
@@ -1228,16 +1240,15 @@ export default function CurrencyConverter({
               <ThemedText style={[{ color: textColor }, styles.currencyCode]}>
                 {toCurrency}
               </ThemedText>
-              <ThemedText
-                style={[{ color: textSecondaryColor }, styles.dropdownArrow]}
-              >
-                ▼
-              </ThemedText>
             </View>
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={textSecondaryColor}
+            />
           </TouchableOpacity>
         </View>
 
-        {/* Conversion Result - Prominent Display */}
         <View style={styles.resultSection}>
           <View
             style={[
@@ -1296,7 +1307,6 @@ export default function CurrencyConverter({
           </View>
         </View>
 
-        {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <View style={styles.actionButtonsRow}>
             <TouchableOpacity
@@ -1305,7 +1315,14 @@ export default function CurrencyConverter({
                 styles.saveRateButton,
               ]}
               onPress={handleSaveRate}
+              activeOpacity={0.88}
             >
+              <Ionicons
+                name="bookmark-outline"
+                size={18}
+                color={textInverseColor}
+                style={styles.saveRateIcon}
+              />
               <ThemedText
                 style={[{ color: textInverseColor }, styles.saveRateText]}
               >
@@ -1417,6 +1434,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap: 14,
+    padding: 24,
+  },
+  loadingLabel: {
+    marginTop: 4,
+  },
+  converterCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 3,
   },
   navHeader: {
     padding: 12,
@@ -1630,12 +1662,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   amountInput: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    fontSize: 18,
-    fontWeight: "500",
+    fontSize: 22,
+    fontWeight: "600",
   },
 
   // Quick Amounts
@@ -1659,43 +1691,38 @@ const styles = StyleSheet.create({
 
   // Currency Selection
   currencySelection: {
-    flexDirection: "column",
-    alignItems: "stretch",
-    marginBottom: 24,
-    paddingHorizontal: 8,
-    position: "relative",
+    marginBottom: 20,
   },
   currencySelector: {
     width: "100%",
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 18,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    marginBottom: 4,
   },
   currencyFlagContainer: {
-    marginRight: 12,
+    marginRight: 14,
   },
   currencyInfo: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    minWidth: 0,
   },
   currencyLabel: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "500",
-    marginRight: 8,
+    marginBottom: 2,
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
   },
   currencyCode: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "700",
-    marginRight: 8,
   },
-  dropdownArrow: {
-    fontSize: 12,
-    fontWeight: "bold",
+  swapRow: {
+    alignItems: "center",
+    marginVertical: 10,
   },
   swapButtonModern: {
     width: 48,
@@ -1703,20 +1730,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginLeft: -24, // Half of width to center horizontally
-    marginTop: -24, // Half of height to center vertically
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
-    zIndex: 10,
-  },
-  swapIcon: {
-    fontSize: 18,
-    fontWeight: "bold",
   },
 
   // Result Section
@@ -1724,9 +1741,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   resultCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 20,
-    borderWidth: 2,
+    borderWidth: 1,
     alignItems: "center",
   },
   conversionDisplay: {
@@ -1783,17 +1800,23 @@ const styles = StyleSheet.create({
   },
   saveRateButton: {
     flex: 1,
+    flexDirection: "row",
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 24,
     alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
   },
+  saveRateIcon: {
+    marginRight: 0,
+  },
   saveRateText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "600",
   },
 });

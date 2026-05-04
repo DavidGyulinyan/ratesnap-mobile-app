@@ -1,5 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "./themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
@@ -29,11 +30,11 @@ export default function DashboardModal({
   return (
     <View style={[styles.modalContainer, style]}>
       <View style={[{ backgroundColor: surfaceColor, borderColor: borderColor, shadowColor }, styles.modalCard]}>
-        {/* Modal Header */}
+        <View style={[styles.sheetHandle, { backgroundColor: borderColor }]} />
         <View style={styles.modalHeader}>
           <View style={styles.modalTitleContainer}>
-            {icon && <ThemedText style={styles.modalIcon}>{icon}</ThemedText>}
-            <ThemedText style={[{ color: textColor }, styles.modalTitle]}>
+            {icon ? <ThemedText style={styles.modalIcon}>{icon}</ThemedText> : null}
+            <ThemedText style={[{ color: textColor }, styles.modalTitle]} numberOfLines={2}>
               {title}
             </ThemedText>
           </View>
@@ -41,13 +42,14 @@ export default function DashboardModal({
             <TouchableOpacity
               style={[{ backgroundColor: backgroundColor, borderColor: borderColor }, styles.closeButton]}
               onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
             >
-              <ThemedText style={[{ color: textSecondaryColor }, styles.closeButtonText]}>×</ThemedText>
+              <Ionicons name="arrow-back" size={20} color={textSecondaryColor} />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Modal Content */}
         <View style={styles.modalContent}>
           {children}
         </View>
@@ -61,19 +63,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   modalCard: {
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
-    padding: 24,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 22,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  sheetHandle: {
+    alignSelf: "center",
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 14,
+    opacity: 0.55,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
+    alignItems: "flex-start",
+    marginBottom: 16,
+    gap: 12,
   },
   modalTitleContainer: {
     flexDirection: "row",
@@ -85,23 +98,19 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
+    lineHeight: 24,
+    flex: 1,
   },
   closeButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    marginLeft: 12,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#6b7280',
-    fontWeight: "bold",
+    marginLeft: 8,
   },
   modalContent: {
     // Content area - children will be rendered here

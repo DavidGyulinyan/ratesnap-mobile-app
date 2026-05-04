@@ -19,6 +19,7 @@ import { getAsyncStorage } from '@/lib/storage';
 import expoGoSafeNotificationService from '@/lib/expoGoSafeNotificationService';
 import ContactSupportModal from '@/components/ContactSupportModal';
 import { useUserData } from '@/hooks/useUserData';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
@@ -721,10 +722,9 @@ RateSnap चुनने के लिए धन्यवाद!`
     },
     modalHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 20,
-      paddingRight: 2, // Add more padding to ensure close button stays within bounds
+      gap: 8,
     },
     modalTitle: {
       fontSize: 20,
@@ -732,17 +732,12 @@ RateSnap चुनने के लिए धन्यवाद!`
       color: textColor,
     },
     closeButton: {
-      width: 32,
-      height: 32,
+      width: 36,
+      height: 36,
       backgroundColor: '#f3f4f6',
-      borderRadius: 16,
+      borderRadius: 18,
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    closeButtonText: {
-      fontSize: 18,
-      color: '#6b7280',
-      fontWeight: 'bold',
     },
     form: {
       gap: 16,
@@ -803,13 +798,16 @@ RateSnap चुनने के लिए धन्यवाद!`
     return (
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <ThemedText style={styles.modalTitle}>{t('settings.theme')}</ThemedText>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setShowThemeSelection(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <ThemedText style={styles.closeButtonText}>×</ThemedText>
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
           </TouchableOpacity>
+          <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>{t('settings.theme')}</ThemedText>
+          <View style={{ width: 32 }} />
         </View>
 
         {[
@@ -849,13 +847,16 @@ RateSnap चुनने के लिए धन्यवाद!`
     return (
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <ThemedText style={styles.modalTitle}>{t('settings.notifications')}</ThemedText>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setShowNotificationSettings(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <ThemedText style={styles.closeButtonText}>×</ThemedText>
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
           </TouchableOpacity>
+          <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>{t('settings.notifications')}</ThemedText>
+          <View style={{ width: 32 }} />
         </View>
 
         <View style={{ gap: 16 }}>
@@ -904,13 +905,16 @@ RateSnap चुनने के लिए धन्यवाद!`
     return (
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <ThemedText style={styles.modalTitle}>{t('settings.termsOfUse')}</ThemedText>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setShowTerms(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <ThemedText style={styles.closeButtonText}>×</ThemedText>
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
           </TouchableOpacity>
+          <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>{t('settings.termsOfUse')}</ThemedText>
+          <View style={{ width: 32 }} />
         </View>
 
         <ScrollView style={{ maxHeight: 300 }}>

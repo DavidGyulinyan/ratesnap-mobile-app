@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,6 +65,7 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     {
       id: 'language',
       title: '🌍 ' + t('settings.language'),
+      onPress: () => {},
       component: (
         <View style={{ marginTop: 12 }}>
           <LanguageDropdown
@@ -126,15 +128,18 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
         style={[{
           flexDirection: 'column',
           justifyContent: 'space-around',
-          width: 24,
-          height: 24,
-          paddingHorizontal: 2,
+          width: 28,
+          height: 28,
+          paddingHorizontal: 4,
+          paddingVertical: 6,
         }, style]}
         onPress={() => setIsVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Open menu"
       >
-        <View style={{ height: 2, backgroundColor: "#1894EE", borderRadius: 1 }} />
-        <View style={{ height: 2, backgroundColor: "#1894EE", borderRadius: 1 }} />
-        <View style={{ height: 2, backgroundColor: "#1894EE", borderRadius: 1 }} />
+        <View style={{ height: 2, backgroundColor: primaryColor, borderRadius: 1 }} />
+        <View style={{ height: 2, backgroundColor: primaryColor, borderRadius: 1 }} />
+        <View style={{ height: 2, backgroundColor: primaryColor, borderRadius: 1 }} />
       </TouchableOpacity>
 
       {/* Menu Modal */}
@@ -147,38 +152,63 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
         <View style={{ flex: 1, backgroundColor: modalBackgroundColor, justifyContent: 'flex-end' }}>
           <View style={{
             backgroundColor: surfaceColor,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            height: '80%',
+            borderTopLeftRadius: 22,
+            borderTopRightRadius: 22,
+            maxHeight: '88%',
+            minHeight: '52%',
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 10,
-            elevation: 5,
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 16,
+            elevation: 8,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderLeftWidth: StyleSheet.hairlineWidth,
+            borderRightWidth: StyleSheet.hairlineWidth,
+            borderColor: borderColor,
           }}>
-            {/* Header */}
+            <View style={{
+              alignSelf: 'center',
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: borderColor,
+              marginTop: 10,
+              marginBottom: 6,
+              opacity: 0.6,
+            }} />
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: 20,
+              alignItems: 'flex-start',
+              paddingHorizontal: 20,
+              paddingBottom: 16,
+              borderBottomWidth: StyleSheet.hairlineWidth,
               borderBottomColor: borderColor,
             }}>
-              <ThemedText style={{ fontSize: 20, fontWeight: '700' }}>
-                RateSnap Menu
-              </ThemedText>
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <ThemedText style={{ fontSize: 20, fontWeight: '700', color: textColor }}>
+                  RateSnap
+                </ThemedText>
+                <ThemedText style={{ fontSize: 13, color: textSecondaryColor, marginTop: 4 }}>
+                  {t('app.subtitle')}
+                </ThemedText>
+              </View>
               <TouchableOpacity
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 36,
+                  height: 36,
                   backgroundColor: surfaceSecondaryColor,
-                  borderRadius: 16,
+                  borderRadius: 18,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: borderColor,
                 }}
                 onPress={() => setIsVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
               >
-                <ThemedText style={{ fontSize: 16, fontWeight: '500' }}>×</ThemedText>
+                <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
               </TouchableOpacity>
             </View>
 
@@ -191,12 +221,13 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
               {menuItems.map((item) => (
                 <TouchableOpacity
                   key={item.id}
+                  activeOpacity={0.88}
                   style={{
                     paddingVertical: 16,
                     paddingHorizontal: 20,
-                    marginBottom: 8,
-                    backgroundColor: item.danger ? addOpacity(errorColor, 0.20) : surfaceSecondaryColor,
-                    borderRadius: 12,
+                    marginBottom: 10,
+                    backgroundColor: item.danger ? addOpacity(errorColor, 0.14) : surfaceSecondaryColor,
+                    borderRadius: 16,
                     borderWidth: 1,
                     borderColor: borderColor,
                   }}
@@ -229,8 +260,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
                 alignItems: 'center',
                 marginTop: 20,
                 paddingTop: 20,
-                borderTopWidth: 1,
-                borderTopColor: "#1894EE",
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: borderColor,
               }}>
                 <ThemedText style={{
                   fontSize: 14,

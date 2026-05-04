@@ -91,7 +91,20 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.stepIndicator}>
+        <TouchableOpacity
+          style={styles.backNavButton}
+          onPress={() => currentStep > 0 && setCurrentStep(currentStep - 1)}
+          disabled={currentStep === 0}
+          accessibilityRole="button"
+          accessibilityLabel="Previous step"
+        >
+          {currentStep > 0 ? (
+            <Ionicons name="arrow-back" size={22} color="#64748b" />
+          ) : (
+            <View style={styles.backNavPlaceholder} />
+          )}
+        </TouchableOpacity>
+        <Text style={[styles.stepIndicator, styles.stepIndicatorCenter]}>
           {currentStep + 1} / {steps.length}
         </Text>
         <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
@@ -141,16 +154,30 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 20,
+    gap: 8,
+  },
+  backNavButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backNavPlaceholder: {
+    width: 22,
+    height: 22,
   },
   stepIndicator: {
     fontSize: 16,
     color: '#64748b',
     fontWeight: '600',
+  },
+  stepIndicatorCenter: {
+    flex: 1,
+    textAlign: 'center',
   },
   skipButton: {
     padding: 8,

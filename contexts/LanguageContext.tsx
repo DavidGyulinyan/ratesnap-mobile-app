@@ -23,6 +23,8 @@ const translations = {
     'dashboard.savedRates': 'Saved Rates',
     'dashboard.features': 'Dashboard Features',
     'dashboard.features.description': 'Complete currency conversion suite with advanced features',
+    'dashboard.features.scrollHint': 'Swipe this row left or right to see every feature',
+    'dashboard.features.tapNext': 'Tap for next',
     
     // Quick Actions
     'quick.action.converter': 'Currency Converter',
@@ -429,6 +431,8 @@ const translations = {
     'dashboard.savedRates': 'Պահպանված դրույքներ',
     'dashboard.features': 'Վահանակի հնարավորություններ',
     'dashboard.features.description': 'Արժույթի փոխարկման ամբողջական գործիքակազմ',
+    'dashboard.features.scrollHint': 'Սահեցրեք տողը ձախ կամ աջ՝ բոլոր հնարավորությունները տեսնելու համար',
+    'dashboard.features.tapNext': 'Հաջորդը',
     
     'quick.action.converter': 'Տարադրամի փոխանակում',
     'quick.action.converter.desc': 'Պրոֆեսիոնալ փոխարկիչ՝ լիարժեք գործառույթներով',
@@ -811,6 +815,8 @@ const translations = {
     'dashboard.savedRates': 'Сохраненные курсы',
     'dashboard.features': 'Возможности панели',
     'dashboard.features.description': 'Полный набор конвертации валют с расширенными функциями',
+    'dashboard.features.scrollHint': 'Свайпните ряд влево или вправо, чтобы увидеть все функции',
+    'dashboard.features.tapNext': 'Дальше',
     
     // Compact versions for header buttons    
     'quick.action.converter': 'Конвертер валют',
@@ -1165,6 +1171,8 @@ const translations = {
     'dashboard.savedRates': 'Tasas Guardadas',
     'dashboard.features': 'Características del Panel',
     'dashboard.features.description': 'Suite completa de conversión de moneda con funciones avanzadas',
+    'dashboard.features.scrollHint': 'Desliza esta fila a izquierda o derecha para ver todas las funciones',
+    'dashboard.features.tapNext': 'Siguiente',
     
     'quick.action.converter': 'Convertidor de Moneda',
     'quick.action.converter.desc': 'Convertidor profesional con todas las funciones',
@@ -1519,6 +1527,8 @@ const translations = {
     'dashboard.savedRates': '已保存汇率',
     'dashboard.features': '仪表板功能',
     'dashboard.features.description': '带高级功能的完整货币转换套件',
+    'dashboard.features.scrollHint': '左右滑动此栏可查看全部功能',
+    'dashboard.features.tapNext': '下一个',
     
     'quick.action.converter': '货币转换器',
     'quick.action.converter.desc': '带所有功能的专业转换器',
@@ -1871,6 +1881,8 @@ const translations = {
     'dashboard.savedRates': 'सेव्ड रेट्स',
     'dashboard.features': 'डैशबोर्ड फीचर्स',
     'dashboard.features.description': 'उन्नत सुविधाओं के साथ पूर्ण मुद्रा रूपांतरण सूट',
+    'dashboard.features.scrollHint': 'सभी फ़ीचर देखने के लिए इस पंक्ति को बाएँ या दाएँ स्वाइप करें',
+    'dashboard.features.tapNext': 'अगला',
     
     'quick.action.converter': 'मुद्रा कन्वर्टर',
     'quick.action.converter.desc': 'सभी सुविधाओं के साथ पेशेवर कन्वर्टर',

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, useWindowDimensions, ScrollView } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { ThemedView } from "./themed-view";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { useCalculatorHistory } from "@/hooks/useUserData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -25,7 +27,16 @@ export default function MathCalculator({
   const { user } = useAuth();
   const { calculatorHistory: supabaseHistory, saveCalculation, clearAllCalculations, loading: historyLoading } = useCalculatorHistory();
   const { t, tWithParams } = useLanguage();
-  
+  const backgroundColor = useThemeColor({}, "background");
+  const surfaceColor = useThemeColor({}, "surface");
+  const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
+  const textColor = useThemeColor({}, "text");
+  const textSecondaryColor = useThemeColor({}, "textSecondary");
+  const borderColor = useThemeColor({}, "border");
+  const primaryColor = useThemeColor({}, "primary");
+  const errorColor = useThemeColor({}, "error");
+  const successColor = useThemeColor({}, "success");
+
   const [display, setDisplay] = useState("0");
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
@@ -353,35 +364,80 @@ export default function MathCalculator({
   };
 
   const renderButton = (text: string, onPress: () => void, buttonType: string = "default", flex?: number) => {
-    let style = { ...styles.button, ...(flex && { flex }) };
+    const flexStyle = flex ? { flex } : {};
+    let style: Record<string, unknown> = {
+      ...styles.button,
+      ...flexStyle,
+      backgroundColor: surfaceColor,
+      borderColor,
+    };
 
     switch (buttonType) {
       case "operation":
-        style = { ...styles.button, ...styles.operationButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.operationButton,
+          ...flexStyle,
+          backgroundColor: primaryColor,
+          borderColor: primaryColor,
+        };
         break;
       case "clear":
-        style = { ...styles.button, ...styles.clearButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.clearButton,
+          ...flexStyle,
+          backgroundColor: errorColor,
+          borderColor: errorColor,
+        };
         break;
       case "delete":
-        style = { ...styles.button, ...styles.deleteButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.deleteButton,
+          ...flexStyle,
+          backgroundColor: surfaceSecondaryColor,
+          borderColor,
+        };
         break;
       case "equals":
-        style = { ...styles.button, ...styles.equalsButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.equalsButton,
+          ...flexStyle,
+          backgroundColor: successColor,
+          borderColor: successColor,
+        };
         break;
       case "memory":
-        style = { ...styles.button, ...styles.memoryButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.memoryButton,
+          ...flexStyle,
+        };
         break;
       case "financial":
-        style = { ...styles.button, ...styles.financialButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.financialButton,
+          ...flexStyle,
+        };
         break;
       case "utility":
-        style = { ...styles.button, ...styles.utilityButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.utilityButton,
+          ...flexStyle,
+        };
         break;
       case "history":
-        style = { ...styles.button, ...styles.historyButton, ...(flex && { flex }) };
+        style = {
+          ...styles.button,
+          ...styles.historyButton,
+          ...flexStyle,
+        };
         break;
       default:
-        if (flex) style.flex = flex;
         break;
     }
 
@@ -392,7 +448,7 @@ export default function MathCalculator({
         case "clear":
           return <Text style={styles.clearButtonText}>{text}</Text>;
         case "delete":
-          return <Text style={styles.deleteButtonText}>{text}</Text>;
+          return <Text style={[styles.deleteButtonText, { color: textColor }]}>{text}</Text>;
         case "equals":
           return <Text style={styles.equalsButtonText}>{text}</Text>;
         case "memory":
@@ -401,7 +457,7 @@ export default function MathCalculator({
         case "history":
           return <Text style={styles.specialButtonText}>{text}</Text>;
         default:
-          return <Text style={styles.buttonText}>{text}</Text>;
+          return <Text style={[styles.buttonText, { color: textColor }]}>{text}</Text>;
       }
     };
 
@@ -449,22 +505,30 @@ export default function MathCalculator({
   };
 
   const RoundingOptions = () => (
-    <View style={styles.optionsContainer}>
-      <Text style={styles.optionsTitle}>{t('calculator.roundingOptions')}</Text>
+    <View style={[styles.optionsContainer, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
+      <Text style={[styles.optionsTitle, { color: textColor }]}>{t('calculator.roundingOptions')}</Text>
       <View style={styles.optionsRow}>
         {[0, 1, 2, 3, 4].map(decimals => (
           <TouchableOpacity
             key={decimals}
             style={[
               styles.optionButton,
-              roundingDecimalPlaces === decimals && styles.optionButtonActive
+              { backgroundColor: surfaceColor, borderColor },
+              roundingDecimalPlaces === decimals && {
+                backgroundColor: primaryColor,
+                borderColor: primaryColor,
+              },
             ]}
             onPress={() => setRoundingDecimalPlaces(decimals)}
           >
-            <Text style={[
-              styles.optionButtonText,
-              roundingDecimalPlaces === decimals && styles.optionButtonTextActive
-            ]}>
+            <Text
+              style={[
+                styles.optionButtonText,
+                roundingDecimalPlaces === decimals
+                  ? styles.optionButtonTextActive
+                  : { color: textColor },
+              ]}
+            >
               {decimals}
             </Text>
           </TouchableOpacity>
@@ -501,12 +565,12 @@ export default function MathCalculator({
       : calculationHistory;
 
     return (
-      <View style={styles.historyContainer}>
+      <View style={[styles.historyContainer, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
         <View style={styles.historyHeader}>
-          <Text style={styles.historyTitle}>{t('calculator.calculationHistory')}</Text>
+          <Text style={[styles.historyTitle, { color: textColor }]}>{t('calculator.calculationHistory')}</Text>
           {displayHistory.length > 0 && (
             <TouchableOpacity
-              style={styles.clearHistoryButton}
+              style={[styles.clearHistoryButton, { backgroundColor: errorColor, borderColor: errorColor }]}
               onPress={clearHistory}
               activeOpacity={0.8}
             >
@@ -516,11 +580,11 @@ export default function MathCalculator({
         </View>
         <ScrollView style={styles.historyList}>
           {displayHistory.length === 0 ? (
-            <Text style={styles.historyEmpty}>{t('calculator.noCalculations')}</Text>
+            <Text style={[styles.historyEmpty, { color: textSecondaryColor }]}>{t('calculator.noCalculations')}</Text>
           ) : (
             displayHistory.map((calc, index) => (
               <View key={index}>
-                <Text style={styles.historyItem}>{calc}</Text>
+                <Text style={[styles.historyItem, { color: textColor, borderBottomColor: borderColor }]}>{calc}</Text>
               </View>
             ))
           )}
@@ -536,7 +600,7 @@ export default function MathCalculator({
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
-      <ThemedView style={styles.container}>
+      <ThemedView style={[styles.container, { backgroundColor }]}>
         {!inModal && (
           <View style={[
             styles.header,
@@ -545,13 +609,26 @@ export default function MathCalculator({
               marginBottom: getResponsiveValue(16, 24, 32),
             }
           ]}>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>x</Text>
+            <TouchableOpacity
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              style={[
+                styles.closeButton,
+                {
+                  backgroundColor: surfaceSecondaryColor,
+                  borderColor,
+                  borderWidth: 1,
+                },
+              ]}
+            >
+              <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
             </TouchableOpacity>
             <Text style={[
               styles.title,
               {
                 fontSize: getResponsiveValue(20, 24, 28),
+                color: textColor,
               }
             ]}>{t('calculator.title')}</Text>
             <View style={{ width: 60 }} />
@@ -570,6 +647,8 @@ export default function MathCalculator({
               minHeight: getResponsiveValue(100, 120, 140),
               padding: getResponsiveValue(20, 26, 32),
               borderRadius: getResponsiveValue(16, 20, 24),
+              backgroundColor: surfaceSecondaryColor,
+              borderColor,
             }
           ]}>
             <Text style={[
@@ -577,6 +656,7 @@ export default function MathCalculator({
               {
                 fontSize: getDisplayFontSize(),
                 lineHeight: getDisplayFontSize() * 1.2,
+                color: textColor,
               }
             ]}>{getDisplayText()}</Text>
           </View>
@@ -586,28 +666,48 @@ export default function MathCalculator({
         <View style={styles.toolbar}>
           <View style={styles.toolbarRow}>
             <TouchableOpacity
-              style={styles.toolbarButton}
+              style={[
+                styles.toolbarButton,
+                { backgroundColor: surfaceSecondaryColor, borderColor },
+              ]}
               onPress={() => setShowAdvanced(!showAdvanced)}
             >
-              <Text style={styles.toolbarButtonText}>{showAdvanced ? t('calculator.basic') : t('calculator.advanced')}</Text>
+              <Text style={[styles.toolbarButtonText, { color: textColor }]}>
+                {showAdvanced ? t('calculator.basic') : t('calculator.advanced')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.toolbarButton}
+              style={[
+                styles.toolbarButton,
+                { backgroundColor: surfaceSecondaryColor, borderColor },
+              ]}
               onPress={() => setShowHistory(!showHistory)}
             >
-              <Text style={styles.toolbarButtonText}>{t('calculator.history')}</Text>
+              <Text style={[styles.toolbarButtonText, { color: textColor }]}>
+                {t('calculator.history')}
+              </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.toolbarRow}>
             <TouchableOpacity
-              style={[styles.toolbarButton, styles.roundingButton]}
+              style={[
+                styles.toolbarButton,
+                styles.roundingButton,
+                { backgroundColor: surfaceSecondaryColor, borderColor },
+              ]}
               onPress={() => setShowRoundingOptions(!showRoundingOptions)}
             >
-              <Text style={[styles.toolbarButtonText, styles.roundingButtonText]}>{tWithParams('calculator.rounding', { decimals: roundingDecimalPlaces })}</Text>
+              <Text style={[styles.toolbarButtonText, styles.roundingButtonText, { color: textColor }]}>
+                {tWithParams('calculator.rounding', { decimals: roundingDecimalPlaces })}
+              </Text>
             </TouchableOpacity>
             {onAddToConverter && (
               <TouchableOpacity
-                style={[styles.toolbarButton, styles.addToConverterButton]}
+                style={[
+                  styles.toolbarButton,
+                  styles.addToConverterButton,
+                  { backgroundColor: successColor, borderColor: successColor },
+                ]}
                 onPress={() => {
                   const result = parseFloat(display);
                   if (!isNaN(result) && result !== 0) {
@@ -834,17 +934,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   closeButton: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     backgroundColor: '#f3f4f6',
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#6b7280',
-    fontWeight: 'bold',
   },
   title: {
     color: "#ffffff",

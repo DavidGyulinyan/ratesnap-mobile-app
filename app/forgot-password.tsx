@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import Logo from '@/components/Logo';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
@@ -47,10 +48,20 @@ export default function ForgotPasswordScreen() {
     content: {
       flex: 1,
       paddingHorizontal: 24,
-      paddingTop: 60,
+      paddingTop: 24,
       paddingBottom: 40,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    topBar: {
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    backNavButton: {
+      padding: 8,
+      marginLeft: -8,
     },
 
     title: {
@@ -218,6 +229,16 @@ export default function ForgotPasswordScreen() {
         <StatusBar barStyle="dark-content" />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.content}>
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backNavButton}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="arrow-back" size={24} color={textColor} />
+              </TouchableOpacity>
+            </View>
             <Logo size={48} showText={true} textSize={24} />
             <Text style={styles.title}>Check Your Email</Text>
             <Text style={styles.subtitle}>
@@ -259,6 +280,16 @@ export default function ForgotPasswordScreen() {
       <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backNavButton}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="arrow-back" size={24} color={textColor} />
+            </TouchableOpacity>
+          </View>
           <Logo size={48} showText={true} textSize={24} />
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>

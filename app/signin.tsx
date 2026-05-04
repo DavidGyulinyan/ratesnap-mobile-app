@@ -94,10 +94,20 @@ export default function SignInScreen() {
     content: {
       flex: 1,
       paddingHorizontal: 24,
-      paddingTop: 60,
+      paddingTop: 24,
       paddingBottom: 40,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    topBar: {
+      width: '100%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    backNavButton: {
+      padding: 8,
+      marginLeft: -8,
     },
 
     // Card layout
@@ -414,6 +424,16 @@ export default function SignInScreen() {
       <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backNavButton}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="arrow-back" size={24} color={textColor} />
+            </TouchableOpacity>
+          </View>
           <Logo size={48} showText={true} textSize={24} />
            <Text style={styles.title}>{t(welcomeTitle)}</Text>
            <Text style={styles.subtitle}>{t('signin.subtitle')}</Text>

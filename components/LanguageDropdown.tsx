@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
@@ -88,28 +89,26 @@ export default function LanguageDropdown({
     },
     dropdownHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 20,
+      padding: 16,
+      paddingHorizontal: 12,
       borderBottomWidth: 1,
+      gap: 8,
     },
     dropdownTitle: {
-      fontSize: 20,
+      fontSize: 18,
       fontWeight: '700',
       letterSpacing: 0.3,
     },
-    closeButton: {
-      width: 32,
-      height: 32,
-      backgroundColor: '#f3f4f6',
-      borderRadius: 16,
+    backButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    closeButtonText: {
-      fontSize: 18,
-      color: '#6b7280',
-      fontWeight: 'bold',
+    headerSpacer: {
+      width: 36,
     },
     languageList: {
       maxHeight: 400,
@@ -238,16 +237,19 @@ export default function LanguageDropdown({
               }
             ]}
           >
-            <View style={styles.dropdownHeader}>
-              <ThemedText style={[styles.dropdownTitle, { color: colors.text }]}>
+            <View style={[styles.dropdownHeader, { borderBottomColor: colors.icon }]}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => setIsDropdownVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="arrow-back" size={22} color={colors.icon} />
+              </TouchableOpacity>
+              <ThemedText style={[styles.dropdownTitle, { color: colors.text, flex: 1, textAlign: 'center' }]}>
                 {t('settings.language')}
               </ThemedText>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setIsDropdownVisible(false)}
-              >
-                <ThemedText style={styles.closeButtonText}>×</ThemedText>
-              </TouchableOpacity>
+              <View style={styles.headerSpacer} />
             </View>
             
             <FlatList

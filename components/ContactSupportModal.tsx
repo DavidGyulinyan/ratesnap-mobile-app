@@ -8,6 +8,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -87,10 +88,9 @@ export default function ContactSupportModal({
     },
     modalHeader: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 20,
-      paddingRight: 2,
+      gap: 8,
     },
     modalTitle: {
       fontSize: 20,
@@ -98,17 +98,12 @@ export default function ContactSupportModal({
       color: textColor,
     },
     closeButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       backgroundColor: textSecondaryColor + "20",
       alignItems: "center",
       justifyContent: "center",
-    },
-    closeButtonText: {
-      fontSize: 18,
-      color: textSecondaryColor,
-      fontWeight: "600",
     },
     input: {
       borderWidth: 1,
@@ -151,16 +146,19 @@ export default function ContactSupportModal({
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.modalHeader}>
-            <ThemedText style={styles.modalTitle}>
-              {t("contactSupport.title")}
-            </ThemedText>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={onClose}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
             >
-              <ThemedText style={styles.closeButtonText}>×</ThemedText>
+              <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
             </TouchableOpacity>
+            <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: "center" }]}>
+              {t("contactSupport.title")}
+            </ThemedText>
+            <View style={{ width: 32 }} />
           </View>
 
           {!user && (

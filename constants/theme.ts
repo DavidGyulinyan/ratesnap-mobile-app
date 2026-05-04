@@ -1,18 +1,29 @@
 /**
- * Modern, user-friendly color palette and design system
- * Optimized for better UX and visual appeal
+ * Design tokens: colors, radii, and spacing for a consistent UI.
  */
 
 import { Platform } from "react-native";
 
-// Modern color palette
-const primary = "#6366f1"; // Modern indigo
-const primaryDark = "#4f46e5";
-const secondary = "#06b6d4"; // Cyan
-const accent = "#f59e0b"; // Amber
-const success = "#10b981"; // Emerald
-const warning = "#f59e0b";
-const error = "#ef4444"; // Red
+const primary = "#4f46e5";
+const primaryDark = "#4338ca";
+const secondary = "#0891b2";
+const accent = "#d97706";
+const success = "#059669";
+const warning = "#d97706";
+const error = "#dc2626";
+
+/** Shared layout tokens — use for padding, gaps, and corner radius. */
+export const Layout = {
+  radiusSm: 10,
+  radiusMd: 14,
+  radiusLg: 20,
+  radiusXl: 28,
+  spaceXs: 6,
+  spaceSm: 10,
+  spaceMd: 16,
+  spaceLg: 22,
+  spaceXl: 28,
+};
 
 export const Colors = {
   light: {
@@ -23,9 +34,9 @@ export const Colors = {
     colorAccent: accent,
     
     // Background colors
-    background: "#fafbff",
+    background: "#f1f4fb",
     surface: "#ffffff",
-    surfaceSecondary: "#f8fafc",
+    surfaceSecondary: "#f4f6fb",
     cardBackground: "#ffffff",
     
     // Text colors
@@ -42,9 +53,9 @@ export const Colors = {
     error: error,
     
     // Border and dividers
-    border: "#e2e8f0",
-    borderLight: "#f1f5f9",
-    divider: "#e2e8f0",
+    border: "#e5e9f2",
+    borderLight: "#eef1f8",
+    divider: "#e5e9f2",
     
     // Icon colors
     icon: "#64748b",
@@ -73,11 +84,11 @@ export const Colors = {
     colorAccent: accent,
     
     // Background colors
-    background: "#0f172a",
-    surface: "#1e293b",
-    surfaceSecondary: "#334155",
-    cardBackground: "#1e293b",
-    modalBackground: "rgba(0, 0, 0, 0.7)",
+    background: "#0c1222",
+    surface: "#151d2e",
+    surfaceSecondary: "#1e293b",
+    cardBackground: "#151d2e",
+    modalBackground: "rgba(0, 0, 0, 0.72)",
     
     // Text colors
     text: "#f1f5f9",

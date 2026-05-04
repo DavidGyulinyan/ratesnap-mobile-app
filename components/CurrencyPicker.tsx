@@ -13,6 +13,8 @@ import { ThemedText } from "./themed-text";
 import CurrencyFlag from "./CurrencyFlag";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 interface CurrencyPickerProps {
   visible: boolean;
@@ -184,8 +186,10 @@ export default function CurrencyPicker({
   const primaryColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
+  const textInverseColor = useThemeColor({}, 'textInverse');
   const borderColor = useThemeColor({}, 'border');
   const shadowColor = '#000000'; // Use black for shadows
+  const insets = useSafeAreaInsets();
 
   // Load frequently used currencies from storage
   const loadFrequentlyUsedCurrencies = async () => {
@@ -286,22 +290,25 @@ export default function CurrencyPicker({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <ThemedView style={styles.container}>
+      <ThemedView style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 8 }]}>
         <View style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
+          <TouchableOpacity
+            style={[{ backgroundColor: surfaceSecondaryColor, shadowColor: shadowColor }, styles.backButton]}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
+          </TouchableOpacity>
+          <ThemedText type="title" style={[styles.title, { color: textColor }]}>
             {t('picker.selectCurrency')}
           </ThemedText>
-          <TouchableOpacity
-            style={[{ backgroundColor: surfaceSecondaryColor, shadowColor: shadowColor }, styles.closeButton]}
-            onPress={onClose}
-          >
-            <ThemedText style={[{ color: textColor }, styles.closeButtonText]}>×</ThemedText>
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
         </View>
         
         {/* Search Input */}
         <TextInput
-          style={[{ backgroundColor: surfaceColor, borderColor: borderColor, color: textColor }, styles.searchInput]}
+          style={[{ backgroundColor: surfaceSecondaryColor, borderColor: borderColor, color: textColor }, styles.searchInput]}
           placeholder={t('picker.searchCurrencies')}
           value={search}
           onChangeText={setSearch}
@@ -321,10 +328,12 @@ export default function CurrencyPicker({
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
-                { backgroundColor: surfaceColor, borderBottomColor: borderColor },
+                { backgroundColor: surfaceColor, borderColor: borderColor },
                 styles.currencyItem,
-                item.code === selectedCurrency && { backgroundColor: surfaceSecondaryColor, borderBottomColor: primaryColor },
-                item.usageCount > 0 && !search.trim() && { backgroundColor: surfaceSecondaryColor, borderBottomColor: primaryColor },
+                item.code === selectedCurrency && {
+                  backgroundColor: surfaceSecondaryColor,
+                  borderColor: primaryColor,
+                },
               ]}
               onPress={() => handleSelect(item.code)}
             >
@@ -342,7 +351,7 @@ export default function CurrencyPicker({
                       </ThemedText>
                       {item.usageCount > 0 && (
                         <View style={[{ backgroundColor: primaryColor }, styles.usageIndicator]}>
-                          <ThemedText style={[{ color: textColor }, styles.usageCount]}>
+                          <ThemedText style={[{ color: textInverseColor }, styles.usageCount]}>
                             {item.usageCount}
                           </ThemedText>
                         </View>
@@ -379,47 +388,49 @@ export default function CurrencyPicker({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     marginBottom: 20,
+    gap: 8,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     flex: 1,
-    fontSize: 20,
-    paddingRight: 16,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeButtonText: {
     fontSize: 18,
-    color: '#6b7280',
-    fontWeight: 'bold',
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  headerSpacer: {
+    width: 36,
   },
   searchInput: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 15,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     fontSize: 16,
     marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   list: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   currencyItem: {
-    padding: 15,
-    borderBottomWidth: 1,
+    padding: 14,
+    marginBottom: 8,
+    borderRadius: 14,
+    borderBottomWidth: 0,
+    borderWidth: 1,
   },
   selectedItem: {
     backgroundColor: "#f0fdf4",

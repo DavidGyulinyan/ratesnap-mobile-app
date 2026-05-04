@@ -102,8 +102,10 @@ export default function AuthPromptModal({
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
           >
-            <Text style={styles.closeButtonText}>×</Text>
+            <Ionicons name="arrow-back" size={24} color="#64748b" />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
@@ -175,20 +177,15 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   closeButton: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     backgroundColor: '#f3f4f6',
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
     top: 16,
-    right: 16,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#6b7280',
-    fontWeight: 'bold',
+    left: 16,
   },
   iconContainer: {
     marginTop: 20,
