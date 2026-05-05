@@ -477,7 +477,7 @@ export class UserDataService {
         .insert({
           user_id: user.id,
           expression: expression.trim(),
-          result: result
+          result: result,
         })
         .select()
         .single();

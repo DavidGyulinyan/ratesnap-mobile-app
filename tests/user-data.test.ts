@@ -267,7 +267,7 @@ describe('UserDataService', () => {
         calculation_expression: '10 + 5 = 15',
         result: 15,
         calculation_type: 'basic',
-        metadata: { memory: 0, roundingDecimalPlaces: 2 },
+        metadata: { roundingDecimalPlaces: 2 },
         created_at: '2025-11-13T21:00:00Z',
       };
 
@@ -287,7 +287,7 @@ describe('UserDataService', () => {
       const { getSupabaseClient } = require('../lib/supabase-safe');
       getSupabaseClient.mockReturnValue(mockSupabase);
 
-      const result = await UserDataService.saveCalculatorHistory('10 + 5', 15, 'basic', { memory: 0, roundingDecimalPlaces: 2 });
+      const result = await UserDataService.saveCalculatorHistory('10 + 5', 15, 'basic', { roundingDecimalPlaces: 2 });
       
       expect(result).toEqual(mockCalculatorHistory);
       expect(mockSupabase.from).toHaveBeenCalledWith('math_calculator_history');
