@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "exratio-mobile",
-    "slug": "exratio-mobile",
+    "slug": "ratesnap-mobile",
     "owner": "davidgyulinyan",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "exratio-mobile",
     "userInterfaceStyle": "automatic",
-    "jsEngine": "jsc",
+    "jsEngine": "hermes",
 
     "ios": {
       "supportsTablet": true,
@@ -29,8 +29,9 @@
 
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "intentFilters": [
         {

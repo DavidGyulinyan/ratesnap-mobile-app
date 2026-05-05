@@ -25,7 +25,6 @@ const translations = {
     'dashboard.savedRates': 'Saved Rates',
     'dashboard.features': 'Dashboard Features',
     'dashboard.features.description': 'Complete currency conversion suite with advanced features',
-    'dashboard.features.scrollHint': 'Swipe this row left or right to see every feature',
     'dashboard.features.tapNext': 'Tap for next',
     
     // Quick Actions
@@ -435,14 +434,13 @@ const translations = {
     'dashboard.savedRates': 'Պահպանված դրույքներ',
     'dashboard.features': 'Վահանակի հնարավորություններ',
     'dashboard.features.description': 'Արժույթի փոխարկման ամբողջական գործիքակազմ',
-    'dashboard.features.scrollHint': 'Սահեցրեք տողը ձախ կամ աջ՝ բոլոր հնարավորությունները տեսնելու համար',
     'dashboard.features.tapNext': 'Հաջորդը',
     
     'quick.action.converter': 'Տարադրամի փոխանակում',
-    'quick.action.converter.desc': 'Պրոֆեսիոնալ փոխարկիչ՝ լիարժեք գործառույթներով',
+    'quick.action.converter.desc': 'Պրոֆեսիոնալ փոխանակում՝ լիարժեք գործառույթներով',
     'quick.action.multiCurrency': 'Բազմարժույթ փոխանակում',
     'quick.action.multiCurrency.desc': 'Արագ փոխարկում 20 արժույթով',
-    'quick.action.multiCurrency.hide': 'Թաքցնել փոխարկման գործիքը',
+    'quick.action.multiCurrency.hide': 'Թաքցնել փոխանակման գործիքը',
     'quick.action.rateAlerts': 'Փոխարժեքի ծանուցումներ',
     'quick.action.rateAlerts.desc': 'Արժույթի մոնիտորինգի համար նշեք թիրախային դրույքներ',
     'quick.action.rateAlerts.hide': 'Թաքցնել ծանուցումները',
@@ -673,10 +671,10 @@ const translations = {
     'error.duplicateCurrency': 'Կրկնվող արժույթ',
     
     // Features
-    'feature.multiCurrency.title': 'Բազմարժույթ փոխարկիչ',
-    'feature.multiCurrency.desc': 'Արագ փոխարկում բազմաթիվ արժույթներով իրական ժամանակի դրույքներով',
-    'feature.calculator.title': 'Հաշվիչի ինտեգրում',
-    'feature.calculator.desc': 'Ներկառուցված հաշվիչ գումարի հաշվարկների համար',
+    'feature.multiCurrency.title': 'Բազմարժույթ հաշվիչ',
+    'feature.multiCurrency.desc': 'Արագ հաշվարկ բազմաթիվ արժույթներով՝ թարմացված փոխարժեքով։',
+    'feature.calculator.title': 'Հաշվիչ',
+    'feature.calculator.desc': 'Ներկառուցված հաշվիչ մաթեմատիկական հաշվարկների համար',
     
     // Calculator
     'calculator.title': 'Հաշվիչ',
@@ -708,12 +706,12 @@ const translations = {
     'calculator.buttonTax20': '20% Հարկ',
     'calculator.buttonDiscount10': '10% Զեղչ',
     'calculator.buttonDiscount25': '25% Զեղչ',
-    'feature.offline.title': 'Անցանց ռեժիմ',
-    'feature.offline.desc': 'Աշխատում է առանց ինտերնետի` օգտագործելով քեշավորված դրույքները',
+    'feature.offline.title': 'Առցանց ռեժիմ',
+    'feature.offline.desc': 'Աշխատում է առանց ինտերնետի` օգտագործելով քեշավորված արժեքները',
     'feature.location.title': 'Ավտոմատ տեղորոշում',
-    'feature.location.desc': 'Ավտոմատ որոշում է երկիրը և ընտրում լռելյայն արժույթը',
+    'feature.location.desc': 'Ավտոմատ որոշում է երկիրը և ընտրում արժույթը',
     'feature.caching.title': 'Խելացի քեշավորում',
-    'feature.caching.desc': 'Դրույքի քեշավորում առանց ինտերնետի',
+    'feature.caching.desc': 'Արժեքների քեշավորում առանց ինտերնետի',
     
     'footer.copyright': '© 2025 {appTitle} - {suiteName}',
     'footer.suiteName': 'Արժույթի մասնագիտական փոխանակում',
@@ -821,7 +819,6 @@ const translations = {
     'dashboard.savedRates': 'Сохраненные курсы',
     'dashboard.features': 'Возможности панели',
     'dashboard.features.description': 'Полный набор конвертации валют с расширенными функциями',
-    'dashboard.features.scrollHint': 'Свайпните ряд влево или вправо, чтобы увидеть все функции',
     'dashboard.features.tapNext': 'Дальше',
     
     // Compact versions for header buttons    
@@ -1179,7 +1176,6 @@ const translations = {
     'dashboard.savedRates': 'Tasas Guardadas',
     'dashboard.features': 'Características del Panel',
     'dashboard.features.description': 'Suite completa de conversión de moneda con funciones avanzadas',
-    'dashboard.features.scrollHint': 'Desliza esta fila a izquierda o derecha para ver todas las funciones',
     'dashboard.features.tapNext': 'Siguiente',
     
     'quick.action.converter': 'Convertidor de Moneda',
@@ -1537,7 +1533,6 @@ const translations = {
     'dashboard.savedRates': '已保存汇率',
     'dashboard.features': '仪表板功能',
     'dashboard.features.description': '带高级功能的完整货币转换套件',
-    'dashboard.features.scrollHint': '左右滑动此栏可查看全部功能',
     'dashboard.features.tapNext': '下一个',
     
     'quick.action.converter': '货币转换器',
@@ -1893,7 +1888,6 @@ const translations = {
     'dashboard.savedRates': 'सेव्ड रेट्स',
     'dashboard.features': 'डैशबोर्ड फीचर्स',
     'dashboard.features.description': 'उन्नत सुविधाओं के साथ पूर्ण मुद्रा रूपांतरण सूट',
-    'dashboard.features.scrollHint': 'सभी फ़ीचर देखने के लिए इस पंक्ति को बाएँ या दाएँ स्वाइप करें',
     'dashboard.features.tapNext': 'अगला',
     
     'quick.action.converter': 'मुद्रा कन्वर्टर',
