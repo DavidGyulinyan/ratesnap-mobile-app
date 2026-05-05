@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemedText } from "./themed-text";
 import CurrencyFlag from "./CurrencyFlag";
 import CurrencyPicker from "./CurrencyPicker";
+import DeleteAllButton from "./DeleteAllButton";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useConverterHistory } from "@/hooks/useUserData";
@@ -100,6 +101,29 @@ export default function MultiCurrencyConverter({
     targets: conversionTargets.map((t) => t.currency),
     hasCurrenciesData: !!currenciesData,
   });
+
+  // #region agent log
+  fetch('http://127.0.0.1:7338/ingest/0d9f3a3e-388a-412c-97f8-11d612315339',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'X-Debug-Session-Id':'f5505d',
+    },
+    body:JSON.stringify({
+      sessionId:'f5505d',
+      runId:'post-fix-1',
+      hypothesisId:'H1',
+      location:'MultiCurrencyConverter.tsx:90',
+      message:'MultiCurrencyConverter render',
+      data:{
+        targetCount:conversionTargets.length,
+        fromCurrency,
+        hasDeleteAllButton:!!DeleteAllButton,
+      },
+      timestamp:Date.now(),
+    }),
+  }).catch(()=>{});
+  // #endregion
 
   // Load available currencies
   useEffect(() => {
@@ -1294,17 +1318,17 @@ const styles = StyleSheet.create({
   },
   gridContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    padding: 4,
+    flexWrap: "nowrap",
+    paddingVertical: 4,
   },
   targetItem: {
-    width: '45%',
-    aspectRatio: 1,
-    justifyContent: "center",
+    width: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
-    padding: 12,
-    margin: 4,
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginVertical: 4,
     borderWidth: 1,
   },
   targetContent: {
@@ -1316,9 +1340,10 @@ const styles = StyleSheet.create({
   targetCurrencyButton: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
-    padding: 8,
-    borderRadius: 8,
+    flexGrow: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     borderWidth: 1,
   },
   targetCurrencyText: {
@@ -1329,7 +1354,8 @@ const styles = StyleSheet.create({
   conversionResult: {
     marginHorizontal: 12,
     minWidth: 80,
-    alignItems: "center",
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   conversionAmount: {
     fontSize: 12,

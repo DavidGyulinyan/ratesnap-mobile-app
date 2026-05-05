@@ -3,6 +3,8 @@ import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getSupabaseClient } from '@/lib/supabase-safe';
 import { Ionicons } from '@expo/vector-icons';
+import * as AuthSession from 'expo-auth-session';
+import * as Linking from 'expo-linking';
 
 export default function AuthCallbackScreen() {
   const router = useRouter();
@@ -19,8 +21,65 @@ export default function AuthCallbackScreen() {
           throw new Error('Supabase client not available');
         }
 
-        // In React Native, the session should be available through getSession
-        // since the OAuth flow automatically handles the redirect
+        const incomingUrl = await Linking.getInitialURL();
+        if (incomingUrl) {
+          const { params, errorCode } = AuthSession.parse(incomingUrl);
+
+          if (errorCode) {
+            throw new Error(`OAuth callback error: ${errorCode}`);
+          }
+
+          const typeParam = params?.type;
+          const type =
+            typeof typeParam === 'string'
+              ? typeParam
+              : Array.isArray(typeParam)
+              ? typeParam[0]
+              : undefined;
+
+          const codeParam = params?.code;
+          const code =
+            typeof codeParam === 'string'
+              ? codeParam
+              : Array.isArray(codeParam)
+              ? codeParam[0]
+              : undefined;
+
+          if (code) {
+            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            if (exchangeError) {
+              throw exchangeError;
+            }
+          } else if (type === 'recovery') {
+            const accessTokenParam = params?.access_token;
+            const refreshTokenParam = params?.refresh_token;
+            const accessToken =
+              typeof accessTokenParam === 'string'
+                ? accessTokenParam
+                : Array.isArray(accessTokenParam)
+                ? accessTokenParam[0]
+                : undefined;
+            const refreshToken =
+              typeof refreshTokenParam === 'string'
+                ? refreshTokenParam
+                : Array.isArray(refreshTokenParam)
+                ? refreshTokenParam[0]
+                : undefined;
+
+            if (accessToken && refreshToken) {
+              const { error: setSessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+              if (setSessionError) {
+                throw setSessionError;
+              }
+            }
+            router.replace('/reset-password');
+            return;
+          }
+        }
+
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {

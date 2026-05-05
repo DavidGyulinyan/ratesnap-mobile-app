@@ -9,6 +9,7 @@ import SavedRates from "@/components/SavedRates";
 import RateAlertManager from "@/components/RateAlertManager";
 import MathCalculator from "@/components/MathCalculator";
 import OnboardingGuide from "@/components/OnboardingGuide";
+import CurrencyRateCharts from "@/components/CurrencyRateCharts";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -120,6 +121,7 @@ export default function HomeScreen() {
   const [showRateAlerts, setShowRateAlerts] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   const [showConverter, setShowConverter] = useState(false);
+  const [showCharts, setShowCharts] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currenciesData, setCurrenciesData] = useState<any>(null);
@@ -536,6 +538,13 @@ export default function HomeScreen() {
                     active: showRateAlerts,
                     onPress: () => setShowRateAlerts(!showRateAlerts),
                   },
+                  {
+                    id: "charts" as const,
+                    labelKey: "quick.action.charts",
+                    icon: "trending-up-outline" as const,
+                    active: showCharts,
+                    onPress: () => setShowCharts(!showCharts),
+                  },
                 ] as const
               ).map((item) => (
                 <TouchableOpacity
@@ -685,6 +694,16 @@ export default function HomeScreen() {
             }}
             currenciesData={currenciesData}
             inModal={true}
+          />
+        </QuickActionModal>
+
+        <QuickActionModal
+          visible={showCharts}
+          onClose={() => setShowCharts(false)}
+          title={t("charts.title")}
+        >
+          <CurrencyRateCharts
+            currencies={currencyList.length ? currencyList : POPULAR_CURRENCIES}
           />
         </QuickActionModal>
 

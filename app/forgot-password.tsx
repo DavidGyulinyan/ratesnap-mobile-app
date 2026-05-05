@@ -193,24 +193,26 @@ export default function ForgotPasswordScreen() {
   }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor]);
 
   const handleResetPassword = async () => {
-    if (!email) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
       Alert.alert('Error', 'Please enter your email address');
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(normalizedEmail)) {
       Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 
     setLoading(true);
     try {
-      const { error } = await resetPassword(email);
+      const { error } = await resetPassword(normalizedEmail);
       if (error) {
-        Alert.alert('Error', 'Failed to send reset email. Please try again.');
+        Alert.alert('Error', error.message || 'Failed to send reset email. Please try again.');
       } else {
+        setEmail(normalizedEmail);
         setEmailSent(true);
       }
     } catch (error) {
