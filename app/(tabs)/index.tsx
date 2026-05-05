@@ -325,7 +325,7 @@ export default function HomeScreen() {
                   type="subtitle"
                   style={[styles.heroTitle, { color: textColor }]}
                 >
-                  RateSnap
+                  ExRatio
                 </ThemedText>
                 <ThemedText
                   type="caption"
@@ -389,31 +389,6 @@ export default function HomeScreen() {
                   {t("dashboard.features.description")}
                 </ThemedText>
               </View>
-            </View>
-
-            <View
-              style={styles.featuresScrollCue}
-              accessibilityRole="text"
-              accessibilityLabel={t("dashboard.features.scrollHint")}
-            >
-              <View
-                style={[
-                  styles.featuresScrollCueIconWrap,
-                  { backgroundColor: surfaceColor, borderColor: borderColor },
-                ]}
-              >
-                <Ionicons
-                  name="swap-horizontal"
-                  size={18}
-                  color={primaryColor}
-                />
-              </View>
-              <ThemedText
-                type="caption"
-                style={[styles.featuresScrollCueText, { color: textSecondaryColor }]}
-              >
-                {t("dashboard.features.scrollHint")}
-              </ThemedText>
             </View>
 
             <ScrollView
@@ -496,7 +471,6 @@ export default function HomeScreen() {
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel={t("dashboard.features.tapNext")}
-              accessibilityHint={t("dashboard.features.scrollHint")}
             >
               <Ionicons
                 name="chevron-back"

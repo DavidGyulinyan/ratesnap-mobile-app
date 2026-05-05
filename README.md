@@ -116,7 +116,7 @@ exratio-mobile/
 │   └── providers/           # API providers
 │       ├── ExchangeRatesAPIProvider.ts
 │       ├── ProviderInterface.ts
-│       └── RateSnapProvider.ts
+│       └── ExRatioProvider.ts
 ├── hooks/               # Custom React hooks
 │   ├── use-color-scheme.ts  # Theme detection
 │   └── use-theme-color.ts   # Theme colors

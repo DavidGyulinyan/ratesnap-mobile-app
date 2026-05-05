@@ -24,6 +24,7 @@ export default function Logo({ size = 36, showText = true, textSize = 26 }: Logo
           {
             width: size,
             height: size,
+            borderRadius: size / 2,
           },
         ]}
         resizeMode="contain"
@@ -54,8 +55,8 @@ const styles = StyleSheet.create({
     maxWidth: '60%', // Prevent logo from taking too much space
   },
   logoImage: {
-    borderRadius: 2,
     flexShrink: 0,
+    backgroundColor: "transparent",
   },
   logoText: {
     fontWeight: 'bold',

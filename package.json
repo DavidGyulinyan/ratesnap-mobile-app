@@ -1,5 +1,5 @@
 {
-  "name": "ratesnap-mobile",
+  "name": "exratio-mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "test": "jest",

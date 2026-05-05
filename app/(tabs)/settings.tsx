@@ -295,7 +295,7 @@ ExRatio provides real-time currency conversion tools and exchange rate informati
 • Offline currency conversion capabilities
 
 2. ACCEPTANCE OF TERMS
-By accessing and using RateSnap, you accept and agree to be bound by the terms and provision of this agreement. These Terms apply to all users of the App.
+By accessing and using ExRatio, you accept and agree to be bound by the terms and provision of this agreement. These Terms apply to all users of the App.
 
 3. USE LICENSE
 Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, non-sublicensable license to:
@@ -338,7 +338,7 @@ We may terminate or suspend your access to the App immediately, without prior no
 These Terms shall be governed by and construed in accordance with applicable local laws, without regard to conflict of law provisions.
 
 11. CONTACT INFORMATION
-If you have any questions about these Terms, please contact us at support@ratesnap.app.
+If you have any questions about these Terms, please contact us at support@exratio.app.
 
 Thank you for choosing ExRatio!`,
 
@@ -356,7 +356,7 @@ ExRatio-ը ապահովում է իրական ժամանակի արժույթի 
 • Անցանց արժույթի փոխարկման հնարավորություններ
 
 2. ՊԱՅՄԱՆՆԵՐԻ ՀԱՄԱՁԱՅՆՈՒԹՅՈՒՆ
-RateSnap-ին մուտք գործելով և օգտագործելով՝ դուք ընդունում եք և համաձայնում եք կապված լինել այս համաձայնագրի պայմաններով և դրույթներով: Այս Պայմաններն առնչվում են Հավելվածի բոլոր օգտատերերին:
+ExRatio-ին մուտք գործելով և օգտագործելով՝ դուք ընդունում եք և համաձայնում եք կապված լինել այս համաձայնագրի պայմաններով և դրույթներով: Այս Պայմաններն առնչվում են Հավելվածի բոլոր օգտատերերին:
 
 3. ՕԳՏԱԳՈՐԾՄԱՆ ԼԻՑԵՆԶԻԱ
 Ձեր համապատասխանության պայմաններով այս Պայմաններին՝ մենք ձեզ շնորհում ենք սահմանափակ, ոչ բացառիկ, ոչ փոխանցելի, ոչ ենթալիցենզավորվող լիցենզիա՝
@@ -399,7 +399,7 @@ RateSnap-ին մուտք գործելով և օգտագործելով՝ դուք
 Այս Պայմանները պետք է կարգավորվեն և մեկնաբանվեն կիրառելի տեղական օրենքների համաձայն, անկախ օրենքների կոնֆլիկտի դրույթներից:
 
 11. ԿԱՊ ՄԱՆ ԻՆՖՈՐՄԱՑԻԱ
-Եթե ունեք հարցեր այս Պայմանների վերաբերյալ, խնդրում ենք կապվել մեզ հետ support@ratesnap.app հասցեով:
+Եթե ունեք հարցեր այս Պայմանների վերաբերյալ, խնդրում ենք կապվել մեզ հետ support@exratio.app հասցեով:
 
 Շնորհակալություն ExRatio-ն ընտրելու համար!`,
 
@@ -417,7 +417,7 @@ ExRatio предоставляет инструменты конвертации
 • Возможности оффлайн-конвертации валюты
 
 2. ПРИНЯТИЕ УСЛОВИЙ
-Получая доступ к RateSnap и используя его, вы принимаете и соглашаетесь соблюдать условия и положения настоящего соглашения. Настоящие Условия применяются ко всем пользователям Приложения.
+Получая доступ к ExRatio и используя его, вы принимаете и соглашаетесь соблюдать условия и положения настоящего соглашения. Настоящие Условия применяются ко всем пользователям Приложения.
 
 3. ЛИЦЕНЗИЯ НА ИСПОЛЬЗОВАНИЕ
 При условии вашего соблюдения настоящих Условий, мы предоставляем вам ограниченную, неисключительную, непередаваемую, не подлежащую сублицензированию лицензию на:
@@ -460,7 +460,7 @@ ExRatio предоставляет инструменты конвертации
 Настоящие Условия регулируются и толкуются в соответствии с применимым местным законодательством, без учета положений о конфликте законов.
 
 11. КОНТАКТНАЯ ИНФОРМАЦИЯ
-Если у вас есть вопросы по настоящим Условиям, пожалуйста, свяжитесь с нами по адресу support@ratesnap.app.
+Если у вас есть вопросы по настоящим Условиям, пожалуйста, свяжитесь с нами по адресу support@exratio.app.
 
 Спасибо за выбор ExRatio!`,
 
@@ -478,7 +478,7 @@ ExRatio proporciona herramientas de conversión de divisas e información de tip
 • Capacidades de conversión de divisas sin conexión
 
 2. ACEPTACIÓN DE TÉRMINOS
-Al acceder y usar RateSnap, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo. Estos Términos se aplican a todos los usuarios de la Aplicación.
+Al acceder y usar ExRatio, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo. Estos Términos se aplican a todos los usuarios de la Aplicación.
 
 3. LICENCIA DE USO
 Sujeto a tu cumplimiento de estos Términos, te otorgamos una licencia limitada, no exclusiva, no transferible, no sublicenciable para:
@@ -521,7 +521,7 @@ Podemos terminar o suspender tu acceso a la Aplicación inmediatamente, sin prev
 Estos Términos se regirán e interpretarán de acuerdo con las leyes locales aplicables, sin tener en cuenta las disposiciones de conflicto de leyes.
 
 11. INFORMACIÓN DE CONTACTO
-Si tienes preguntas sobre estos Términos, por favor contáctanos en support@ratesnap.app.
+Si tienes preguntas sobre estos Términos, por favor contáctanos en support@exratio.app.
 
 ¡Gracias por elegir ExRatio!`,
 
@@ -539,7 +539,7 @@ ExRatio 为个人和信息用途提供实时货币转换工具和汇率信息。
 • 离线货币转换功能
 
 2. 条款接受
-通过访问和使用 RateSnap，您接受并同意受本协议条款和规定的约束。这些条款适用于应用程序的所有用户。
+通过访问和使用 ExRatio，您接受并同意受本协议条款和规定的约束。这些条款适用于应用程序的所有用户。
 
 3. 使用许可
 在您遵守这些条款的前提下，我们授予您有限的、非独占的、不可转让的、不可再许可的许可，以：
@@ -582,7 +582,7 @@ ExRatio 为个人和信息用途提供实时货币转换工具和汇率信息。
 这些条款应受适用当地法律管辖并据其解释，不考虑法律冲突条款。
 
 11. 联系信息
-如果您对这些条款有任何疑问，请通过 support@ratesnap.app 与我们联系。
+如果您对这些条款有任何疑问，请通过 support@exratio.app 与我们联系。
 
 感谢您选择 ExRatio！`,
 
@@ -600,7 +600,7 @@ ExRatio व्यक्तिगत और सूचनात्मक उपय
 • ऑफलाइन मुद्रा रूपांतरण क्षमताएं
 
 2. शर्तों की स्वीकृति
-RateSnap तक पहुंचकर और इसका उपयोग करके, आप इस समझौते की शर्तों और प्रावधानों से बाध्य होने पर सहमत होते हैं। ये शर्तें एप्लिकेशन के सभी उपयोगकर्ताओं पर लागू होती हैं।
+ExRatio तक पहुंचकर और इसका उपयोग करके, आप इस समझौते की शर्तों और प्रावधानों से बाध्य होने पर सहमत होते हैं। ये शर्तें एप्लिकेशन के सभी उपयोगकर्ताओं पर लागू होती हैं।
 
 3. उपयोग लाइसेंस
 इन शर्तों के आपके अनुपालन के अधीन, हम आपको एक सीमित, गैर-अनन्य, गैर-हस्तांतरणीय, गैर-उपलाइसेंस योग्य लाइसेंस प्रदान करते हैं:
@@ -643,7 +643,7 @@ RateSnap तक पहुंचकर और इसका उपयोग कर
 ये शर्तें कानूनों के संघर्ष के प्रावधानों की परवाह किए बिना, लागू स्थानीय कानूनों द्वारा शासित और समझी जाएंगी।
 
 11. संपर्क जानकारी
-यदि आपके पास इन शर्तों के बारे में कोई प्रश्न हैं, तो कृपया support@ratesnap.app पर हमसे संपर्क करें।
+यदि आपके पास इन शर्तों के बारे में कोई प्रश्न हैं, तो कृपया support@exratio.app पर हमसे संपर्क करें।
 
 ExRatio चुनने के लिए धन्यवाद!`
     };
