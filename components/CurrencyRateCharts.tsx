@@ -10,6 +10,7 @@ import { LineChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 
 import CurrencyPicker from "@/components/CurrencyPicker";
+import { useLocationCurrency } from "@/components/LocationDetection";
 import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -48,6 +49,8 @@ export default function CurrencyRateCharts({
   days = 30,
 }: Props) {
   const { t } = useLanguage();
+  const { currency: locationCurrency, loading: locationLoading } =
+    useLocationCurrency();
 
   const primaryColor = useThemeColor({}, "primary");
   const backgroundColor = useThemeColor({}, "background");
@@ -74,6 +77,7 @@ export default function CurrencyRateCharts({
 
   const [showBasePicker, setShowBasePicker] = useState(false);
   const [showTargetPicker, setShowTargetPicker] = useState(false);
+  const [didInitFromLocation, setDidInitFromLocation] = useState(false);
 
   const initialPeriod: PeriodKey =
     days >= 365 ? "1Y" : days >= 90 ? "90D" : days >= 30 ? "30D" : "7D";
@@ -144,6 +148,31 @@ export default function CurrencyRateCharts({
     label: string;
   } | null>(null);
 
+  // Default pair: USD -> user's location currency (if available).
+  useEffect(() => {
+    if (didInitFromLocation) return;
+    if (locationLoading) return;
+
+    const desiredBase = "USD";
+    const desiredTarget =
+      locationCurrency && locationCurrency !== "USD" ? locationCurrency : null;
+
+    if (desiredTarget && safeCurrencies.includes(desiredTarget)) {
+      setBaseCurrency(desiredBase);
+      setTargetCurrency(desiredTarget);
+      setDidInitFromLocation(true);
+      return;
+    }
+
+    // If location currency isn't available in the list (or is USD), keep USD base,
+    // but choose the first non-USD target if possible.
+    const fallbackTarget =
+      safeCurrencies.find((c) => c !== desiredBase) || desiredBase;
+    setBaseCurrency(desiredBase);
+    setTargetCurrency(fallbackTarget);
+    setDidInitFromLocation(true);
+  }, [didInitFromLocation, locationCurrency, locationLoading, safeCurrencies]);
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={[styles.controls, { backgroundColor: surfaceColor, borderColor }]}>
@@ -162,7 +191,22 @@ export default function CurrencyRateCharts({
           <Ionicons name="chevron-down" size={16} color={textSecondaryColor} />
         </TouchableOpacity>
 
-        <Ionicons name="arrow-forward" size={18} color={textSecondaryColor} />
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedPoint(null);
+            setBaseCurrency(targetCurrency);
+            setTargetCurrency(baseCurrency);
+          }}
+          activeOpacity={0.85}
+          style={[
+            styles.swapButton,
+            { backgroundColor: surfaceSecondaryColor, borderColor },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Swap currencies"
+        >
+          <Ionicons name="swap-horizontal" size={18} color={textSecondaryColor} />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[
@@ -422,6 +466,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 8,
+  },
+  swapButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: "center",
+    justifyContent: "center",
   },
   card: {
     borderRadius: 18,
