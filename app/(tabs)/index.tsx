@@ -292,12 +292,6 @@ export default function HomeScreen() {
     ]);
   };
 
-  const handleCalculatorResult = (result: number): void => {
-    console.log("Calculator result:", result);
-    // You can use this result for currency conversion or other calculations
-    Alert.alert("Calculation Result", `Result: ${result}`);
-  };
-
   const renderMainContent = (): React.ReactElement => {
     if (currentView === "converter") {
       return (
@@ -710,7 +704,6 @@ export default function HomeScreen() {
         <MathCalculator
           visible={showCalculator}
           onClose={() => setShowCalculator(false)}
-          onResult={handleCalculatorResult}
           autoCloseAfterCalculation={false}
         />
       </ThemedView>
