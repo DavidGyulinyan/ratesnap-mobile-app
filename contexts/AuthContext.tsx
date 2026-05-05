@@ -275,16 +275,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(true);
       console.log("Starting Google sign in");
 
-      // Use the correct redirect URI format
       const redirectTo = AuthSession.makeRedirectUri({
         scheme: "exratio-mobile",
         path: "auth/callback",
       });
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo,
+          skipBrowserRedirect: true,
         },
       });
 
@@ -293,7 +293,68 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         return { error };
       }
 
-      console.log("Google sign in initiated successfully");
+      if (!data?.url) {
+        return {
+          error: {
+            message: "Unable to start Google sign-in flow.",
+            name: "OAuthStartError",
+          } as AuthError,
+        };
+      }
+
+      const authResult = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectTo
+      );
+
+      if (authResult.type !== "success" || !authResult.url) {
+        return {
+          error: {
+            message:
+              authResult.type === "cancel"
+                ? "Google sign-in was cancelled."
+                : "Google sign-in did not complete. Please try again.",
+            name: "OAuthCancelled",
+          } as AuthError,
+        };
+      }
+
+      const { params, errorCode } = AuthSession.parse(authResult.url);
+      if (errorCode) {
+        return {
+          error: {
+            message: `Google sign-in failed: ${errorCode}`,
+            name: "OAuthError",
+          } as AuthError,
+        };
+      }
+
+      const codeParam = params?.code;
+      const code =
+        typeof codeParam === "string"
+          ? codeParam
+          : Array.isArray(codeParam)
+          ? codeParam[0]
+          : undefined;
+
+      if (!code) {
+        return {
+          error: {
+            message: "Missing authorization code from Google sign-in.",
+            name: "OAuthCodeMissing",
+          } as AuthError,
+        };
+      }
+
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
+        code
+      );
+
+      if (exchangeError) {
+        return { error: exchangeError };
+      }
+
+      console.log("Google sign in completed successfully");
       return {};
     } catch (error) {
       console.error("Google sign in catch error:", error);
@@ -352,7 +413,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const redirectTo = AuthSession.makeRedirectUri({
+        scheme: "exratio-mobile",
+        path: "auth/callback",
+      });
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
 
       if (error) {
         return { error };

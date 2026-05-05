@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type Language = 'en' | 'hy' | 'ru' | 'es' | 'zh' | 'hi';
@@ -2234,7 +2235,11 @@ const translations = {
   },
 };
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+type LanguageProviderProps = {
+  children: ReactNode;
+};
+
+export function LanguageProvider({ children }: LanguageProviderProps) {
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
@@ -2282,7 +2287,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       {children}
     </LanguageContext.Provider>
   );
-};
+}
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
