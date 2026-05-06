@@ -1137,7 +1137,7 @@ ExRatio चुनने के लिए धन्यवाद!`
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
       <ScrollView style={styles.scrollView}>
         {/* Header */}
         <View style={styles.header}>

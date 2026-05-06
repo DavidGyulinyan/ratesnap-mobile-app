@@ -13,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /** Opens dashboard modals — same tools as Quick Actions, separate from Settings. */
 export type BurgerMenuQuickActions = {
@@ -34,6 +35,7 @@ export default function BurgerMenu({ style, quickActions }: BurgerMenuProps) {
    const router = useRouter();
    const { user, signOut } = useAuth();
    const [isVisible, setIsVisible] = useState(false);
+   const insets = useSafeAreaInsets();
 
    // Helper function to add opacity to hex colors
    const addOpacity = (hexColor: string, opacity: number) => {
@@ -303,7 +305,10 @@ export default function BurgerMenu({ style, quickActions }: BurgerMenuProps) {
             {/* Menu Items */}
             <ScrollView
               style={{ flex: 1 }}
-              contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+              contentContainerStyle={{
+                padding: 20,
+                paddingBottom: 28 + insets.bottom,
+              }}
               showsVerticalScrollIndicator={false}
             >
               {renderRow(settingsItem)}

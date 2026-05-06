@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { getSupabaseClient } from '@/lib/supabase-safe';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -174,6 +175,7 @@ export default function AuthCallbackScreen() {
 
   if (loading) {
     return (
+      <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'left', 'right', 'bottom']}>
       <View style={[styles.container, { backgroundColor }]}>
         <View style={styles.content}>
           <ActivityIndicator size="large" color={primaryColor} />
@@ -181,11 +183,13 @@ export default function AuthCallbackScreen() {
           <Text style={styles.subtitle}>Please wait while we sign you in</Text>
         </View>
       </View>
+      </SafeAreaView>
     );
   }
 
   if (error) {
     return (
+      <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'left', 'right', 'bottom']}>
       <View style={[styles.container, { backgroundColor }]}>
         <View style={styles.content}>
           <Ionicons name="alert-circle-outline" size={64} color={errorColor} />
@@ -204,10 +208,12 @@ export default function AuthCallbackScreen() {
           </View>
         </View>
       </View>
+      </SafeAreaView>
     );
   }
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'left', 'right', 'bottom']}>
     <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.content}>
         <Ionicons name="checkmark-circle-outline" size={64} color={primaryColor} />
@@ -215,6 +221,7 @@ export default function AuthCallbackScreen() {
         <Text style={styles.successText}>You have been successfully signed in!</Text>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 

@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: 12,
     paddingBottom: 20,
     gap: 8,
   },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: 20,
-    paddingBottom: 50,
+    paddingBottom: 24,
     alignItems: 'center',
   },
   dotsContainer: {

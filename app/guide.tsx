@@ -11,7 +11,7 @@ export default function GuideScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right', 'bottom']}>
       <OnboardingGuide onComplete={handleComplete} />
     </SafeAreaView>
   );

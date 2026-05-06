@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +29,7 @@ export default function AuthPromptModal({
   message = 'Sign up to save your data and enable premium features',
   feature = 'general',
 }: AuthPromptModalProps) {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const { signInWithGoogle, signInWithApple } = useAuth();
   const { t } = useLanguage();
@@ -97,7 +99,15 @@ export default function AuthPromptModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
+      <View
+        style={[
+          styles.overlay,
+          {
+            paddingTop: insets.top + 12,
+            paddingBottom: insets.bottom + 12,
+          },
+        ]}
+      >
         <View style={styles.container}>
           <TouchableOpacity
             style={styles.closeButton}

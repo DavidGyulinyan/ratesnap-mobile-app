@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedView } from "./themed-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useCalculatorHistory } from "@/hooks/useUserData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -1101,6 +1102,10 @@ export default function MathCalculator({
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor }}
+        edges={["top", "left", "right", "bottom"]}
+      >
       <ThemedView style={[styles.container, { backgroundColor }]}>
         {!inModal && (
           <View style={[
@@ -1466,6 +1471,7 @@ export default function MathCalculator({
           {mode === "advanced" && <AdvancedToolsPanel />}
         </ScrollView>
       </ThemedView>
+      </SafeAreaView>
     </Modal>
   );
 }
@@ -1475,7 +1481,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0a0a0a",
     paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingTop: 8,
   },
   header: {
     flexDirection: "row",
