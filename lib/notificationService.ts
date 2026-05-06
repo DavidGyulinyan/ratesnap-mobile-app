@@ -72,9 +72,13 @@ const loadNotificationModules = async () => {
               shouldShowList: false,
             };
           }
+          // Android: native builder gates vibration on this flag (see ExpoNotificationBuilder.shouldVibrate).
+          // Keep actual audio off via content `sound: false` when the user disables sound.
+          const behaviorSoundGate =
+            prefs.sound || (Platform.OS === 'android' && prefs.vibration);
           return {
             shouldShowAlert: prefs.showPreview,
-            shouldPlaySound: prefs.sound,
+            shouldPlaySound: behaviorSoundGate,
             shouldSetBadge: true,
             shouldShowBanner: prefs.showPreview,
             shouldShowList: prefs.showPreview,
@@ -107,7 +111,7 @@ async function ensureAndroidRateAlertChannel(
     importance: AndroidImportance.HIGH,
     sound: prefs.sound ? 'default' : null,
     enableVibrate: prefs.vibration,
-    vibrationPattern: prefs.vibration ? [0, 250, 250, 250] : null,
+    vibrationPattern: prefs.vibration ? [0, 500, 250, 500, 250, 500] : null,
   });
   return channelId;
 }
@@ -126,7 +130,8 @@ function rateAlertNotificationContent(
           priority: prefs.vibration
             ? mod.AndroidNotificationPriority.HIGH
             : mod.AndroidNotificationPriority.LOW,
-          vibrate: prefs.vibration ? undefined : [],
+          // Explicit pattern so native `contentAllowsVibration` is true (undefined omits vibration intent).
+          vibrate: prefs.vibration ? [0, 500, 250, 500, 250, 500] : [],
         }
       : {}),
   };
