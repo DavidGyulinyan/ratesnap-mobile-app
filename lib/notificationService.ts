@@ -1,25 +1,85 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isRunningInExpoGo } from 'expo';
 import { Alert, Platform } from 'react-native';
+
+import { getAsyncStorage } from './storage';
+
+/** Importing `expo-notifications` on Expo Go + Android registers push listeners that `console.error` (SDK 53+). */
+function isExpoGoAndroidSkipNativeNotifications(): boolean {
+  return Platform.OS === 'android' && isRunningInExpoGo();
+}
+
+const NOTIFICATION_PREFS_KEY = 'notificationSettings';
+
+export type NotificationUserSettings = {
+  enabled: boolean;
+  sound: boolean;
+  vibration: boolean;
+  showPreview: boolean;
+};
+
+const DEFAULT_NOTIFICATION_PREFS: NotificationUserSettings = {
+  enabled: true,
+  sound: true,
+  vibration: true,
+  showPreview: true,
+};
+
+/** Matches Settings → Notifications (AsyncStorage JSON). */
+export async function getNotificationUserSettings(): Promise<NotificationUserSettings> {
+  try {
+    const raw = await getAsyncStorage().getItem(NOTIFICATION_PREFS_KEY);
+    if (!raw) return { ...DEFAULT_NOTIFICATION_PREFS };
+    const parsed = JSON.parse(raw) as Partial<NotificationUserSettings>;
+    return { ...DEFAULT_NOTIFICATION_PREFS, ...parsed };
+  } catch {
+    return { ...DEFAULT_NOTIFICATION_PREFS };
+  }
+}
 
 // Dynamic imports to prevent Expo Go errors during module load
 let Notifications: any = null;
 let Device: any = null;
+let notificationModuleRef: any = null;
 
 const loadNotificationModules = async () => {
+  if (isExpoGoAndroidSkipNativeNotifications()) {
+    try {
+      if (!Device) {
+        Device = await import('expo-device');
+      }
+    } catch (error) {
+      console.log('⚠️ Failed to load expo-device:', error);
+    }
+    return { Notifications: null, Device };
+  }
+
   if (!Notifications || !Device) {
     try {
       Notifications = await import('expo-notifications');
+      notificationModuleRef = Notifications;
       Device = await import('expo-device');
       
-      // Configure notification behavior after dynamic load
+      // Respect Settings → Notifications for foreground delivery
       Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: true,
-          shouldShowBanner: true,
-          shouldShowList: true,
-        }),
+        handleNotification: async () => {
+          const prefs = await getNotificationUserSettings();
+          if (!prefs.enabled) {
+            return {
+              shouldShowAlert: false,
+              shouldPlaySound: false,
+              shouldSetBadge: false,
+              shouldShowBanner: false,
+              shouldShowList: false,
+            };
+          }
+          return {
+            shouldShowAlert: prefs.showPreview,
+            shouldPlaySound: prefs.sound,
+            shouldSetBadge: true,
+            shouldShowBanner: prefs.showPreview,
+            shouldShowList: prefs.showPreview,
+          };
+        },
       });
     } catch (error) {
       console.log('⚠️ Failed to load notification modules:', error);
@@ -27,6 +87,50 @@ const loadNotificationModules = async () => {
   }
   return { Notifications, Device };
 };
+
+/** Android: channel sound is fixed at creation; use separate IDs per sound × vibration. */
+function androidRateAlertChannelId(prefs: NotificationUserSettings): string {
+  return `ratesnap-rate-${prefs.sound ? 's1' : 's0'}-${prefs.vibration ? 'v1' : 'v0'}`;
+}
+
+async function ensureAndroidRateAlertChannel(
+  notificationModule: any,
+  prefs: NotificationUserSettings
+): Promise<string | undefined> {
+  if (Platform.OS !== 'android' || !notificationModule?.setNotificationChannelAsync) {
+    return undefined;
+  }
+  const channelId = androidRateAlertChannelId(prefs);
+  const { AndroidImportance } = notificationModule;
+  await notificationModule.setNotificationChannelAsync(channelId, {
+    name: 'Rate alerts',
+    importance: AndroidImportance.HIGH,
+    sound: prefs.sound ? 'default' : null,
+    enableVibrate: prefs.vibration,
+    vibrationPattern: prefs.vibration ? [0, 250, 250, 250] : null,
+  });
+  return channelId;
+}
+
+function rateAlertNotificationContent(
+  prefs: NotificationUserSettings,
+  base: { title: string; body: string; data: Record<string, unknown> }
+) {
+  const mod = notificationModuleRef;
+  return {
+    ...base,
+    sound: prefs.sound ? 'default' : false,
+    ...(Platform.OS === 'ios' && !prefs.sound ? { interruptionLevel: 'passive' as const } : {}),
+    ...(Platform.OS === 'android' && mod
+      ? {
+          priority: prefs.vibration
+            ? mod.AndroidNotificationPriority.HIGH
+            : mod.AndroidNotificationPriority.LOW,
+          vibrate: prefs.vibration ? undefined : [],
+        }
+      : {}),
+  };
+}
 
 export interface RateAlert {
   id: string;
@@ -68,6 +172,14 @@ class NotificationService {
 
       // Load notification modules dynamically
       const { Notifications: notificationModule, Device: deviceModule } = await loadNotificationModules();
+
+      if (isExpoGoAndroidSkipNativeNotifications()) {
+        console.log(
+          '📱 Expo Go (Android): skipping expo-notifications — rate alerts use in-app dialogs; use a dev build for system notifications.'
+        );
+        return true;
+      }
+
       if (!notificationModule || !deviceModule) {
         console.log('⚠️ Notifications module not available - using safe mode');
         return false;
@@ -150,6 +262,12 @@ class NotificationService {
         return null;
       }
 
+      const prefs = await getNotificationUserSettings();
+      if (!prefs.enabled) {
+        console.log('🔕 Notifications disabled in settings — skipping schedule');
+        return null;
+      }
+
       // Check if the alert should trigger immediately
       const shouldTrigger = await this.checkAlertTrigger(alert);
       
@@ -158,10 +276,30 @@ class NotificationService {
         return null; // No need to schedule since it's triggered
       }
 
+      if (!Notifications) {
+        console.log('📱 Native notification scheduling unavailable — skipping (Expo Go Android)');
+        return null;
+      }
+
       // Schedule periodic check (every hour)
       const triggerTime = Date.now() + (60 * 60 * 1000); // 1 hour from now
+      const channelId = await ensureAndroidRateAlertChannel(Notifications, prefs);
+      const trigger =
+        Platform.OS === 'android' && channelId
+          ? {
+              type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+              seconds: 60 * 60,
+              repeats: true,
+              channelId,
+            }
+          : {
+              type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+              seconds: 60 * 60,
+              repeats: true,
+            };
+
       const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
+        content: rateAlertNotificationContent(prefs, {
           title: '💰 ExRatio Alert',
           body: `Monitoring ${alert.fromCurrency} to ${alert.toCurrency}`,
           data: {
@@ -169,12 +307,8 @@ class NotificationService {
             alertId: alert.id,
             rateId: alert.id,
           },
-          sound: 'default',
-        },
-        trigger: {
-          seconds: 60 * 60, // Check every hour
-          repeats: true
-        } as any,
+        }),
+        trigger,
       });
 
       this.scheduledNotifications.set(alert.id, notificationId);
@@ -187,7 +321,7 @@ class NotificationService {
         rateId: alert.id,
         triggerTime: triggerTime,
       };
-      await AsyncStorage.setItem('scheduledRateAlerts', JSON.stringify(scheduledData));
+      await getAsyncStorage().setItem('scheduledRateAlerts', JSON.stringify(scheduledData));
 
       return notificationId;
     } catch (error) {
@@ -201,7 +335,9 @@ class NotificationService {
       const notificationId = this.scheduledNotifications.get(alertId);
       
       if (notificationId) {
-        await Notifications.cancelScheduledNotificationAsync(notificationId);
+        if (Notifications) {
+          await Notifications.cancelScheduledNotificationAsync(notificationId);
+        }
         this.scheduledNotifications.delete(alertId);
         console.log(`🚫 Cancelled rate alert: ${alertId}`);
       }
@@ -209,7 +345,7 @@ class NotificationService {
       // Remove from storage
       const scheduledData = await this.getScheduledNotifications();
       delete scheduledData[alertId];
-      await AsyncStorage.setItem('scheduledRateAlerts', JSON.stringify(scheduledData));
+      await getAsyncStorage().setItem('scheduledRateAlerts', JSON.stringify(scheduledData));
     } catch (error) {
       console.error('❌ Error cancelling rate alert:', error);
     }
@@ -227,31 +363,44 @@ class NotificationService {
         return;
       }
 
+      const prefs = await getNotificationUserSettings();
+      if (!prefs.enabled) {
+        console.log('🔕 Notifications disabled in settings — skipping alert');
+        return;
+      }
+
       const currentRate = await this.getCurrentRate(alert.fromCurrency, alert.toCurrency);
       const isTriggered = this.evaluateAlertTrigger(alert, currentRate);
 
       if (isTriggered) {
         const message = `🎯 ${alert.fromCurrency} → ${alert.toCurrency} is now ${currentRate.toFixed(4)}!`;
-        
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: '🚀 Rate Alert Triggered!',
-            body: message,
-            data: {
-              type: 'rate_triggered',
-              alertId: alert.id,
-              fromCurrency: alert.fromCurrency,
-              toCurrency: alert.toCurrency,
-              currentRate: currentRate,
-              targetRate: alert.targetRate,
-              direction: alert.direction,
-            },
-            sound: 'default',
-          },
-          trigger: null, // Immediate
-        });
 
-        console.log(`🚨 Alert sent: ${message}`);
+        if (!Notifications) {
+          Alert.alert('🚀 Rate Alert Triggered!', message, [{ text: 'OK' }]);
+          console.log(`🚨 In-app alert (Expo Go Android): ${message}`);
+        } else {
+          const channelId = await ensureAndroidRateAlertChannel(Notifications, prefs);
+
+          await Notifications.scheduleNotificationAsync({
+            content: rateAlertNotificationContent(prefs, {
+              title: '🚀 Rate Alert Triggered!',
+              body: message,
+              data: {
+                type: 'rate_triggered',
+                alertId: alert.id,
+                fromCurrency: alert.fromCurrency,
+                toCurrency: alert.toCurrency,
+                currentRate: currentRate,
+                targetRate: alert.targetRate,
+                direction: alert.direction,
+              },
+            }),
+            trigger:
+              Platform.OS === 'android' && channelId ? { channelId } : null,
+          });
+
+          console.log(`🚨 Alert sent: ${message}`);
+        }
         
         // Mark alert as triggered
         const updatedAlert = { ...alert, triggered: true, message };
@@ -295,7 +444,7 @@ class NotificationService {
 
   private async getCurrentRate(fromCurrency: string, toCurrency: string): Promise<number> {
     try {
-      const cachedData = await AsyncStorage.getItem('cachedExchangeRates');
+      const cachedData = await getAsyncStorage().getItem('cachedExchangeRates');
       if (cachedData) {
         const data = JSON.parse(cachedData);
         const fromRate = data.conversion_rates[fromCurrency];
@@ -317,7 +466,7 @@ class NotificationService {
 
   private async getScheduledNotifications(): Promise<{[key: string]: NotificationSchedule}> {
     try {
-      const stored = await AsyncStorage.getItem('scheduledRateAlerts');
+      const stored = await getAsyncStorage().getItem('scheduledRateAlerts');
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       console.error('❌ Error getting scheduled notifications:', error);
@@ -334,7 +483,7 @@ class NotificationService {
     try {
       const alerts = await this.getSavedAlerts();
       alerts[alert.id] = alert;
-      await AsyncStorage.setItem('rateAlerts', JSON.stringify(alerts));
+      await getAsyncStorage().setItem('rateAlerts', JSON.stringify(alerts));
     } catch (error) {
       console.error('❌ Error saving alert:', error);
     }
@@ -347,7 +496,7 @@ class NotificationService {
 
   private async getSavedAlerts(): Promise<{[key: string]: RateAlert}> {
     try {
-      const stored = await AsyncStorage.getItem('rateAlerts');
+      const stored = await getAsyncStorage().getItem('rateAlerts');
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       console.error('❌ Error getting saved alerts:', error);
@@ -426,7 +575,7 @@ class NotificationService {
       const alerts = await this.getSavedAlerts();
       if (alerts[data.alertId]) {
         alerts[data.alertId].triggered = false; // Reset for future alerts
-        await AsyncStorage.setItem('rateAlerts', JSON.stringify(alerts));
+        await getAsyncStorage().setItem('rateAlerts', JSON.stringify(alerts));
       }
     } catch (error) {
       console.error('❌ Error handling rate alert tap:', error);
@@ -461,7 +610,9 @@ class NotificationService {
   // Clean up all notifications
   async cleanup(): Promise<void> {
     try {
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      if (Notifications) {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+      }
       this.scheduledNotifications.clear();
       console.log('🧹 Cleaned up all notifications');
     } catch (error) {
