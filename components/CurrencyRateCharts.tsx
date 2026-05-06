@@ -23,6 +23,8 @@ type Props = {
   defaultBase?: string;
   defaultTarget?: string;
   days?: number;
+  /** When true, outer shell is transparent (e.g. QuickActionModal + FinancialBackground). */
+  inModal?: boolean;
 };
 
 type PeriodKey = "7D" | "30D" | "90D" | "1Y";
@@ -47,6 +49,7 @@ export default function CurrencyRateCharts({
   defaultBase = "USD",
   defaultTarget = "EUR",
   days = 30,
+  inModal = false,
 }: Props) {
   const { t } = useLanguage();
   const { currency: locationCurrency, loading: locationLoading } =
@@ -175,7 +178,12 @@ export default function CurrencyRateCharts({
   }, [didInitFromLocation, locationCurrency, locationLoading, safeCurrencies]);
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: inModal ? "transparent" : backgroundColor },
+      ]}
+    >
       <View style={[styles.controls, { backgroundColor: surfaceColor, borderColor }]}>
         <TouchableOpacity
           style={[

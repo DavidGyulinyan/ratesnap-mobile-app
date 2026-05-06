@@ -7,6 +7,7 @@ import { View } from 'react-native';
 import 'react-native-reanimated';
 import 'react-native-url-polyfill/auto';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
@@ -20,27 +21,30 @@ export const unstable_settings = {
 
 function AppContent() {
   const { effectiveTheme } = useTheme();
+  const backgroundColor = useThemeColor({}, 'background');
 
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <View style={{ flex: 1 }}>
-          <Stack screenOptions={{
-            headerShown: false,
-            contentStyle: {
-              backgroundColor: 'transparent',
-              paddingTop: 0,
-              paddingBottom: 0,
-              paddingLeft: 0,
-              paddingRight: 0
-            }
-          }}>
-            {/* Always register all screens, navigation control will handle which is shown */}
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="signin" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="signup" options={{ presentation: 'modal' }} />
-          </Stack>
+        <View style={{ flex: 1, backgroundColor }}>
+          <View style={{ flex: 1, backgroundColor: "transparent" }}>
+            <Stack screenOptions={{
+              headerShown: false,
+              contentStyle: {
+                backgroundColor: 'transparent',
+                paddingTop: 0,
+                paddingBottom: 0,
+                paddingLeft: 0,
+                paddingRight: 0
+              }
+            }}>
+              {/* Always register all screens, navigation control will handle which is shown */}
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="signin" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="signup" options={{ presentation: 'modal' }} />
+            </Stack>
+          </View>
           <StatusBar style={effectiveTheme === 'dark' ? 'light' : 'dark'} />
         </View>
       </AuthProvider>

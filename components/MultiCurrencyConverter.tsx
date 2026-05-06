@@ -923,7 +923,10 @@ export default function MultiCurrencyConverter({
   return (
     <View style={[styles.container, style, inModal && styles.containerFlex]}>
       <ScrollView
-        style={inModal ? styles.scrollFlex : undefined}
+        style={[
+          inModal ? styles.scrollFlex : undefined,
+          inModal && { backgroundColor: "transparent" },
+        ]}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         nestedScrollEnabled
