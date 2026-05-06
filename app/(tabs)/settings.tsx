@@ -551,6 +551,7 @@ ExRatio चुनने के लिए धन्यवाद!`
     },
     title: {
       fontSize: 26,
+      lineHeight: 32,
       fontWeight: '700',
       color: textColor,
       letterSpacing: -0.5,
@@ -559,7 +560,7 @@ ExRatio चुनने के लिए धन्यवाद!`
     subtitle: {
       fontSize: 15,
       color: textSecondaryColor,
-      lineHeight: 21,
+      lineHeight: 22,
     },
     section: {
       backgroundColor: surfaceColor,

@@ -27,6 +27,7 @@ import {
   Alert,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -358,14 +359,25 @@ export default function HomeScreen() {
                 </ThemedText>
                 <ThemedText
                   type="caption"
-                  style={{ color: textSecondaryColor }}
-                  numberOfLines={1}
+                  style={[
+                    {
+                      color: textSecondaryColor,
+                      lineHeight: 20,
+                      ...(Platform.OS === "android"
+                        ? { includeFontPadding: false }
+                        : null),
+                    },
+                  ]}
+                  numberOfLines={2}
                 >
                   {t("dashboard.features.description")}
                 </ThemedText>
               </View>
             </View>
-            <BurgerMenu quickActions={burgerQuickActions} />
+            <BurgerMenu
+              quickActions={burgerQuickActions}
+              style={{ marginTop: 8 }}
+            />
           </View>
         </View>
 
@@ -807,13 +819,13 @@ const styles = StyleSheet.create({
   },
   headerTopRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
   },
   heroBlock: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flex: 1,
     gap: 14,
     minWidth: 0,
@@ -825,7 +837,9 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontSize: 22,
+    lineHeight: 28,
     letterSpacing: -0.4,
+    ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
   },
 
   dashboardScrollView: {
