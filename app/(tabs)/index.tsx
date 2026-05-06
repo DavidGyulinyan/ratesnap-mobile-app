@@ -763,11 +763,21 @@ export default function HomeScreen() {
 
   // Show onboarding for new users
   if (showOnboarding) {
-    return <OnboardingGuide onComplete={() => setShowOnboarding(false)} />;
+    return (
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: pageBackgroundColor }}
+        edges={["top", "left", "right", "bottom"]}
+      >
+        <OnboardingGuide onComplete={() => setShowOnboarding(false)} />
+      </SafeAreaView>
+    );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "transparent" }}
+      edges={["top", "left", "right", "bottom"]}
+    >
       {renderMainContent()}
 
       {/* Auth Prompt Modal */}

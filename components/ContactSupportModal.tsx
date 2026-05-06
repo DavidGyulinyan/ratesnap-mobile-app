@@ -8,6 +8,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -25,6 +26,7 @@ export default function ContactSupportModal({
   visible,
   onClose,
 }: ContactSupportModalProps) {
+  const insets = useSafeAreaInsets();
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -81,6 +83,8 @@ export default function ContactSupportModal({
       justifyContent: "center",
       alignItems: "center",
       paddingHorizontal: 20,
+      paddingTop: insets.top + 12,
+      paddingBottom: insets.bottom + 12,
     },
     container: {
       backgroundColor: surfaceColor,
