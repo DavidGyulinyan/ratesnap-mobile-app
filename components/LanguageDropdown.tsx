@@ -13,14 +13,17 @@ interface LanguageDropdownProps {
   compact?: boolean;
 }
 
-const languageData = {
+/** Shared labels for language picker (Settings, dropdown, etc.) */
+export const LANGUAGE_UI = {
   en: { name: 'English', fullName: 'English', code: 'EN', flag: '🇺🇸' },
   hy: { name: 'Հայերեն', fullName: 'Armenian', code: 'HY', flag: '🇦🇲' },
   ru: { name: 'Русский', fullName: 'Russian', code: 'RU', flag: '🇷🇺' },
   es: { name: 'Español', fullName: 'Spanish', code: 'ES', flag: '🇪🇸' },
   zh: { name: '中文', fullName: 'Chinese', code: 'ZH', flag: '🇨🇳' },
   hi: { name: 'हिंदी', fullName: 'Hindi', code: 'HI', flag: '🇮🇳' },
-};
+} as const;
+
+const languageData = LANGUAGE_UI;
 
 export default function LanguageDropdown({ 
   showFlag = true, 
