@@ -350,34 +350,15 @@ export default function HomeScreen() {
           <View style={styles.headerTopRow}>
             <View style={styles.heroBlock}>
               <Logo size={44} showText={false} />
-              <View style={styles.heroTextBlock}>
-                <ThemedText
-                  type="subtitle"
-                  style={[styles.heroTitle, { color: textColor }]}
-                >
-                  ExRatio
-                </ThemedText>
-                <ThemedText
-                  type="caption"
-                  style={[
-                    {
-                      color: textSecondaryColor,
-                      lineHeight: 20,
-                      ...(Platform.OS === "android"
-                        ? { includeFontPadding: false }
-                        : null),
-                    },
-                  ]}
-                  numberOfLines={2}
-                >
-                  {t("dashboard.features.description")}
-                </ThemedText>
-              </View>
+              <ThemedText
+                type="subtitle"
+                style={[styles.heroTitle, { color: textColor }]}
+                numberOfLines={1}
+              >
+                {t("app.title")}
+              </ThemedText>
             </View>
-            <BurgerMenu
-              quickActions={burgerQuickActions}
-              style={{ marginTop: 8 }}
-            />
+            <BurgerMenu quickActions={burgerQuickActions} />
           </View>
         </View>
 
@@ -819,21 +800,16 @@ const styles = StyleSheet.create({
   },
   headerTopRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
   },
   heroBlock: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     flex: 1,
     gap: 14,
     minWidth: 0,
-  },
-  heroTextBlock: {
-    flex: 1,
-    minWidth: 0,
-    gap: 4,
   },
   heroTitle: {
     fontSize: 22,
