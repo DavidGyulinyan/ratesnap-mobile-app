@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { hexToRgba, FormField } from '@/constants/theme';
 import Logo from '@/components/Logo';
 import AuthButtons from '@/components/AuthButtons';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,19 +60,12 @@ export default function SignInScreen() {
       loadPreferences();
     }, []);
 
-   // Helper function to add opacity to hex colors
-   const addOpacity = (hexColor: string, opacity: number) => {
-     const r = parseInt(hexColor.slice(1, 3), 16);
-     const g = parseInt(hexColor.slice(3, 5), 16);
-     const b = parseInt(hexColor.slice(5, 7), 16);
-     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-   };
-
    // Theme colors
    const backgroundColor = useThemeColor({}, 'background');
    const surfaceColor = useThemeColor({}, 'surface');
    const surfaceSecondaryColor = useThemeColor({}, 'surfaceSecondary');
    const primaryColor = useThemeColor({}, 'primary');
+   const accentColor = useThemeColor({}, 'accent');
    const textColor = useThemeColor({}, 'text');
    const textSecondaryColor = useThemeColor({}, 'textSecondary');
    const borderColor = useThemeColor({}, 'border');
@@ -115,21 +109,26 @@ export default function SignInScreen() {
       marginBottom: 32,
       alignItems: 'center',
     },
-    card: {
+    authCard: {
       backgroundColor: surfaceColor,
       width: '100%',
       maxWidth: 400,
-      borderRadius: 20,
-      padding: 24,
-      marginBottom: 24,
+      borderRadius: FormField.radiusCard,
+      padding: 14,
+      marginBottom: 20,
       borderWidth: 1,
       borderColor: borderColor,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.1,
-      shadowRadius: 20,
-      elevation: 8,
-      backdropFilter: 'blur(10px)',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    fieldPanel: {
+      borderRadius: FormField.radiusPanel,
+      borderWidth: 1,
+      padding: 12,
+      marginBottom: 12,
     },
 
     // Typography
@@ -149,33 +148,23 @@ export default function SignInScreen() {
       lineHeight: 24,
     },
 
-    // Form elements
-    form: {
-      width: '100%',
-    },
-    inputContainer: {
-      marginBottom: 20,
-    },
     label: {
-      fontSize: 14,
+      fontSize: FormField.labelSize,
       fontWeight: '600',
       color: textColor,
-      marginBottom: 8,
+      marginBottom: 10,
+      letterSpacing: 0.2,
     },
     input: {
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      fontSize: 16,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
+      backgroundColor: surfaceColor,
       color: textColor,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 1,
     },
     passwordInputContainer: {
       position: 'relative',
@@ -183,18 +172,14 @@ export default function SignInScreen() {
     passwordInput: {
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      paddingRight: 50, // Make room for the eye button
-      fontSize: 16,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      paddingRight: 50,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
+      backgroundColor: surfaceColor,
       color: textColor,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 1,
     },
     eyeButton: {
       position: 'absolute',
@@ -255,7 +240,7 @@ export default function SignInScreen() {
 
     // Email Confirmation Error Styles
     confirmationError: {
-      backgroundColor: addOpacity(warningColor, 0.10),
+      backgroundColor: hexToRgba(warningColor, 0.1),
       borderRadius: 12,
       padding: 16,
       marginBottom: 24,
@@ -287,7 +272,7 @@ export default function SignInScreen() {
 
     // Invalid Credentials Error Styles
     credentialsError: {
-      backgroundColor: addOpacity(errorColor, 0.10),
+      backgroundColor: hexToRgba(errorColor, 0.1),
       borderRadius: 12,
       padding: 16,
       marginBottom: 24,
@@ -333,8 +318,8 @@ export default function SignInScreen() {
     rememberMeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 24,
-      marginBottom: 20,
+      marginTop: 8,
+      marginBottom: 16,
       alignSelf: 'flex-start',
     },
     checkbox: {
@@ -356,7 +341,7 @@ export default function SignInScreen() {
       fontSize: 14,
       color: textColor,
     },
-  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor, errorColor, warningColor]);
+  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, accentColor, textColor, textSecondaryColor, borderColor, errorColor, warningColor]);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -438,8 +423,16 @@ export default function SignInScreen() {
            <Text style={styles.title}>{t(welcomeTitle)}</Text>
            <Text style={styles.subtitle}>{t('signin.subtitle')}</Text>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
+          <View style={[styles.authCard, { borderColor }]}>
+            <View
+              style={[
+                styles.fieldPanel,
+                {
+                  borderColor,
+                  backgroundColor: hexToRgba(accentColor, 0.1),
+                },
+              ]}
+            >
               <Text style={styles.label}>{t('auth.email')}</Text>
               <TextInput
                 style={styles.input}
@@ -453,7 +446,15 @@ export default function SignInScreen() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.fieldPanel,
+                {
+                  borderColor,
+                  backgroundColor: hexToRgba(accentColor, 0.1),
+                },
+              ]}
+            >
               <Text style={styles.label}>{t('auth.password')}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
@@ -477,7 +478,6 @@ export default function SignInScreen() {
               </View>
             </View>
 
-            {/* Remember Me Checkbox */}
             <TouchableOpacity
               style={styles.rememberMeContainer}
               onPress={() => setRememberMe(!rememberMe)}
@@ -511,7 +511,10 @@ export default function SignInScreen() {
           {/* Email Confirmation Error */}
           {emailNotConfirmed && (
             <View style={styles.confirmationError}>
-              <Text style={styles.confirmationErrorTitle}>📧 {t('signin.emailNotConfirmed')}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Ionicons name="mail-outline" size={22} color={primaryColor} />
+                <Text style={styles.confirmationErrorTitle}>{t('signin.emailNotConfirmed')}</Text>
+              </View>
               <Text style={styles.confirmationErrorText}>
                 {t('signin.checkEmail')}
               </Text>
@@ -520,9 +523,12 @@ export default function SignInScreen() {
                 onPress={handleResendConfirmation}
                 disabled={resendLoading}
               >
-                <Text style={styles.resendButtonText}>
-                  {resendLoading ? t('common.loading') : `📤 ${t('signin.resendConfirmation')}`}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  {!resendLoading && <Ionicons name="send-outline" size={18} color="#fff" />}
+                  <Text style={styles.resendButtonText}>
+                    {resendLoading ? t('common.loading') : t('signin.resendConfirmation')}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           )}
@@ -530,7 +536,10 @@ export default function SignInScreen() {
           {/* Invalid Credentials Error */}
           {invalidCredentials && (
             <View style={styles.credentialsError}>
-              <Text style={styles.credentialsErrorTitle}>❌ {t('signin.invalidCredentials')}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Ionicons name="close-circle-outline" size={22} color={errorColor} />
+                <Text style={styles.credentialsErrorTitle}>{t('signin.invalidCredentials')}</Text>
+              </View>
               <Text style={styles.credentialsErrorText}>
                 {t('signin.invalidCredentialsText')}
               </Text>

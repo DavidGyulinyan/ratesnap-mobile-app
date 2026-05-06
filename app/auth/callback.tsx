@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getSupabaseClient } from '@/lib/supabase-safe';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthSession from 'expo-auth-session';
 import * as Linking from 'expo-linking';
 
 export default function AuthCallbackScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const primaryColor = useThemeColor({}, 'primary');
+  const errorColor = useThemeColor({}, 'error');
+  const textSecondaryColor = useThemeColor({}, 'textSecondary');
+  const backgroundColor = useThemeColor({}, 'background');
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -23,7 +27,15 @@ export default function AuthCallbackScreen() {
 
         const incomingUrl = await Linking.getInitialURL();
         if (incomingUrl) {
-          const { params, errorCode } = AuthSession.parse(incomingUrl);
+          const { queryParams } = Linking.parse(incomingUrl);
+          const params = queryParams ?? {};
+          const errRaw = params.error;
+          const errorCode =
+            typeof errRaw === 'string'
+              ? errRaw
+              : Array.isArray(errRaw)
+                ? errRaw[0]
+                : null;
 
           if (errorCode) {
             throw new Error(`OAuth callback error: ${errorCode}`);
@@ -162,9 +174,9 @@ export default function AuthCallbackScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor }]}>
         <View style={styles.content}>
-          <ActivityIndicator size="large" color="#3b82f6" />
+          <ActivityIndicator size="large" color={primaryColor} />
           <Text style={styles.loadingText}>Completing authentication...</Text>
           <Text style={styles.subtitle}>Please wait while we sign you in</Text>
         </View>
@@ -174,19 +186,21 @@ export default function AuthCallbackScreen() {
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor }]}>
         <View style={styles.content}>
-          <Ionicons name="alert-circle-outline" size={64} color="#ef4444" />
-          <Text style={styles.errorTitle}>Authentication Failed</Text>
+          <Ionicons name="alert-circle-outline" size={64} color={errorColor} />
+          <Text style={[styles.errorTitle, { color: errorColor }]}>Authentication Failed</Text>
           <Text style={styles.errorText}>{error}</Text>
           
           <View style={styles.buttonContainer}>
-            <Text style={styles.retryButton} onPress={handleRetry}>
-              🔄 Try Again
-            </Text>
-            <Text style={styles.backButton} onPress={handleGoBack}>
-              ← Go Back
-            </Text>
+            <TouchableOpacity style={styles.retryButtonRow} onPress={handleRetry} activeOpacity={0.7}>
+              <Ionicons name="refresh-outline" size={18} color={primaryColor} />
+              <Text style={[styles.retryButton, { color: primaryColor }]}>Try Again</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.backButtonRow} onPress={handleGoBack} activeOpacity={0.7}>
+              <Ionicons name="arrow-back" size={18} color={textSecondaryColor} />
+              <Text style={[styles.backButton, { color: textSecondaryColor }]}>Go Back</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -194,10 +208,10 @@ export default function AuthCallbackScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <View style={styles.content}>
-        <Ionicons name="checkmark-circle-outline" size={64} color="#10b981" />
-        <Text style={styles.successTitle}>Authentication Complete</Text>
+        <Ionicons name="checkmark-circle-outline" size={64} color={primaryColor} />
+        <Text style={[styles.successTitle, { color: primaryColor }]}>Authentication Complete</Text>
         <Text style={styles.successText}>You have been successfully signed in!</Text>
       </View>
     </View>
@@ -207,7 +221,6 @@ export default function AuthCallbackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
@@ -228,26 +241,25 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#18181b',
     marginTop: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#71717a',
     marginTop: 8,
     textAlign: 'center',
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#ef4444',
     marginTop: 16,
     textAlign: 'center',
   },
   errorText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#71717a',
     marginTop: 8,
     textAlign: 'center',
     marginBottom: 24,
@@ -255,13 +267,12 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#10b981',
     marginTop: 16,
     textAlign: 'center',
   },
   successText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#71717a',
     marginTop: 8,
     textAlign: 'center',
   },
@@ -269,17 +280,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     marginTop: 24,
+    alignItems: 'center',
+  },
+  retryButtonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    padding: 12,
+  },
+  backButtonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    padding: 12,
   },
   retryButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3b82f6',
-    padding: 12,
   },
   backButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6b7280',
-    padding: 12,
   },
 });

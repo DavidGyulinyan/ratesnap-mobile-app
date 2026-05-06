@@ -84,6 +84,9 @@ export default function SettingsScreen() {
   const primaryColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
+  const errorColor = useThemeColor({}, 'error');
+  const textInverseColor = useThemeColor({}, 'textInverse');
+  const borderColor = useThemeColor({}, 'border');
 
   // Load notification settings and exchange rate data on mount
   useEffect(() => {
@@ -821,11 +824,11 @@ ExRatio चुनने के लिए धन्यवाद!`
           <View style={{ width: 32 }} />
         </View>
 
-        {[
-          { key: 'system', name: t('settings.system'), icon: '📱' },
-          { key: 'light', name: t('settings.light'), icon: '☀️' },
-          { key: 'dark', name: t('settings.dark'), icon: '🌙' },
-        ].map((theme) => (
+        {([
+          { key: 'system', name: t('settings.system'), icon: 'phone-portrait-outline' as const },
+          { key: 'light', name: t('settings.light'), icon: 'sunny-outline' as const },
+          { key: 'dark', name: t('settings.dark'), icon: 'moon-outline' as const },
+        ] as const).map((theme) => (
           <TouchableOpacity
             key={theme.key}
             style={[
@@ -838,10 +841,10 @@ ExRatio चुनने के लिए धन्यवाद!`
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <ThemedText style={{ fontSize: 20 }}>{theme.icon}</ThemedText>
+              <Ionicons name={theme.icon} size={22} color={primaryColor} />
               <ThemedText style={styles.settingItemText}>{theme.name}</ThemedText>
               {themePreference === theme.key && (
-                <ThemedText style={styles.checkmark}>✓</ThemedText>
+                <Ionicons name="checkmark-circle" size={20} color={primaryColor} />
               )}
             </View>
           </TouchableOpacity>
@@ -871,15 +874,19 @@ ExRatio चुनने के लिए धन्यवाद!`
         </View>
 
         <View style={{ gap: 16 }}>
-          {[
-            { key: 'enabled', label: t('settings.enableNotifications'), icon: notificationSettings.enabled ? '🔔' : '🔕' },
-            { key: 'sound', label: t('settings.sound'), icon: '🔊' },
-            { key: 'vibration', label: t('settings.vibration'), icon: '📳' },
-            { key: 'showPreview', label: t('settings.showPreview'), icon: '👁️' },
-          ].map((setting) => (
+          {([
+            {
+              key: 'enabled',
+              label: t('settings.enableNotifications'),
+              icon: (notificationSettings.enabled ? 'notifications-outline' : 'notifications-off-outline') as const,
+            },
+            { key: 'sound', label: t('settings.sound'), icon: 'volume-high-outline' as const },
+            { key: 'vibration', label: t('settings.vibration'), icon: 'phone-portrait-outline' as const },
+            { key: 'showPreview', label: t('settings.showPreview'), icon: 'eye-outline' as const },
+          ] as const).map((setting) => (
             <View key={setting.key} style={styles.toggleContainer}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                <ThemedText style={{ fontSize: 20 }}>{setting.icon}</ThemedText>
+                <Ionicons name={setting.icon} size={22} color={primaryColor} />
                 <ThemedText style={styles.settingItemText}>{setting.label}</ThemedText>
               </View>
               <TouchableOpacity
@@ -994,25 +1001,28 @@ ExRatio चुनने के लिए धन्यवाद!`
                       height: 24,
                       justifyContent: 'center',
                       alignItems: 'center',
-                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                      backgroundColor: 'rgba(63, 63, 70, 0.12)',
                       borderRadius: 12,
                       borderWidth: 1,
-                      borderColor: 'rgba(239, 68, 68, 0.3)',
+                      borderColor: borderColor,
                     }}
                     onPress={() => handleDeletePickedRate(rate.id)}
                   >
-                    <ThemedText style={{ fontSize: 14, fontWeight: 'bold', color: '#ef4444' }}>×</ThemedText>
+                    <ThemedText style={{ fontSize: 14, fontWeight: 'bold', color: errorColor }}>×</ThemedText>
                   </TouchableOpacity>
                 </View>
               ))}
               {pickedRates.pickedRates.length > 1 && (
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: '#ef4444', marginTop: 16 }]}
+                  style={[styles.button, { backgroundColor: errorColor, marginTop: 16 }]}
                   onPress={handleDeleteAllPickedRates}
                 >
-                  <ThemedText style={[styles.buttonText, { color: 'white' }]}>
-                    🗑️ Delete All Picked Rates
-                  </ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <Ionicons name="trash-outline" size={18} color={textInverseColor} />
+                    <ThemedText style={[styles.buttonText, { color: textInverseColor }]}>
+                      Delete All Picked Rates
+                    </ThemedText>
+                  </View>
                 </TouchableOpacity>
               )}
             </ScrollView>
@@ -1130,26 +1140,29 @@ ExRatio चुनने के लिए धन्यवाद!`
                         height: 24,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        backgroundColor: 'rgba(63, 63, 70, 0.12)',
                         borderRadius: 12,
                         borderWidth: 1,
-                        borderColor: 'rgba(239, 68, 68, 0.3)',
+                        borderColor: borderColor,
                       }}
                       onPress={() => handleDeleteRate(rate.id)}
                     >
-                      <ThemedText style={{ fontSize: 14, fontWeight: 'bold', color: '#ef4444' }}>×</ThemedText>
+                      <ThemedText style={{ fontSize: 14, fontWeight: 'bold', color: errorColor }}>×</ThemedText>
                     </TouchableOpacity>
                   </View>
                 ))}
               </ScrollView>
               {savedRates.savedRates.length > 1 && (
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: '#ef4444', marginTop: 16 }]}
+                  style={[styles.button, { backgroundColor: errorColor, marginTop: 16 }]}
                   onPress={handleDeleteAllRates}
                 >
-                  <ThemedText style={[styles.buttonText, { color: 'white' }]}>
-                    🗑️ Delete All Rates
-                  </ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <Ionicons name="trash-outline" size={18} color={textInverseColor} />
+                    <ThemedText style={[styles.buttonText, { color: textInverseColor }]}>
+                      Delete All Rates
+                    </ThemedText>
+                  </View>
                 </TouchableOpacity>
               )}
             </>
@@ -1168,7 +1181,10 @@ ExRatio चुनने के लिए धन्यवाद!`
       <ScrollView style={styles.scrollView}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>⚙️ {t('settings.title')}</ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Ionicons name="settings-outline" size={28} color={primaryColor} />
+            <ThemedText style={styles.title}>{t('settings.title')}</ThemedText>
+          </View>
           <ThemedText style={styles.subtitle}>
             {t('settings.subtitle')}
           </ThemedText>
@@ -1182,7 +1198,10 @@ ExRatio चुनने के लिए धन्यवाद!`
             style={styles.settingItem}
             onPress={() => setShowThemeSelection(true)}
           >
-            <ThemedText style={styles.settingItemText}>🎨 {t('settings.theme')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Ionicons name="color-palette-outline" size={20} color={primaryColor} />
+              <ThemedText style={styles.settingItemText}>{t('settings.theme')}</ThemedText>
+            </View>
             <ThemedText style={styles.settingValue}>
               {themePreference === 'system' ? t('settings.system') :
                themePreference === 'light' ? t('settings.light') : t('settings.dark')}
@@ -1194,7 +1213,10 @@ ExRatio चुनने के लिए धन्यवाद!`
             style={styles.settingItem}
             onPress={() => setShowNotificationSettings(true)}
           >
-            <ThemedText style={styles.settingItemText}>🔔 {t('settings.notifications')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Ionicons name="notifications-outline" size={20} color={primaryColor} />
+              <ThemedText style={styles.settingItemText}>{t('settings.notifications')}</ThemedText>
+            </View>
             <ThemedText style={styles.settingValue}>
               {notificationSettings.enabled ? t('common.enabled') : t('common.disabled')}
             </ThemedText>
@@ -1209,27 +1231,36 @@ ExRatio चुनने के लिए धन्यवाद!`
             style={[styles.button, styles.secondaryButton]}
             onPress={handleClearCache}
           >
-            <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-              🗑️ {t('settings.clearCache')}
-            </ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Ionicons name="trash-outline" size={20} color={primaryColor} />
+              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                {t('settings.clearCache')}
+              </ThemedText>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
             onPress={handleExportData}
           >
-            <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-              📤 {t('settings.exportData')}
-            </ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Ionicons name="share-outline" size={20} color={primaryColor} />
+              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                {t('settings.exportData')}
+              </ThemedText>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
             onPress={handleImportData}
           >
-            <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-              📥 {t('settings.importData')}
-            </ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Ionicons name="download-outline" size={20} color={primaryColor} />
+              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                {t('settings.importData')}
+              </ThemedText>
+            </View>
           </TouchableOpacity>
 
           {user && (
@@ -1238,22 +1269,28 @@ ExRatio चुनने के लिए धन्यवाद!`
                 style={[styles.button, styles.secondaryButton]}
                 onPress={() => setShowSavedRatesManagement(true)}
               >
-                <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                  ⭐ {t('saved.shortTitle')} ({savedRates.savedRates?.length || 0})
-                </ThemedText>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="bookmark-outline" size={20} color={primaryColor} />
+                  <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                    {t('saved.shortTitle')} ({savedRates.savedRates?.length || 0})
+                  </ThemedText>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.button, styles.secondaryButton]}
                 onPress={() => setShowPickedRatesManagement(true)}
               >
-                <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                  💱 Multi-Currency ({pickedRates.pickedRates?.length || 0})
-                </ThemedText>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="stats-chart-outline" size={20} color={primaryColor} />
+                  <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                    Multi-Currency ({pickedRates.pickedRates?.length || 0})
+                  </ThemedText>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#ef4444' }]}
+                style={[styles.button, { backgroundColor: errorColor }]}
                 onPress={() => {
                   Alert.alert(
                     'Clear All Data',
@@ -1280,9 +1317,12 @@ ExRatio चुनने के लिए धन्यवाद!`
                   );
                 }}
               >
-                <ThemedText style={[styles.buttonText, { color: 'white' }]}>
-                  🗑️ {t('settings.clearAllData')}
-                </ThemedText>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Ionicons name="trash-outline" size={20} color={textInverseColor} />
+                  <ThemedText style={[styles.buttonText, { color: textInverseColor }]}>
+                    {t('settings.clearAllData')}
+                  </ThemedText>
+                </View>
               </TouchableOpacity>
             </>
           )}
@@ -1294,14 +1334,20 @@ ExRatio चुनने के लिए धन्यवाद!`
             <ThemedText style={styles.sectionTitle}>{t('settings.accountInfo')}</ThemedText>
 
             <TouchableOpacity style={styles.settingItem}>
-              <ThemedText style={styles.settingItemText}>👤 {t('auth.username')}</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="person-outline" size={20} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('auth.username')}</ThemedText>
+              </View>
               <ThemedText style={styles.settingValue}>
                 {user.user_metadata?.username || user.email?.split('@')[0]}
               </ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.settingItem}>
-              <ThemedText style={styles.settingItemText}>📧 {t('auth.email')}</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="mail-outline" size={20} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('auth.email')}</ThemedText>
+              </View>
               <ThemedText style={styles.settingValue}>{user.email}</ThemedText>
             </TouchableOpacity>
 
@@ -1309,23 +1355,29 @@ ExRatio चुनने के लिए धन्यवाद!`
               style={[styles.button, styles.secondaryButton]}
               onPress={handleSignOut}
             >
-              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                🚪 {t('auth.signout')}
-              </ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Ionicons name="log-out-outline" size={20} color={primaryColor} />
+                <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
+                  {t('auth.signout')}
+                </ThemedText>
+              </View>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Exchange Rate Info Section */}
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>📈{t('settings.exchangeRateInfo')}</ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <Ionicons name="trending-up-outline" size={20} color={primaryColor} />
+            <ThemedText style={styles.sectionTitle}>{t('settings.exchangeRateInfo')}</ThemedText>
+          </View>
           <ThemedText style={[styles.settingValue, { fontSize: 14, marginBottom: 16, lineHeight: 20 }]}>
             {t('settings.exchangeRateInfoDescription')}
           </ThemedText>
 
           <View style={[styles.settingItem, { marginBottom: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ThemedText style={{ fontSize: 16 }}>🕒</ThemedText>
+              <Ionicons name="time-outline" size={20} color={primaryColor} />
               <ThemedText style={styles.settingItemText}>{t('time.lastUpdate')}</ThemedText>
             </View>
             <View style={{ alignItems: 'flex-end', flex: 1 }}>
@@ -1339,7 +1391,7 @@ ExRatio चुनने के लिए धन्यवाद!`
 
           <View style={styles.settingItem}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ThemedText style={{ fontSize: 16 }}>⏰</ThemedText>
+              <Ionicons name="timer-outline" size={20} color={primaryColor} />
               <ThemedText style={styles.settingItemText}>{t('time.nextUpdate')}</ThemedText>
             </View>
             <View style={{ alignItems: 'flex-end', flex: 1 }}>
@@ -1360,7 +1412,10 @@ ExRatio चुनने के लिए धन्यवाद!`
             style={styles.settingItem}
             onPress={() => setShowTerms(true)}
           >
-            <ThemedText style={styles.settingItemText}>📄 {t('settings.termsOfUse')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Ionicons name="document-text-outline" size={20} color={primaryColor} />
+              <ThemedText style={styles.settingItemText}>{t('settings.termsOfUse')}</ThemedText>
+            </View>
             <ThemedText style={styles.settingValue}>›</ThemedText>
           </TouchableOpacity>
         </View>
@@ -1370,7 +1425,10 @@ ExRatio चुनने के लिए धन्यवाद!`
           <ThemedText style={styles.sectionTitle}>{t('settings.about')}</ThemedText>
 
           <TouchableOpacity style={styles.settingItem}>
-            <ThemedText style={styles.settingItemText}>ℹ️ {t('settings.about')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Ionicons name="information-circle-outline" size={20} color={primaryColor} />
+              <ThemedText style={styles.settingItemText}>{t('settings.about')}</ThemedText>
+            </View>
             <ThemedText style={styles.settingValue}>1.0.0</ThemedText>
           </TouchableOpacity>
 
@@ -1378,7 +1436,10 @@ ExRatio चुनने के लिए धन्यवाद!`
             style={styles.settingItem}
             onPress={() => setShowContactSupport(true)}
           >
-            <ThemedText style={styles.settingItemText}>📧 {t('settings.contactSupport')}</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Ionicons name="mail-outline" size={20} color={primaryColor} />
+              <ThemedText style={styles.settingItemText}>{t('settings.contactSupport')}</ThemedText>
+            </View>
             <ThemedText style={styles.settingValue}>Send Message</ThemedText>
           </TouchableOpacity>
         </View>

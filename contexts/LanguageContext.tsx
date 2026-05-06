@@ -170,7 +170,7 @@ const translations = {
     'saved.emptyState': 'No saved rates yet. Convert currencies and click "Save This Rate" to add some!',
     'saved.loadingText': 'Loading saved rates...',
     'saved.deletingIcon': '⏳',
-    'saved.deleteIcon': '🗑️',
+    'saved.deleteIcon': '',
     'saved.hideIcon': '×',    // Settings & Common
     'settings.title': 'Settings',
     'settings.subtitle': 'Manage your account and app preferences',
@@ -238,7 +238,7 @@ const translations = {
     'multi.addCurrency': '+ Add Currency',
     'multi.convertTo': 'Convert To',
     'multi.deleteAll': 'Delete All',
-    'multi.titleComponent': '🔄 Multi-Currency Converter',
+    'multi.titleComponent': 'Multi-Currency Converter',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': 'Select Currency',
@@ -336,7 +336,7 @@ const translations = {
     'time.nextUpdate': 'Next update',
 
     // Onboarding Guide
-    'onboarding.welcome': 'Welcome to ExRatio! 🎉',
+    'onboarding.welcome': 'Welcome to ExRatio!',
     'onboarding.welcomeDesc': 'Your professional currency converter with real-time rates and advanced features.',
     'onboarding.convert': 'Convert Currencies Instantly',
     'onboarding.convertDesc': 'Use the main converter to quickly convert between any currencies with live exchange rates.',
@@ -587,7 +587,7 @@ const translations = {
     'multi.addCurrency': '+ Ավելացնել',
     'multi.convertTo': 'Փոխանակել',
     'multi.deleteAll': 'Հեռացնել բոլորը',
-    'multi.titleComponent': '🔄 Բազմարժույթ փոխանակում',
+    'multi.titleComponent': 'Բազմարժույթ փոխանակում',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': 'Ընտրել արժույթ',
@@ -643,7 +643,7 @@ const translations = {
     'saved.emptyState': 'Դեռևս պահպանված դրույքներ չկան: Փոխանակեք արժույթները և սեղմեք "Պահպանել այս դրույքը" որպեսզի ավելացնեք:',
     'saved.loadingText': 'Բեռնվում են պահպանված դրույքները...',
     'saved.deletingIcon': '⏳',
-    'saved.deleteIcon': '🗑️',
+    'saved.deleteIcon': '',
     'saved.hideIcon': '×',    // Rate Alert Manager
     'rateAlerts.signInRequired': 'Մուտք գործեք շարունակելու համար',
     'rateAlerts.signInMessage': 'Խնդրում ենք մուտք գործել՝ արժույթի դրույքի ծանուցումներ ստեղծելու համար',
@@ -777,7 +777,7 @@ const translations = {
     'time.nextUpdate': 'Հաջորդ',
 
     // Onboarding Guide
-    'onboarding.welcome': 'Բարի գալուստ ExRatio! 🎉',
+    'onboarding.welcome': 'Բարի գալուստ ExRatio!',
     'onboarding.welcomeDesc': 'Թարմ ու ճշգրիտ փոխարժեքներ՝ լիարժեք գործիքներով և առաջադեմ հնարավորություններով։',
     'onboarding.convert': 'Արժույթները փոխանակեք անմիջապես',
     'onboarding.convertDesc': 'Հիմնական փոխանակումը թույլ է տալիս ակնթարթորեն իմանալ ներկայիս փոխարժեքներն ու կատարել արժույթների փոխարկում։',
@@ -978,7 +978,7 @@ const translations = {
     'multi.addCurrency': '+ Добавить',
     'multi.convertTo': 'Конвертировать в',
     'multi.deleteAll': 'Удалить все',
-    'multi.titleComponent': '🔄 Мультивалютный конвертер',
+    'multi.titleComponent': 'Мультивалютный конвертер',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': 'Выберите валюту',
@@ -1086,7 +1086,7 @@ const translations = {
     'time.nextUpdate': 'Следующее',
 
     // Onboarding Guide
-    'onboarding.welcome': 'Добро пожаловать в ExRatio! 🎉',
+    'onboarding.welcome': 'Добро пожаловать в ExRatio!',
     'onboarding.welcomeDesc': 'Ваш профессиональный конвертер валют с курсами в реальном времени и расширенными функциями.',
     'onboarding.convert': 'Конвертируйте валюты мгновенно',
     'onboarding.convertDesc': 'Используйте основной конвертер для быстрого конвертирования между любыми валютами с курсами в реальном времени.',
@@ -1362,7 +1362,7 @@ const translations = {
     'multi.addCurrency': '+ Agregar Moneda',
     'multi.convertTo': 'Convertir a',
     'multi.deleteAll': 'Eliminar Todo',
-    'multi.titleComponent': '🔄 Convertidor Multi-Moneda',
+    'multi.titleComponent': 'Convertidor Multi-Moneda',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': 'Seleccionar Moneda',
@@ -1470,7 +1470,7 @@ const translations = {
     'time.nextUpdate': 'Próxima',
 
     // Onboarding Guide
-    'onboarding.welcome': '¡Bienvenido a ExRatio! 🎉',
+    'onboarding.welcome': '¡Bienvenido a ExRatio!',
     'onboarding.welcomeDesc': 'Tu convertidor de moneda profesional con tasas en tiempo real y funciones avanzadas.',
     'onboarding.convert': 'Convierte Monedas Instantáneamente',
     'onboarding.convertDesc': 'Usa el convertidor principal para convertir rápidamente entre cualquier moneda con tasas de cambio en vivo.',
@@ -1744,7 +1744,7 @@ const translations = {
     'multi.addCurrency': '+ 添加货币',
     'multi.convertTo': '转换为',
     'multi.deleteAll': '删除全部',
-    'multi.titleComponent': '🔄 多货币转换器',
+    'multi.titleComponent': '多货币转换器',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': '选择货币',
@@ -1852,7 +1852,7 @@ const translations = {
     'time.nextUpdate': '下次更新',
 
     // Onboarding Guide
-    'onboarding.welcome': '欢迎来到ExRatio！🎉',
+    'onboarding.welcome': '欢迎来到ExRatio！',
     'onboarding.welcomeDesc': '您的专业货币转换器，具有实时汇率和高级功能。',
     'onboarding.convert': '即时转换货币',
     'onboarding.convertDesc': '使用主转换器快速转换任何货币之间的汇率，使用实时汇率。',
@@ -2127,7 +2127,7 @@ const translations = {
     'multi.addCurrency': '+ करेंसी जोड़ें',
     'multi.convertTo': 'में बदलें',
     'multi.deleteAll': 'सभी हटाएं',
-    'multi.titleComponent': '🔄 मल्टी-करेंसी कन्वर्टर',
+    'multi.titleComponent': 'मल्टी-करेंसी कन्वर्टर',
 
     // Currency Picker & Dynamic
     'picker.selectCurrency': 'मुद्रा चुनें',
@@ -2235,7 +2235,7 @@ const translations = {
     'time.nextUpdate': 'अगला अपडेट',
 
     // Onboarding Guide
-    'onboarding.welcome': 'ExRatio में आपका स्वागत है! 🎉',
+    'onboarding.welcome': 'ExRatio में आपका स्वागत है!',
     'onboarding.welcomeDesc': 'रियल-टाइम दरों और उन्नत सुविधाओं के साथ आपका पेशेवर मुद्रा कन्वर्टर।',
     'onboarding.convert': 'मुद्राएं तुरंत बदलें',
     'onboarding.convertDesc': 'लाइव एक्सचेंज दरों के साथ किसी भी मुद्राओं के बीच तेजी से बदलने के लिए मुख्य कन्वर्टर का उपयोग करें।',

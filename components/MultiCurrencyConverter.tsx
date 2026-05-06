@@ -19,6 +19,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useConverterHistory } from "@/hooks/useUserData";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserDataService } from "@/lib/userDataService";
+import { FormField } from "@/constants/theme";
+import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 
 interface MultiCurrencyConverterProps {
   currenciesData: any;
@@ -128,7 +130,9 @@ export default function MultiCurrencyConverter({
   // Load available currencies
   useEffect(() => {
     if (currenciesData && currenciesData.conversion_rates) {
-      setCurrencyList(Object.keys(currenciesData.conversion_rates));
+      setCurrencyList(
+        fiatKeysFromConversionRates(currenciesData.conversion_rates)
+      );
     }
   }, [currenciesData]);
 
@@ -917,110 +921,117 @@ export default function MultiCurrencyConverter({
   };
 
   return (
-    <View style={[styles.container, style]}>
-      <View
-        style={[
-          {
-            backgroundColor: surfaceColor,
-            borderColor: primaryColor,
-            shadowColor: shadowColor,
-          },
-          styles.card,
-        ]}
+    <View style={[styles.container, style, inModal && styles.containerFlex]}>
+      <ScrollView
+        style={inModal ? styles.scrollFlex : undefined}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={inModal}
       >
-        {!inModal && (
-          <View style={styles.header}>
-            {onClose && (
-              <TouchableOpacity
-                style={[
-                  {
-                    backgroundColor: surfaceSecondaryColor,
-                    shadowColor: shadowColor,
-                  },
-                  styles.closeButton,
-                  closeButtonPressed && { backgroundColor: borderColor },
-                ]}
-                onPressIn={() => setCloseButtonPressed(true)}
-                onPressOut={() => setCloseButtonPressed(false)}
-                onPress={() => {
-                  onClose();
-                  setCloseButtonPressed(false);
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="Go back"
-              >
-                <Ionicons
-                  name="arrow-back"
-                  size={22}
-                  color={closeButtonPressed ? textSecondaryColor : textColor}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {/* Amount Input */}
-        <View style={styles.inputGroup}>
-          <ThemedText style={[{ color: textColor }, styles.label]}>
-            {t("multi.amount")}
-          </ThemedText>
-          <TextInput
-            style={[
-              {
-                backgroundColor: surfaceColor,
-                borderColor: borderColor,
-                color: textColor,
-              },
-              styles.amountInput,
-            ]}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            placeholder={t("converter.enterAmount")}
-            placeholderTextColor={textSecondaryColor}
-          />
-        </View>
-
-        {/* From Currency Input */}
-        <View style={styles.inputGroup}>
-          <ThemedText style={[{ color: textColor }, styles.label]}>
-            {t("multi.from")}
-          </ThemedText>
-          <TouchableOpacity
-            style={[
-              {
-                backgroundColor: surfaceColor,
-                borderColor: borderColor,
-                shadowColor: shadowColor,
-              },
-              styles.currencyButton,
-            ]}
-            onPress={() => setShowFromCurrencyPicker(true)}
-          >
-            {fromCurrency ? (
-              <>
-                <CurrencyFlag currency={fromCurrency} size={20} />
-                <ThemedText
-                  style={[{ color: textColor }, styles.currencyButtonText]}
+        <View
+          style={[
+            {
+              backgroundColor: surfaceColor,
+              borderColor: borderColor,
+              shadowColor: shadowColor,
+            },
+            styles.card,
+          ]}
+        >
+          {!inModal && (
+            <View style={styles.header}>
+              {onClose && (
+                <TouchableOpacity
+                  style={[
+                    {
+                      backgroundColor: surfaceSecondaryColor,
+                      shadowColor: shadowColor,
+                    },
+                    styles.closeButton,
+                    closeButtonPressed && { backgroundColor: borderColor },
+                  ]}
+                  onPressIn={() => setCloseButtonPressed(true)}
+                  onPressOut={() => setCloseButtonPressed(false)}
+                  onPress={() => {
+                    onClose();
+                    setCloseButtonPressed(false);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Go back"
                 >
-                  {fromCurrency}
-                </ThemedText>
-              </>
-            ) : (
-              <ThemedText
-                style={[
-                  { color: textSecondaryColor },
-                  styles.currencyButtonPlaceholder,
-                ]}
-              >
-                {t("multi.selectCurrency")}
-              </ThemedText>
-            )}
-          </TouchableOpacity>
-        </View>
+                  <Ionicons
+                    name="arrow-back"
+                    size={22}
+                    color={closeButtonPressed ? textSecondaryColor : textColor}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
-        {/* Target Currencies Section */}
-        <View style={styles.targetsSection}>
+          {/* Amount Input */}
+          <View style={styles.inputGroup}>
+            <ThemedText style={[{ color: textColor }, styles.label]}>
+              {t("multi.amount")}
+            </ThemedText>
+            <TextInput
+              style={[
+                {
+                  backgroundColor: surfaceColor,
+                  borderColor: borderColor,
+                  color: textColor,
+                },
+                styles.amountInput,
+              ]}
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              placeholder={t("converter.enterAmount")}
+              placeholderTextColor={textSecondaryColor}
+            />
+          </View>
+
+          {/* From Currency Input */}
+          <View style={styles.inputGroup}>
+            <ThemedText style={[{ color: textColor }, styles.label]}>
+              {t("multi.from")}
+            </ThemedText>
+            <TouchableOpacity
+              style={[
+                {
+                  backgroundColor: surfaceColor,
+                  borderColor: borderColor,
+                  shadowColor: shadowColor,
+                },
+                styles.currencyButton,
+              ]}
+              onPress={() => setShowFromCurrencyPicker(true)}
+            >
+              {fromCurrency ? (
+                <>
+                  <CurrencyFlag currency={fromCurrency} size={20} />
+                  <ThemedText
+                    style={[{ color: textColor }, styles.currencyButtonText]}
+                  >
+                    {fromCurrency}
+                  </ThemedText>
+                </>
+              ) : (
+                <ThemedText
+                  style={[
+                    { color: textSecondaryColor },
+                    styles.currencyButtonPlaceholder,
+                  ]}
+                >
+                  {t("multi.selectCurrency")}
+                </ThemedText>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Target Currencies Section */}
+          <View style={styles.targetsSection}>
           <View style={styles.targetsHeader}>
             <ThemedText style={[{ color: textColor }, styles.label]}>
               {t("multi.convertTo")}
@@ -1193,7 +1204,8 @@ export default function MultiCurrencyConverter({
             </>
           )}
         </View>
-      </View>
+        </View>
+      </ScrollView>
 
       {/* From Currency Picker */}
       <CurrencyPicker
@@ -1228,10 +1240,19 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
   },
+  containerFlex: {
+    flex: 1,
+  },
+  scrollFlex: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   card: {
-    borderRadius: 16,
-    borderWidth: 2,
-    padding: 20,
+    borderRadius: FormField.radiusCard,
+    borderWidth: 1,
+    padding: 14,
   },
   header: {
     flexDirection: "row",
@@ -1256,23 +1277,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: FormField.labelSize,
     fontWeight: "600",
-    marginBottom: 8,
+    marginBottom: 10,
+    letterSpacing: 0.2,
   },
   amountInput: {
-    borderWidth: 2,
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 18,
-    fontWeight: "500",
+    borderWidth: 1,
+    borderRadius: FormField.radiusInput,
+    paddingHorizontal: FormField.padH,
+    paddingVertical: FormField.padV,
+    fontSize: FormField.fontSize,
+    fontWeight: FormField.fontWeight,
   },
   currencyButton: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 12,
-    padding: 16,
+    borderWidth: 1,
+    borderRadius: FormField.radiusInput,
+    paddingVertical: FormField.padV,
+    paddingHorizontal: FormField.padH,
   },
   currencyButtonText: {
     marginLeft: 10,
@@ -1293,9 +1317,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   addButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: FormField.padH,
+    paddingVertical: 10,
+    borderRadius: FormField.radiusInput,
     borderWidth: 1,
   },
   addButtonText: {

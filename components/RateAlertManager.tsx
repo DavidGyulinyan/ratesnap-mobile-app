@@ -20,6 +20,8 @@ import { useRateAlerts } from "@/hooks/useUserData";
 import { useAuth } from "@/contexts/AuthContext";
 import alertCheckerService from "@/lib/alertCheckerService";
 import { getAsyncStorage } from "@/lib/storage";
+import { FormField } from "@/constants/theme";
+import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 
 interface RateAlert {
   id: string;
@@ -69,10 +71,13 @@ export default function RateAlertManager({
   const borderColor = useThemeColor({}, 'border');
   const successColor = useThemeColor({}, 'success');
   const errorColor = useThemeColor({}, 'error');
+  const textInverseColor = useThemeColor({}, 'textInverse');
   const shadowColor = '#000000'; // Use black for shadows
 
   // Extract currencies list from currenciesData
-  const currencies = currenciesData?.conversion_rates ? Object.keys(currenciesData.conversion_rates) : [];
+  const currencies = fiatKeysFromConversionRates(
+    currenciesData?.conversion_rates
+  );
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [editingAlertId, setEditingAlertId] = useState<string | null>(null);
   const [showFromCurrencyPicker, setShowFromCurrencyPicker] = useState(false);
@@ -318,7 +323,7 @@ export default function RateAlertManager({
                 style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.createButton]}
                 onPress={handleCreateAlert}
               >
-                <ThemedText style={[{ color: textColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
+                <ThemedText style={[{ color: textInverseColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
               </TouchableOpacity>
             </View>
             <ThemedText style={styles.subtitle}>
@@ -334,7 +339,7 @@ export default function RateAlertManager({
               style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.createButton]}
               onPress={handleCreateAlert}
             >
-              <ThemedText style={[{ color: textColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
+              <ThemedText style={[{ color: textInverseColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
             </TouchableOpacity>
           </View>
         )}
@@ -380,13 +385,16 @@ export default function RateAlertManager({
               style={[{ backgroundColor: primaryColor, shadowColor: primaryColor }, styles.debugButton]}
               onPress={handleDebugAlerts}
             >
-              <ThemedText style={[{ color: textColor }, styles.debugButtonText]}>🔍 Debug</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="search-outline" size={16} color={textInverseColor} />
+                <ThemedText style={[{ color: textInverseColor }, styles.debugButtonText]}>Debug</ThemedText>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity
               style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.createButton]}
               onPress={handleCreateAlert}
             >
-              <ThemedText style={[{ color: textColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
+              <ThemedText style={[{ color: textInverseColor }, styles.createButtonText]}>{t('rateAlerts.createButton')}</ThemedText>
             </TouchableOpacity>
           </View>
           {user && (
@@ -404,7 +412,10 @@ export default function RateAlertManager({
             style={[{ backgroundColor: primaryColor, shadowColor: primaryColor }, styles.debugButton]}
             onPress={handleDebugAlerts}
           >
-            <ThemedText style={[{ color: textColor }, styles.debugButtonText]}>🔍 Debug</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="search-outline" size={16} color={textInverseColor} />
+              <ThemedText style={[{ color: textInverseColor }, styles.debugButtonText]}>Debug</ThemedText>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.createButton]}
@@ -454,8 +465,8 @@ export default function RateAlertManager({
                     value={alert.is_active}
                     onValueChange={(value) => toggleAlertActive(alert.id, value)}
                     disabled={alert.notified}
-                    trackColor={{ false: '#ec1c1cff', true: '#10b981' }}
-                    thumbColor='#ffffff'
+                    trackColor={{ false: borderColor, true: primaryColor }}
+                    thumbColor={textInverseColor}
                   />
                 </View>
 
@@ -539,7 +550,7 @@ export default function RateAlertManager({
               <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSaveAlert} style={[{ backgroundColor: successColor, shadowColor: successColor }, styles.saveButton]}>
-              <ThemedText style={[{ color: textColor }, styles.saveButtonText]}>{t('rateAlerts.save')}</ThemedText>
+              <ThemedText style={[{ color: textInverseColor }, styles.saveButtonText]}>{t('rateAlerts.save')}</ThemedText>
             </TouchableOpacity>
           </View>
 
@@ -559,7 +570,7 @@ export default function RateAlertManager({
                   <ThemedText style={[{ color: textColor }, styles.currencySelectorText]}>
                     {formData.fromCurrency}
                   </ThemedText>
-                  <ThemedText style={[{ color: textSecondaryColor }, styles.arrowText]}>▼</ThemedText>
+                  <Ionicons name="chevron-down" size={18} color={textSecondaryColor} />
                 </View>
               </TouchableOpacity>
             </View>
@@ -575,7 +586,7 @@ export default function RateAlertManager({
                   <ThemedText style={[{ color: textColor }, styles.currencySelectorText]}>
                     {formData.toCurrency}
                   </ThemedText>
-                  <ThemedText style={[{ color: textSecondaryColor }, styles.arrowText]}>▼</ThemedText>
+                  <Ionicons name="chevron-down" size={18} color={textSecondaryColor} />
                 </View>
               </TouchableOpacity>
             </View>
@@ -609,9 +620,11 @@ export default function RateAlertManager({
                   >
                     <ThemedText
                       style={[
-                        { color: textColor },
                         styles.directionButtonText,
-                        formData.direction === direction && styles.directionButtonTextActive,
+                        {
+                          color:
+                            formData.direction === direction ? textInverseColor : textColor,
+                        },
                       ]}
                     >
                       {t(`rateAlerts.direction.${direction}`)}
@@ -627,8 +640,8 @@ export default function RateAlertManager({
                 <Switch
                   value={formData.isActive}
                   onValueChange={(value) => setFormData({ ...formData, isActive: value })}
-                  trackColor={{ false: '#d1d5db', true: '#10b981' }}
-                  thumbColor={formData.isActive ? '#ffffff' : '#ffffff'}
+                  trackColor={{ false: borderColor, true: primaryColor }}
+                  thumbColor={textInverseColor}
                 />
               </View>
             </View>
@@ -911,15 +924,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   label: {
-    fontSize: 16,
+    fontSize: FormField.labelSize,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 10,
+    letterSpacing: 0.2,
   },
   input: {
-    borderWidth: 2,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    borderWidth: 1,
+    borderRadius: FormField.radiusInput,
+    paddingHorizontal: FormField.padH,
+    paddingVertical: FormField.padV,
+    fontSize: FormField.fontSize,
+    fontWeight: FormField.fontWeight,
   },
   directionButtons: {
     flexDirection: 'row',
@@ -928,22 +944,16 @@ const styles = StyleSheet.create({
   },
   directionButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: FormField.padV,
+    paddingHorizontal: FormField.padH,
+    borderRadius: FormField.radiusInput,
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'transparent',
-  },
-  directionButtonActive: {
-    backgroundColor: '#10b981',
-    borderColor: '#059669',
   },
   directionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  directionButtonTextActive: {
-    color: 'white',
   },
   switchContainer: {
     flexDirection: 'row',
@@ -951,9 +961,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   currencySelector: {
-    borderWidth: 2,
-    borderRadius: 8,
-    padding: 12,
+    borderWidth: 1,
+    borderRadius: FormField.radiusInput,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   currencySelectorContent: {
     flexDirection: 'row',
@@ -965,9 +976,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
     flex: 1,
-  },
-  arrowText: {
-    fontSize: 14,
-    fontWeight: 'bold',
   },
 });

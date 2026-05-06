@@ -10,7 +10,7 @@ import { LineChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 
 import CurrencyPicker from "@/components/CurrencyPicker";
-import { useLocationCurrency } from "@/components/LocationDetection";
+import { usePreferredLocalCurrency } from "@/components/LocationDetection";
 import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -50,7 +50,7 @@ export default function CurrencyRateCharts({
 }: Props) {
   const { t } = useLanguage();
   const { currency: locationCurrency, loading: locationLoading } =
-    useLocationCurrency();
+    usePreferredLocalCurrency();
 
   const primaryColor = useThemeColor({}, "primary");
   const backgroundColor = useThemeColor({}, "background");
@@ -60,6 +60,7 @@ export default function CurrencyRateCharts({
   const textSecondaryColor = useThemeColor({}, "textSecondary");
   const borderColor = useThemeColor({}, "border");
   const errorColor = useThemeColor({}, "error");
+  const textInverseColor = useThemeColor({}, "textInverse");
 
   const safeCurrencies = useMemo(() => {
     const unique = Array.from(new Set(currencies)).filter(Boolean);
@@ -261,7 +262,7 @@ export default function CurrencyRateCharts({
                   <ThemedText
                     type="caption"
                     style={{
-                      color: active ? "#FFFFFF" : textSecondaryColor,
+                      color: active ? textInverseColor : textSecondaryColor,
                       fontWeight: active ? "700" : "600",
                     }}
                   >
@@ -293,8 +294,8 @@ export default function CurrencyRateCharts({
                   changeAbs === undefined
                     ? textColor
                     : changeAbs >= 0
-                      ? "#16A34A"
-                      : "#DC2626",
+                      ? textColor
+                      : textSecondaryColor,
               }}
             >
               {changeAbs === undefined

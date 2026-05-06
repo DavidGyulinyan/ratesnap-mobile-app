@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -53,10 +53,21 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     }
   };
 
-  const menuItems = [
+  type MenuItem = {
+    id: string;
+    title: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    onPress: () => void;
+    subtitle?: string;
+    component?: ReactNode;
+    danger?: boolean;
+  };
+
+  const menuItems: MenuItem[] = [
     {
       id: 'settings',
-      title: '⚙️ ' + t('settings.title'),
+      title: t('settings.title'),
+      icon: 'settings-outline',
       onPress: () => {
         setIsVisible(false);
         router.push('/(tabs)/settings');
@@ -64,7 +75,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     },
     {
       id: 'language',
-      title: '🌍 ' + t('settings.language'),
+      title: t('settings.language'),
+      icon: 'language-outline',
       onPress: () => {},
       component: (
         <View style={{ marginTop: 12 }}>
@@ -78,7 +90,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     ...(user ? [
       {
         id: 'converter',
-        title: '💱 ' + t('auth.converter'),
+        title: t('auth.converter'),
+        icon: 'swap-horizontal',
         onPress: () => {
           setIsVisible(false);
           router.push('/guide');
@@ -86,7 +99,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
       },
       {
         id: 'user-info',
-        title: `👤 ${user.user_metadata?.username || user.email?.split('@')[0] || 'User'}`,
+        title: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+        icon: 'person-outline',
         subtitle: user.email,
         onPress: () => {
           setIsVisible(false);
@@ -97,14 +111,16 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     ...(user ? [
       {
         id: 'signout',
-        title: '🚪 ' + t('auth.signout'),
+        title: t('auth.signout'),
+        icon: 'log-out-outline',
         onPress: handleSignOut,
         danger: true,
       },
     ] : [
       {
         id: 'signin',
-        title: '🔐 ' + t('auth.signin'),
+        title: t('auth.signin'),
+        icon: 'log-in-outline',
         onPress: () => {
           setIsVisible(false);
           router.push('/signin');
@@ -112,7 +128,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
       },
       {
         id: 'signup',
-        title: '✨ ' + t('auth.signup'),
+        title: t('auth.signup'),
+        icon: 'person-add-outline',
         onPress: () => {
           setIsVisible(false);
           router.push('/signup');
@@ -233,15 +250,23 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
                   }}
                   onPress={item.onPress}
                 >
-                  <ThemedText
-                    style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: item.danger ? errorColor : textColor,
-                    }}
-                  >
-                    {item.title}
-                  </ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Ionicons
+                      name={item.icon}
+                      size={22}
+                      color={item.danger ? errorColor : primaryColor}
+                    />
+                    <ThemedText
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: item.danger ? errorColor : textColor,
+                        flex: 1,
+                      }}
+                    >
+                      {item.title}
+                    </ThemedText>
+                  </View>
                   {item.subtitle && (
                     <ThemedText style={{
                       fontSize: 14,

@@ -14,6 +14,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import * as MailComposer from "expo-mail-composer";
+import { FormField } from "@/constants/theme";
 
 interface ContactSupportModalProps {
   visible: boolean;
@@ -33,9 +34,12 @@ export default function ContactSupportModal({
   // Theme colors
   const backgroundColor = useThemeColor({}, "background");
   const surfaceColor = useThemeColor({}, "surface");
+  const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
   const primaryColor = useThemeColor({}, "primary");
   const textColor = useThemeColor({}, "text");
   const textSecondaryColor = useThemeColor({}, "textSecondary");
+  const textInverseColor = useThemeColor({}, "textInverse");
+  const borderColor = useThemeColor({}, "border");
 
   const handleSend = async () => {
     if (!message.trim()) {
@@ -80,11 +84,18 @@ export default function ContactSupportModal({
     },
     container: {
       backgroundColor: surfaceColor,
-      borderRadius: 12,
-      padding: 20,
+      borderRadius: FormField.radiusCard,
+      borderWidth: 1,
+      borderColor: borderColor,
+      padding: 14,
       width: "100%",
       maxWidth: 400,
       position: "relative",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
     },
     modalHeader: {
       flexDirection: "row",
@@ -101,38 +112,42 @@ export default function ContactSupportModal({
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: textSecondaryColor + "20",
+      backgroundColor: surfaceSecondaryColor,
       alignItems: "center",
       justifyContent: "center",
     },
     input: {
       borderWidth: 1,
-      borderColor: textSecondaryColor + "30",
-      borderRadius: 8,
-      padding: 12,
-      fontSize: 16,
+      borderColor: borderColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
       color: textColor,
-      backgroundColor: backgroundColor,
+      backgroundColor: surfaceColor,
       height: 120,
       textAlignVertical: "top",
     },
     button: {
       backgroundColor: primaryColor,
-      borderRadius: 8,
-      padding: 14,
+      borderRadius: FormField.radiusInput,
+      paddingVertical: FormField.padV + 2,
+      paddingHorizontal: FormField.padH,
       alignItems: "center",
       marginTop: 16,
     },
     buttonText: {
-      color: textColor,
+      color: textInverseColor,
       fontSize: 16,
       fontWeight: "600",
     },
     label: {
-      fontSize: 16,
-      fontWeight: "500",
+      fontSize: FormField.labelSize,
+      fontWeight: "600",
       color: textColor,
-      marginBottom: 8,
+      marginBottom: 10,
+      letterSpacing: 0.2,
     },
   });
 
@@ -199,7 +214,7 @@ export default function ContactSupportModal({
             disabled={loading || !message.trim()}
           >
             {loading ? (
-              <ActivityIndicator color={textColor} />
+              <ActivityIndicator color={textInverseColor} />
             ) : (
               <ThemedText style={styles.buttonText}>
                 {t("contactSupport.sendMessage")}
