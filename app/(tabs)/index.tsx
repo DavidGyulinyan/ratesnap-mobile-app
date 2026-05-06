@@ -1072,7 +1072,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     fontWeight: "600",
-    color: "#00BEAC",
+    color: "#F07E25",
   },
   createAlertSection: {
     marginTop: 20,
@@ -1094,7 +1094,7 @@ const styles = StyleSheet.create({
     color: "#18181b",
   },
   conditionButton: {
-    backgroundColor: "#00BEAC",
+    backgroundColor: "#F07E25",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -1112,7 +1112,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   createAlertButton: {
-    backgroundColor: "#00ECD6",
+    backgroundColor: "#FFB366",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -1128,7 +1128,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   showMoreAlertsText: {
-    color: "#00BEAC",
+    color: "#F07E25",
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
@@ -1155,7 +1155,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   deleteAllInlineButton: {
-    backgroundColor: "#F77872",
+    backgroundColor: "#E04D4D",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",

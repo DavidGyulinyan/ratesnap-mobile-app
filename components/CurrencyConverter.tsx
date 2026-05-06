@@ -1552,7 +1552,7 @@ const styles = StyleSheet.create({
   },
   featureToggleActive: {
     backgroundColor: "#e4e4e7",
-    borderColor: "#00BEAC",
+    borderColor: "#F07E25",
   },
   featureToggleText: {
     fontSize: 12,
@@ -1562,7 +1562,7 @@ const styles = StyleSheet.create({
   },
   mainConverterBox: {
     borderWidth: 2,
-    borderColor: "#00BEAC",
+    borderColor: "#F07E25",
     borderRadius: 16,
     padding: 20,
     backgroundColor: "#ffffff",
@@ -1612,11 +1612,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   calculatorButton: {
-    backgroundColor: "#00BEAC",
+    backgroundColor: "#F07E25",
     padding: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#009A8C",
+    borderColor: "#C86418",
   },
   calculatorButtonText: {
     color: "white",
@@ -1661,12 +1661,12 @@ const styles = StyleSheet.create({
   swapButton: {
     padding: 15,
     marginHorizontal: 15,
-    backgroundColor: "#00BEAC",
+    backgroundColor: "#F07E25",
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#009A8C",
+    borderColor: "#C86418",
   },
   swapButtonText: {
     color: "white",
@@ -1674,19 +1674,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   swapArrows: {
-    color: "#00BEAC",
+    color: "#F07E25",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
   },
   saveButton: {
-    backgroundColor: "#00BEAC",
+    backgroundColor: "#F07E25",
     padding: 15,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: "#009A8C",
+    borderColor: "#C86418",
   },
   saveButtonText: {
     color: "white",

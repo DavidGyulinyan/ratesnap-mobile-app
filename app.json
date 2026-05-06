@@ -69,7 +69,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#EFEFEF"
+          "backgroundColor": "#FAF6F2"
         }
       ],
       "expo-mail-composer"
@@ -90,7 +90,7 @@
 
     "notifications": {
       "icon": "./assets/images/notification-icon.png",
-      "color": "#ffffff",
+      "color": "#F07E25",
       "iosDisplayInForeground": true
     },
 
