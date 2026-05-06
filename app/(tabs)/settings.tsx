@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  TextInput,
-  FlatList,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
@@ -15,9 +7,8 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getSupabaseClient } from '@/lib/supabase-safe';
 import { getAsyncStorage } from '@/lib/storage';
-import expoGoSafeNotificationService from '@/lib/expoGoSafeNotificationService';
+import { Layout, hexToRgba } from '@/constants/theme';
 import ContactSupportModal from '@/components/ContactSupportModal';
 import {
   useUserData,
@@ -29,17 +20,10 @@ import CurrencyFlag from '@/components/CurrencyFlag';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
-  const { t, language, setLanguage } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const { themePreference, setThemePreference } = useTheme();
-  const {
-    savedRates,
-    rateAlerts,
-    converterHistory,
-    calculatorHistory,
-    pickedRates,
-    clearAllData
-  } = useUserData();
+  const { savedRates, pickedRates, clearAllData } = useUserData();
 
   const { deleteRate: deleteSavedRate, deleteAllRates: deleteAllSavedRates } = useSavedRates();
   const { deletePickedRate } = usePickedRates();
@@ -47,22 +31,10 @@ export default function SettingsScreen() {
   // State for modals and forms
   const [showThemeSelection, setShowThemeSelection] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
-  const [showAccountInfo, setShowAccountInfo] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showContactSupport, setShowContactSupport] = useState(false);
   const [showSavedRatesManagement, setShowSavedRatesManagement] = useState(false);
   const [showPickedRatesManagement, setShowPickedRatesManagement] = useState(false);
-
-  // Account info form state
-  const [accountInfo, setAccountInfo] = useState({
-    username: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
-    email: user?.email || '',
-  });
-  const [passwordForm, setPasswordForm] = useState({
-    newPassword: '',
-    confirmPassword: '',
-  });
 
   // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
@@ -81,6 +53,7 @@ export default function SettingsScreen() {
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const surfaceColor = useThemeColor({}, 'surface');
+  const surfaceSecondaryColor = useThemeColor({}, 'surfaceSecondary');
   const primaryColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
@@ -133,14 +106,6 @@ export default function SettingsScreen() {
     loadSettings();
   }, []);
 
-  // Helper function to add opacity to hex colors
-  const addOpacity = (hexColor: string, opacity: number) => {
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  };
-
   // Handle sign out
   const handleSignOut = async () => {
     try {
@@ -187,94 +152,6 @@ export default function SettingsScreen() {
             } catch (error) {
               Alert.alert('Error', 'Failed to clear cache.');
             }
-          }
-        }
-      ]
-    );
-  };
-
-  // Handle export data
-  const handleExportData = async () => {
-    try {
-      const storage = getAsyncStorage();
-
-      // Collect all user data
-      const exportData = {
-        exportVersion: '1.0',
-        exportDate: new Date().toISOString(),
-        appVersion: '1.0.0',
-        userInfo: user ? {
-          email: user.email,
-          username: user.user_metadata?.username,
-          created_at: user.created_at
-        } : null,
-        settings: {
-          themePreference,
-          language,
-          notificationSettings
-        },
-        localData: {
-          savedRates: await storage.getItem('savedRates'),
-          selectedFromCurrency: await storage.getItem('selectedFromCurrency'),
-          selectedToCurrency: await storage.getItem('selectedToCurrency'),
-          currencyHistory: await storage.getItem('currencyHistory'),
-          frequentlyUsedCurrencies: await storage.getItem('frequentlyUsedCurrencies'),
-          lastConversion: await storage.getItem('lastConversion'),
-          cachedExchangeRates: await storage.getItem('cachedExchangeRates'),
-          cachedRatesTimestamp: await storage.getItem('cachedRatesTimestamp'),
-          onboardingCompleted: await storage.getItem('onboardingCompleted'),
-          detectedLocation: await storage.getItem('detectedLocation')
-        },
-        databaseData: user ? {
-          savedRates: savedRates.savedRates,
-          rateAlerts: rateAlerts.rateAlerts,
-          converterHistory: converterHistory.converterHistory,
-          calculatorHistory: calculatorHistory.calculatorHistory,
-          pickedRates: pickedRates.pickedRates
-        } : null
-      };
-
-      // Convert to JSON string
-      const jsonString = JSON.stringify(exportData, null, 2);
-
-      Alert.alert(
-        'Data Export',
-        `Export Summary:\n• User: ${user?.email || 'Not logged in'}\n• Settings: ${Object.keys(exportData.settings).length} items\n• Local Data: ${Object.keys(exportData.localData).length} items\n• Database Data: ${user && exportData.databaseData ? Object.keys(exportData.databaseData).length : 0} items\n\nTotal data size: ${jsonString.length} characters\n\nIn a production app, this data would be saved to a file for backup.`,
-        [{ text: 'OK' }]
-      );
-    } catch (error) {
-      console.error('Export error:', error);
-      Alert.alert('Error', 'Failed to export data. Please try again.');
-    }
-  };
-
-  // Handle import data
-  const handleImportData = async () => {
-    Alert.alert(
-      'Import Data',
-      'File import functionality requires additional setup. For now, you can manually restore your settings through the app preferences.',
-      [
-        { text: 'OK' },
-        {
-          text: 'Reset Settings',
-          onPress: async () => {
-            // Reset to default settings
-            setThemePreference('system');
-            setLanguage('en');
-            setNotificationSettings({
-              enabled: true,
-              sound: true,
-              vibration: true,
-              showPreview: true,
-            });
-            const storage = getAsyncStorage();
-            await storage.setItem('notificationSettings', JSON.stringify({
-              enabled: true,
-              sound: true,
-              vibration: true,
-              showPreview: true,
-            }));
-            Alert.alert('Settings Reset', 'All settings have been reset to defaults.');
           }
         }
       ]
@@ -660,95 +537,120 @@ ExRatio चुनने के लिए धन्यवाद!`
     },
     scrollView: {
       flex: 1,
-      padding: 20,
+      paddingHorizontal: Layout.spaceMd,
+      paddingTop: Layout.spaceSm,
+      paddingBottom: Layout.spaceXl,
     },
     header: {
-      marginBottom: 24,
-      paddingBottom: 16,
+      marginBottom: Layout.spaceLg,
+      paddingBottom: Layout.spaceMd,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: borderColor,
     },
     title: {
-      fontSize: 28,
+      fontSize: 26,
       fontWeight: '700',
       color: textColor,
-      marginBottom: 8,
-      paddingVertical: 5,
+      letterSpacing: -0.5,
+      marginBottom: 6,
     },
     subtitle: {
-      fontSize: 16,
+      fontSize: 15,
       color: textSecondaryColor,
-      opacity: 0.8,
+      lineHeight: 21,
     },
     section: {
       backgroundColor: surfaceColor,
-      borderRadius: 12,
-      padding: 20,
-      marginBottom: 16,
+      borderRadius: Layout.radiusLg,
+      paddingVertical: Layout.spaceSm,
+      paddingHorizontal: Layout.spaceMd,
+      marginBottom: Layout.spaceMd,
+      borderWidth: 1,
+      borderColor: borderColor,
     },
     sectionTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: textColor,
-      marginBottom: 16,
+      fontSize: 12,
+      fontWeight: '700',
+      color: textSecondaryColor,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+      marginBottom: Layout.spaceSm,
+      marginTop: 4,
     },
     settingItem: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      marginVertical: 4,
-      borderRadius: 8,
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      borderRadius: Layout.radiusMd,
+      backgroundColor: hexToRgba(surfaceSecondaryColor, 0.45),
+    },
+    settingItemSpaced: {
+      marginBottom: 8,
     },
     settingItemText: {
       fontSize: 16,
       color: textColor,
-      fontWeight: '500',
+      fontWeight: '600',
     },
     settingValue: {
       fontSize: 15,
       color: textSecondaryColor,
+      fontWeight: '500',
+    },
+    rowTrailing: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      maxWidth: '52%',
     },
     button: {
       backgroundColor: primaryColor,
-      borderRadius: 8,
-      padding: 14,
+      borderRadius: Layout.radiusMd,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
       alignItems: 'center',
-      marginVertical: 8,
+      marginTop: 8,
     },
     buttonText: {
-      color: textColor,
+      color: textInverseColor,
       fontSize: 16,
       fontWeight: '600',
     },
     secondaryButton: {
-      backgroundColor: surfaceColor,
-      borderWidth: 1,
-      borderColor: textSecondaryColor + '30',
+      backgroundColor: 'transparent',
+      borderWidth: 1.5,
+      borderColor: hexToRgba(primaryColor, 0.45),
+      marginTop: 8,
     },
     secondaryButtonText: {
-      color: textSecondaryColor,
+      color: primaryColor,
     },
     modalContainer: {
       backgroundColor: surfaceColor,
-      borderRadius: 12,
-      padding: 20,
-      margin: 20,
+      borderRadius: Layout.radiusLg,
+      padding: Layout.spaceMd,
+      margin: Layout.spaceMd,
+      borderWidth: 1,
+      borderColor: borderColor,
     },
     modalHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: Layout.spaceMd,
       gap: 8,
     },
     modalTitle: {
-      fontSize: 20,
-      fontWeight: '600',
+      fontSize: 18,
+      fontWeight: '700',
       color: textColor,
+      letterSpacing: -0.2,
     },
     closeButton: {
       width: 36,
       height: 36,
-      backgroundColor: '#f3f4f6',
+      backgroundColor: surfaceSecondaryColor,
       borderRadius: 18,
       alignItems: 'center',
       justifyContent: 'center',
@@ -795,15 +697,21 @@ ExRatio चुनने के लिए धन्यवाद!`
     languageOption: {
       padding: 16,
       marginVertical: 4,
-      borderRadius: 8,
-      backgroundColor: backgroundColor,
+      borderRadius: Layout.radiusMd,
+      backgroundColor: hexToRgba(surfaceSecondaryColor, 0.4),
     },
     checkmark: {
       fontSize: 18,
       color: primaryColor,
       fontWeight: 'bold',
     },
-  }), [backgroundColor, surfaceColor, primaryColor, textColor, textSecondaryColor]);
+    exchangeBlurb: {
+      fontSize: 14,
+      color: textSecondaryColor,
+      lineHeight: 20,
+      marginBottom: Layout.spaceMd,
+    },
+  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, textInverseColor, borderColor]);
 
   // Render theme selection modal
   const renderThemeSelection = () => {
@@ -1181,179 +1089,181 @@ ExRatio चुनने के लिए धन्यवाद!`
       <ScrollView style={styles.scrollView}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Ionicons name="settings-outline" size={28} color={primaryColor} />
-            <ThemedText style={styles.title}>{t('settings.title')}</ThemedText>
-          </View>
-          <ThemedText style={styles.subtitle}>
-            {t('settings.subtitle')}
-          </ThemedText>
+          <ThemedText style={styles.title}>{t('settings.title')}</ThemedText>
+          <ThemedText style={styles.subtitle}>{t('settings.subtitle')}</ThemedText>
         </View>
 
-        {/* Preferences Section */}
+        {/* Preferences */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.preferences')}</ThemedText>
+          <View style={{ gap: 8 }}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowThemeSelection(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="color-palette-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.theme')}</ThemedText>
+              </View>
+              <View style={styles.rowTrailing}>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {themePreference === 'system'
+                    ? t('settings.system')
+                    : themePreference === 'light'
+                      ? t('settings.light')
+                      : t('settings.dark')}
+                </ThemedText>
+                <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => setShowThemeSelection(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-              <Ionicons name="color-palette-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('settings.theme')}</ThemedText>
-            </View>
-            <ThemedText style={styles.settingValue}>
-              {themePreference === 'system' ? t('settings.system') :
-               themePreference === 'light' ? t('settings.light') : t('settings.dark')}
-            </ThemedText>
-          </TouchableOpacity>
-
-
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => setShowNotificationSettings(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-              <Ionicons name="notifications-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('settings.notifications')}</ThemedText>
-            </View>
-            <ThemedText style={styles.settingValue}>
-              {notificationSettings.enabled ? t('common.enabled') : t('common.disabled')}
-            </ThemedText>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowNotificationSettings(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="notifications-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.notifications')}</ThemedText>
+              </View>
+              <View style={styles.rowTrailing}>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {notificationSettings.enabled ? t('common.enabled') : t('common.disabled')}
+                </ThemedText>
+                <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Data Management Section */}
+        {/* Data & storage */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.dataManagement')}</ThemedText>
+          <View style={{ gap: 8 }}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={handleClearCache}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="cloud-offline-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.clearCache')}</ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleClearCache}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Ionicons name="trash-outline" size={20} color={primaryColor} />
-              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                {t('settings.clearCache')}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
+            {user && (
+              <>
+                <TouchableOpacity
+                  style={styles.settingItem}
+                  onPress={() => setShowSavedRatesManagement(true)}
+                  activeOpacity={0.75}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                    <Ionicons name="bookmark-outline" size={22} color={primaryColor} />
+                    <ThemedText style={styles.settingItemText}>{t('saved.shortTitle')}</ThemedText>
+                  </View>
+                  <View style={styles.rowTrailing}>
+                    <ThemedText style={styles.settingValue}>
+                      {savedRates.savedRates?.length ?? 0}
+                    </ThemedText>
+                    <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+                  </View>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleExportData}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Ionicons name="share-outline" size={20} color={primaryColor} />
-              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                {t('settings.exportData')}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleImportData}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Ionicons name="download-outline" size={20} color={primaryColor} />
-              <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                {t('settings.importData')}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.settingItem}
+                  onPress={() => setShowPickedRatesManagement(true)}
+                  activeOpacity={0.75}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                    <Ionicons name="stats-chart-outline" size={22} color={primaryColor} />
+                    <ThemedText style={styles.settingItemText}>
+                      {t('converter.multiCurrency.section')}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.rowTrailing}>
+                    <ThemedText style={styles.settingValue}>
+                      {pickedRates.pickedRates?.length ?? 0}
+                    </ThemedText>
+                    <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+                  </View>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
 
           {user && (
-            <>
-              <TouchableOpacity
-                style={[styles.button, styles.secondaryButton]}
-                onPress={() => setShowSavedRatesManagement(true)}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="bookmark-outline" size={20} color={primaryColor} />
-                  <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                    {t('saved.shortTitle')} ({savedRates.savedRates?.length || 0})
-                  </ThemedText>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.button, styles.secondaryButton]}
-                onPress={() => setShowPickedRatesManagement(true)}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="stats-chart-outline" size={20} color={primaryColor} />
-                  <ThemedText style={[styles.buttonText, styles.secondaryButtonText]}>
-                    Multi-Currency ({pickedRates.pickedRates?.length || 0})
-                  </ThemedText>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: errorColor }]}
-                onPress={() => {
-                  Alert.alert(
-                    'Clear All Data',
-                    'This will permanently delete all your saved rates, alerts, history, and preferences. This action cannot be undone.',
-                    [
-                      { text: 'Cancel', style: 'cancel' },
-                      {
-                        text: 'Delete Everything',
-                        style: 'destructive',
-                        onPress: async () => {
-                          try {
-                            const success = await clearAllData();
-                            if (success) {
-                              Alert.alert('Success', 'All data has been cleared.');
-                            } else {
-                              Alert.alert('Error', 'Failed to clear all data.');
-                            }
-                          } catch (error) {
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: errorColor, marginTop: 14 }]}
+              onPress={() => {
+                Alert.alert(
+                  'Clear All Data',
+                  'This will permanently delete all your saved rates, alerts, history, and preferences. This action cannot be undone.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Delete Everything',
+                      style: 'destructive',
+                      onPress: async () => {
+                        try {
+                          const success = await clearAllData();
+                          if (success) {
+                            Alert.alert('Success', 'All data has been cleared.');
+                          } else {
                             Alert.alert('Error', 'Failed to clear all data.');
                           }
+                        } catch {
+                          Alert.alert('Error', 'Failed to clear all data.');
                         }
-                      }
-                    ]
-                  );
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <Ionicons name="trash-outline" size={20} color={textInverseColor} />
-                  <ThemedText style={[styles.buttonText, { color: textInverseColor }]}>
-                    {t('settings.clearAllData')}
-                  </ThemedText>
-                </View>
-              </TouchableOpacity>
-            </>
+                      },
+                    },
+                  ]
+                );
+              }}
+              activeOpacity={0.85}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Ionicons name="warning-outline" size={20} color={textInverseColor} />
+                <ThemedText style={[styles.buttonText, { color: textInverseColor }]}>
+                  {t('settings.clearAllData')}
+                </ThemedText>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
 
-        {/* Account Section */}
+        {/* Account */}
         {user && (
           <View style={styles.section}>
             <ThemedText style={styles.sectionTitle}>{t('settings.accountInfo')}</ThemedText>
-
-            <TouchableOpacity style={styles.settingItem}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-                <Ionicons name="person-outline" size={20} color={primaryColor} />
-                <ThemedText style={styles.settingItemText}>{t('auth.username')}</ThemedText>
+            <View style={{ gap: 8 }}>
+              <View style={styles.settingItem}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                  <Ionicons name="person-outline" size={22} color={primaryColor} />
+                  <ThemedText style={styles.settingItemText}>{t('auth.username')}</ThemedText>
+                </View>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {user.user_metadata?.username || user.email?.split('@')[0]}
+                </ThemedText>
               </View>
-              <ThemedText style={styles.settingValue}>
-                {user.user_metadata?.username || user.email?.split('@')[0]}
-              </ThemedText>
-            </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-                <Ionicons name="mail-outline" size={20} color={primaryColor} />
-                <ThemedText style={styles.settingItemText}>{t('auth.email')}</ThemedText>
+              <View style={styles.settingItem}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                  <Ionicons name="mail-outline" size={22} color={primaryColor} />
+                  <ThemedText style={styles.settingItemText}>{t('auth.email')}</ThemedText>
+                </View>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {user.email}
+                </ThemedText>
               </View>
-              <ThemedText style={styles.settingValue}>{user.email}</ThemedText>
-            </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={[styles.button, styles.secondaryButton]}
               onPress={handleSignOut}
+              activeOpacity={0.85}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <Ionicons name="log-out-outline" size={20} color={primaryColor} />
@@ -1365,83 +1275,79 @@ ExRatio चुनने के लिए धन्यवाद!`
           </View>
         )}
 
-        {/* Exchange Rate Info Section */}
+        {/* Rates refresh info */}
         <View style={styles.section}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <Ionicons name="trending-up-outline" size={20} color={primaryColor} />
-            <ThemedText style={styles.sectionTitle}>{t('settings.exchangeRateInfo')}</ThemedText>
-          </View>
-          <ThemedText style={[styles.settingValue, { fontSize: 14, marginBottom: 16, lineHeight: 20 }]}>
+          <ThemedText style={styles.sectionTitle}>{t('settings.exchangeRateInfo')}</ThemedText>
+          <ThemedText style={styles.exchangeBlurb}>
             {t('settings.exchangeRateInfoDescription')}
           </ThemedText>
-
-          <View style={[styles.settingItem, { marginBottom: 12 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="time-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('time.lastUpdate')}</ThemedText>
-            </View>
-            <View style={{ alignItems: 'flex-end', flex: 1 }}>
-              <ThemedText style={[styles.settingValue, { textAlign: 'right', fontSize: 14, lineHeight: 18 }]}>
+          <View style={{ gap: 8 }}>
+            <View style={styles.settingItem}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="time-outline" size={20} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('time.lastUpdate')}</ThemedText>
+              </View>
+              <ThemedText style={[styles.settingValue, { flex: 1, textAlign: 'right' }]} numberOfLines={2}>
                 {exchangeRateData?.time_last_update_utc
                   ? new Date(exchangeRateData.time_last_update_utc).toLocaleString()
-                  : 'Loading...'}
+                  : '…'}
               </ThemedText>
             </View>
-          </View>
-
-          <View style={styles.settingItem}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="timer-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('time.nextUpdate')}</ThemedText>
-            </View>
-            <View style={{ alignItems: 'flex-end', flex: 1 }}>
-              <ThemedText style={[styles.settingValue, { textAlign: 'right', fontSize: 14, lineHeight: 18 }]}>
+            <View style={styles.settingItem}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                <Ionicons name="timer-outline" size={20} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('time.nextUpdate')}</ThemedText>
+              </View>
+              <ThemedText style={[styles.settingValue, { flex: 1, textAlign: 'right' }]} numberOfLines={2}>
                 {exchangeRateData?.time_next_update_utc
                   ? new Date(exchangeRateData.time_next_update_utc).toLocaleString()
-                  : 'Loading...'}
+                  : '…'}
               </ThemedText>
             </View>
           </View>
         </View>
 
-        {/* Legal Section */}
+        {/* About & support */}
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.aboutSupport')}</ThemedText>
+          <View style={{ gap: 8 }}>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowTerms(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="document-text-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.termsOfUse')}</ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => setShowTerms(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-              <Ionicons name="document-text-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('settings.termsOfUse')}</ThemedText>
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setShowContactSupport(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="mail-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.contactSupport')}</ThemedText>
+              </View>
+              <View style={styles.rowTrailing}>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {t('settings.help')}
+                </ThemedText>
+                <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.settingItem}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+                <Ionicons name="information-circle-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.about')}</ThemedText>
+              </View>
+              <ThemedText style={styles.settingValue}>1.0.0</ThemedText>
             </View>
-            <ThemedText style={styles.settingValue}>›</ThemedText>
-          </TouchableOpacity>
-        </View>
-
-        {/* About Section */}
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.about')}</ThemedText>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-              <Ionicons name="information-circle-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('settings.about')}</ThemedText>
-            </View>
-            <ThemedText style={styles.settingValue}>1.0.0</ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => setShowContactSupport(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
-              <Ionicons name="mail-outline" size={20} color={primaryColor} />
-              <ThemedText style={styles.settingItemText}>{t('settings.contactSupport')}</ThemedText>
-            </View>
-            <ThemedText style={styles.settingValue}>Send Message</ThemedText>
-          </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 

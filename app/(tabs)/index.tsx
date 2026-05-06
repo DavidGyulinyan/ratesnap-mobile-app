@@ -18,6 +18,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useUserData } from "@/hooks/useUserData";
 import { getAsyncStorage } from "@/lib/storage";
 import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
+import { hexToRgba } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -106,7 +107,7 @@ export default function HomeScreen() {
   // Theme colors - must be called at top level
   const primaryColor = useThemeColor({}, "primary");
   const textInverseColor = useThemeColor({}, "textInverse");
-  const backgroundColor = useThemeColor({}, "background");
+  const pageBackgroundColor = useThemeColor({}, "background");
   const surfaceColor = useThemeColor({}, "surface");
   const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
   const textColor = useThemeColor({}, "text");
@@ -548,7 +549,10 @@ export default function HomeScreen() {
                   style={[
                     styles.quickTile,
                     {
-                      backgroundColor: surfaceColor,
+                      // Use canvas tint, not surface (white) — white at any alpha reads as a solid block on the chart.
+                      backgroundColor: item.active
+                        ? hexToRgba(primaryColor, 0.22)
+                        : hexToRgba(pageBackgroundColor, 0.52),
                       borderColor: item.active ? primaryColor : borderColor,
                       borderWidth: item.active ? 2 : 1,
                     },
@@ -558,7 +562,15 @@ export default function HomeScreen() {
                   <View
                     style={[
                       styles.quickTileIconWrap,
-                      { backgroundColor: surfaceSecondaryColor },
+                      {
+                        backgroundColor: item.active
+                          ? hexToRgba(primaryColor, 0.14)
+                          : "transparent",
+                        borderWidth: 1,
+                        borderColor: item.active
+                          ? hexToRgba(primaryColor, 0.45)
+                          : hexToRgba(borderColor, 0.55),
+                      },
                     ]}
                   >
                     <Ionicons
@@ -647,7 +659,7 @@ export default function HomeScreen() {
           title={t("saved.title")}
         >
           <ScrollView
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor: "transparent" }}
             contentContainerStyle={{ paddingBottom: 24 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
@@ -705,6 +717,7 @@ export default function HomeScreen() {
         >
           <CurrencyRateCharts
             currencies={currencyList.length ? currencyList : POPULAR_CURRENCIES}
+            inModal
           />
         </QuickActionModal>
 
@@ -723,7 +736,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: backgroundColor }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
       {renderMainContent()}
 
       {/* Auth Prompt Modal */}
@@ -804,11 +817,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     alignItems: "flex-start",
     gap: 10,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 0,
   },
   quickTileIconWrap: {
     width: 44,

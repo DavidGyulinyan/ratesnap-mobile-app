@@ -1119,7 +1119,13 @@ export default function CurrencyConverter({
 
   return (
     <ScrollView
-      style={[{ flex: 1, padding: inModal ? 0 : 14, backgroundColor }]}
+      style={[
+        {
+          flex: 1,
+          padding: inModal ? 0 : 14,
+          backgroundColor: inModal ? "transparent" : backgroundColor,
+        },
+      ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }

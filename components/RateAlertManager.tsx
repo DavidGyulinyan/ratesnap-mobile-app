@@ -738,6 +738,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingVertical: 16,
+    backgroundColor: "transparent",
   },
   emptyState: {
     flex: 1,

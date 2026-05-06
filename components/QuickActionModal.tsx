@@ -2,7 +2,9 @@ import React from "react";
 import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { FinancialBackground } from "@/components/FinancialBackground";
 import { ThemedText } from "@/components/themed-text";
+import { hexToRgba } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 interface QuickActionModalProps {
@@ -22,7 +24,6 @@ export default function QuickActionModal({
   children,
 }: QuickActionModalProps) {
   const backgroundColor = useThemeColor({}, "background");
-  const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
   const textColor = useThemeColor({}, "text");
   const textSecondaryColor = useThemeColor({}, "textSecondary");
   const borderColor = useThemeColor({}, "border");
@@ -38,40 +39,46 @@ export default function QuickActionModal({
         style={[styles.safeArea, { backgroundColor }]}
         edges={["top", "left", "right", "bottom"]}
       >
-        <View
-          style={[
-            styles.header,
-            { borderBottomColor: borderColor, backgroundColor },
-          ]}
-        >
-          <TouchableOpacity
-            onPress={onClose}
+        <FinancialBackground />
+        <View style={styles.contentLayer}>
+          <View
             style={[
-              styles.closeButton,
+              styles.header,
               {
-                backgroundColor: surfaceSecondaryColor,
-                borderColor,
+                borderBottomColor: borderColor,
+                backgroundColor: hexToRgba(backgroundColor, 0.88),
               },
             ]}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
           >
-            <Ionicons
-              name="arrow-back"
-              size={22}
-              color={textSecondaryColor}
-            />
-          </TouchableOpacity>
-          <ThemedText
-            type="defaultSemiBold"
-            style={[styles.title, { color: textColor }]}
-            numberOfLines={1}
-          >
-            {title}
-          </ThemedText>
-          <View style={styles.headerSpacer} />
+            <TouchableOpacity
+              onPress={onClose}
+              style={[
+                styles.closeButton,
+                {
+                  backgroundColor: hexToRgba(backgroundColor, 0.55),
+                  borderColor,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons
+                name="arrow-back"
+                size={22}
+                color={textSecondaryColor}
+              />
+            </TouchableOpacity>
+            <ThemedText
+              type="defaultSemiBold"
+              style={[styles.title, { color: textColor }]}
+              numberOfLines={1}
+            >
+              {title}
+            </ThemedText>
+            <View style={styles.headerSpacer} />
+          </View>
+          <View style={styles.body}>{children}</View>
         </View>
-        <View style={styles.body}>{children}</View>
       </SafeAreaView>
     </Modal>
   );
@@ -80,6 +87,10 @@ export default function QuickActionModal({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  contentLayer: {
+    flex: 1,
+    backgroundColor: "transparent",
   },
   header: {
     flexDirection: "row",
@@ -110,5 +121,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
     paddingTop: 0,
+    backgroundColor: "transparent",
   },
 });
