@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { hexToRgba, FormField } from '@/constants/theme';
 import Logo from '@/components/Logo';
 import AuthButtons from '@/components/AuthButtons';
 import * as WebBrowser from 'expo-web-browser';
@@ -39,19 +40,12 @@ function SignUpScreen() {
    const { t, language, setLanguage } = useLanguage();
    const router = useRouter();
 
-   // Helper function to add opacity to hex colors
-   const addOpacity = (hexColor: string, opacity: number) => {
-     const r = parseInt(hexColor.slice(1, 3), 16);
-     const g = parseInt(hexColor.slice(3, 5), 16);
-     const b = parseInt(hexColor.slice(5, 7), 16);
-     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-   };
-
    // Theme colors
    const backgroundColor = useThemeColor({}, 'background');
    const surfaceColor = useThemeColor({}, 'surface');
    const surfaceSecondaryColor = useThemeColor({}, 'surfaceSecondary');
    const primaryColor = useThemeColor({}, 'primary');
+   const accentColor = useThemeColor({}, 'accent');
    const textColor = useThemeColor({}, 'text');
    const textSecondaryColor = useThemeColor({}, 'textSecondary');
    const borderColor = useThemeColor({}, 'border');
@@ -98,27 +92,44 @@ function SignUpScreen() {
       textAlign: 'center',
       marginBottom: 32,
     },
-    form: {
+    authCard: {
       width: '100%',
       maxWidth: 400,
+      backgroundColor: surfaceColor,
+      borderRadius: FormField.radiusCard,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: borderColor,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+      marginBottom: 8,
     },
-    inputContainer: {
-      marginBottom: 20,
+    fieldPanel: {
+      borderRadius: FormField.radiusPanel,
+      borderWidth: 1,
+      padding: 12,
+      marginBottom: 12,
     },
     label: {
-      fontSize: 14,
+      fontSize: FormField.labelSize,
       fontWeight: '600',
       color: textColor,
-      marginBottom: 8,
+      marginBottom: 10,
+      letterSpacing: 0.2,
     },
     input: {
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      fontSize: 16,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
+      backgroundColor: surfaceColor,
+      color: textColor,
     },
     passwordInputContainer: {
       position: 'relative',
@@ -126,12 +137,14 @@ function SignUpScreen() {
     passwordInput: {
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      paddingRight: 50, // Make room for the eye button
-      fontSize: 16,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      paddingRight: 50,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
+      backgroundColor: surfaceColor,
+      color: textColor,
     },
     eyeButton: {
       position: 'absolute',
@@ -187,13 +200,14 @@ function SignUpScreen() {
       justifyContent: 'space-between',
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      backgroundColor: surfaceColor,
     },
     pickerButtonText: {
-      fontSize: 16,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
       color: textColor,
       flex: 1,
     },
@@ -248,7 +262,7 @@ function SignUpScreen() {
       borderBottomColor: borderColor,
     },
     languageOptionSelected: {
-      backgroundColor: addOpacity(primaryColor, 0.10),
+      backgroundColor: hexToRgba(primaryColor, 0.1),
     },
     languageOptionText: {
       fontSize: 16,
@@ -258,7 +272,7 @@ function SignUpScreen() {
       color: primaryColor,
       fontWeight: '600',
     },
-  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor]);
+  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, accentColor, textColor, textSecondaryColor, borderColor]);
 
   useEffect(() => {
     setSelectedLanguage(language);
@@ -333,8 +347,13 @@ function SignUpScreen() {
             <Text style={styles.title}>{t('signup.createAccount')}</Text>
             <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
 
-            <View style={styles.form}>
-              <View style={styles.inputContainer}>
+            <View style={[styles.authCard, { borderColor }]}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
+                ]}
+              >
                 <Text style={styles.label}>{t('signup.usernameOptional')}</Text>
                 <TextInput
                   style={styles.input}
@@ -346,7 +365,12 @@ function SignUpScreen() {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
+                ]}
+              >
                 <Text style={styles.label}>{t('signup.preferredLanguage')}</Text>
                 <View style={styles.pickerContainer}>
                   <TouchableOpacity
@@ -361,7 +385,12 @@ function SignUpScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
+                ]}
+              >
                 <Text style={styles.label}>{t('auth.email')}</Text>
                 <TextInput
                   style={styles.input}
@@ -375,7 +404,12 @@ function SignUpScreen() {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
+                ]}
+              >
                 <Text style={styles.label}>{t('auth.password')}</Text>
                 <View style={styles.passwordInputContainer}>
                   <TextInput
@@ -399,7 +433,12 @@ function SignUpScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
+                ]}
+              >
                 <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
                 <View style={styles.passwordInputContainer}>
                   <TextInput

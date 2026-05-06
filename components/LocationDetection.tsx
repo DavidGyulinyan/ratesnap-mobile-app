@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import * as Location from 'expo-location';
+import { COUNTRY_NAME_TO_ISO } from '@/constants/countryNameToIso';
 import { ThemedText } from './themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 // Mapping of country codes to currency codes (common ones)
-const countryToCurrency: { [key: string]: string } = {
+export const countryToCurrency: { [key: string]: string } = {
   'US': 'USD',
   'GB': 'GBP',
   'EU': 'EUR', // For EU countries
@@ -227,6 +228,153 @@ const countryToCurrency: { [key: string]: string } = {
   'GI': 'GIP',
 };
 
+/** Non-standard codes occasionally returned by platform geocoders → ISO 3166-1 alpha-2. */
+const COUNTRY_CODE_ALIASES: Record<string, string> = {
+  UK: 'GB',
+};
+
+/** Normalize ISO 3166-1 alpha-2 (expo sometimes returns lowercase or aliases). */
+function normalizeCountryCode(iso: string | null | undefined): string | null {
+  if (iso == null || typeof iso !== 'string') return null;
+  const upper = iso.trim().toUpperCase();
+  const resolved = COUNTRY_CODE_ALIASES[upper] ?? upper;
+  return /^[A-Z]{2}$/.test(resolved) ? resolved : null;
+}
+
+function normalizeCountryNameKey(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isoFromCountryName(country: string | null | undefined): string | null {
+  if (country == null || typeof country !== 'string') return null;
+  const key = normalizeCountryNameKey(country);
+  return COUNTRY_NAME_TO_ISO[key] ?? null;
+}
+
+/** Higher = more local / specific placemark (prefer over coarse or wrong first hits). */
+function placemarkSpecificity(p: Location.LocationGeocodedAddress): number {
+  let s = 0;
+  if (p.name) s += 1;
+  if (p.street || p.streetNumber) s += 5;
+  if (p.city || p.district) s += 4;
+  if (p.subregion) s += 2;
+  if (p.region) s += 1;
+  if (p.postalCode) s += 1;
+  return s;
+}
+
+/**
+ * Pick currency from reverse-geocode results. The first placemark is often
+ * coarse or wrong (e.g. wrong isoCountryCode); combine iso + country name
+ * with weights so the local row (e.g. country "Armenia") can override.
+ */
+function currencyFromReverseGeocode(
+  placemarks: Location.LocationGeocodedAddress[],
+): string {
+  const scoreByCode = new Map<string, number>();
+
+  for (const p of placemarks) {
+    const spec = Math.max(1, placemarkSpecificity(p));
+    const code = normalizeCountryCode(p.isoCountryCode);
+    if (code && countryToCurrency[code]) {
+      scoreByCode.set(code, (scoreByCode.get(code) ?? 0) + spec);
+    }
+    const nameIso = isoFromCountryName(p.country);
+    if (nameIso && countryToCurrency[nameIso]) {
+      scoreByCode.set(nameIso, (scoreByCode.get(nameIso) ?? 0) + spec * 1.25);
+    }
+  }
+
+  if (scoreByCode.size === 0) return 'USD';
+
+  let bestCode: string | null = null;
+  let bestScore = -1;
+  for (const [code, score] of scoreByCode) {
+    if (score > bestScore) {
+      bestScore = score;
+      bestCode = code;
+    }
+  }
+  return bestCode ? countryToCurrency[bestCode] : 'USD';
+}
+
+/** GPS reverse geocode only; returns USD if permission denied or on error. */
+export async function detectCurrencyFromReverseGeocodeAsync(): Promise<string> {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      return 'USD';
+    }
+
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    const address = await Location.reverseGeocodeAsync({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+    if (address.length > 0) {
+      return currencyFromReverseGeocode(address);
+    }
+  } catch (err) {
+    console.error('Location detection error:', err);
+  }
+  return 'USD';
+}
+
+const CAUCASUS_TIMEZONE_TO_CURRENCY: Record<string, string> = {
+  'Asia/Yerevan': 'AMD',
+  'Asia/Tbilisi': 'GEL',
+  'Asia/Baku': 'AZN',
+};
+
+function currencyFromCaucasusTimezone(): string | null {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!tz) return null;
+    return CAUCASUS_TIMEZONE_TO_CURRENCY[tz] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function currencyFromNetworkIp(): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(
+      'http://ip-api.com/json/?fields=countryCode',
+      { signal: controller.signal },
+    );
+    clearTimeout(timeoutId);
+    if (!response.ok) return null;
+    const data = (await response.json()) as { countryCode?: string };
+    const code = normalizeCountryCode(data.countryCode);
+    if (!code || !countryToCurrency[code]) return null;
+    return countryToCurrency[code];
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Best-effort local fiat: IP country (same approach as CurrencyConverter),
+ * then Caucasus timezones, then GPS reverse geocode.
+ */
+export async function detectPreferredLocalCurrency(): Promise<string> {
+  const fromIp = await currencyFromNetworkIp();
+  if (fromIp) return fromIp;
+
+  const fromTz = currencyFromCaucasusTimezone();
+  if (fromTz) return fromTz;
+
+  return detectCurrencyFromReverseGeocodeAsync();
+}
+
 interface LocationDetectionProps {
   onCurrencyDetected?: (currency: string) => void;
   visible?: boolean;
@@ -252,16 +400,15 @@ export default function LocationDetection({ onCurrencyDetected, visible = true }
         return;
       }
 
-      // Get current position
-      const location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
       const { latitude, longitude } = location.coords;
 
-      // Reverse geocode to get country code
       // Note: reverseGeocodeAsync is deprecated in SDK 49+, consider using Google Places API for production
       const address = await Location.reverseGeocodeAsync({ latitude, longitude });
       if (address.length > 0) {
-        const countryCode = address[0].isoCountryCode;
-        const currency = countryCode ? (countryToCurrency[countryCode] || 'USD') : 'USD'; // Default to USD
+        const currency = currencyFromReverseGeocode(address);
 
         setDetectedCurrency(currency);
         if (onCurrencyDetected) {
@@ -306,7 +453,7 @@ export default function LocationDetection({ onCurrencyDetected, visible = true }
   );
 }
 
-// Hook version for easier integration
+/** GPS reverse geocode only (legacy). Prefer {@link usePreferredLocalCurrency} for app defaults. */
 export const useLocationCurrency = () => {
   const [currency, setCurrency] = useState<string>('USD');
   const [loading, setLoading] = useState(false);
@@ -314,23 +461,8 @@ export const useLocationCurrency = () => {
   const detectCurrency = async () => {
     setLoading(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-
-      // Note: reverseGeocodeAsync is deprecated in SDK 49+, consider using Google Places API for production
-      const address = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (address.length > 0) {
-        const countryCode = address[0].isoCountryCode;
-        const detectedCurrency = countryCode ? (countryToCurrency[countryCode] || 'USD') : 'USD';
-        setCurrency(detectedCurrency);
-      }
-    } catch (err) {
-      console.error('Location detection error:', err);
+      const c = await detectCurrencyFromReverseGeocodeAsync();
+      setCurrency(c);
     } finally {
       setLoading(false);
     }
@@ -338,6 +470,42 @@ export const useLocationCurrency = () => {
 
   useEffect(() => {
     detectCurrency();
+  }, []);
+
+  return { currency, loading, detectCurrency };
+};
+
+/**
+ * IP country + Caucasus timezone + GPS geocode (matches CurrencyConverter-style detection).
+ */
+export const usePreferredLocalCurrency = () => {
+  const [currency, setCurrency] = useState<string>('USD');
+  const [loading, setLoading] = useState(true);
+
+  const detectCurrency = async () => {
+    setLoading(true);
+    try {
+      const c = await detectPreferredLocalCurrency();
+      setCurrency(c);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const c = await detectPreferredLocalCurrency();
+        if (!cancelled) setCurrency(c);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return { currency, loading, detectCurrency };

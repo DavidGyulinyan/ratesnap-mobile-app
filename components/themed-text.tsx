@@ -18,6 +18,7 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const linkTint = useThemeColor({}, "primary");
   const { language } = useLanguage();
 
   // Reduce font size by 2px for Armenian and Russian languages
@@ -32,7 +33,13 @@ export function ThemedText({
         type === "title" ? { ...styles.title, fontSize: Math.max(28, styles.title.fontSize + fontSizeAdjustment) } : undefined,
         type === "defaultSemiBold" ? { ...styles.defaultSemiBold, fontSize: Math.max(14, styles.defaultSemiBold.fontSize + fontSizeAdjustment) } : undefined,
         type === "subtitle" ? { ...styles.subtitle, fontSize: Math.max(16, styles.subtitle.fontSize + fontSizeAdjustment) } : undefined,
-        type === "link" ? { ...styles.link, fontSize: Math.max(14, styles.link.fontSize + fontSizeAdjustment) } : undefined,
+        type === "link"
+          ? {
+              ...styles.link,
+              color: linkTint,
+              fontSize: Math.max(14, styles.link.fontSize + fontSizeAdjustment),
+            }
+          : undefined,
         type === "caption" ? { ...styles.caption, fontSize: Math.max(12, styles.caption.fontSize + fontSizeAdjustment) } : undefined,
         style,
       ]}
@@ -71,6 +78,5 @@ const styles = StyleSheet.create({
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: "#0a7ea4",
   },
 });

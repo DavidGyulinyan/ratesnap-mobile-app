@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Logo from "@/components/Logo";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { hexToRgba, FormField } from "@/constants/theme";
 import { getSupabaseClient } from "@/lib/supabase-safe";
 
 export default function ResetPasswordScreen() {
@@ -27,8 +28,10 @@ export default function ResetPasswordScreen() {
   const [loading, setLoading] = useState(false);
 
   const backgroundColor = useThemeColor({}, "background");
+  const surfaceColor = useThemeColor({}, "surface");
   const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
   const primaryColor = useThemeColor({}, "primary");
+  const accentColor = useThemeColor({}, "accent");
   const textColor = useThemeColor({}, "text");
   const textSecondaryColor = useThemeColor({}, "textSecondary");
   const borderColor = useThemeColor({}, "border");
@@ -59,24 +62,44 @@ export default function ResetPasswordScreen() {
           textAlign: "center",
           marginBottom: 28,
         },
-        form: { width: "100%", maxWidth: 420 },
-        inputContainer: { marginBottom: 18 },
+        authCard: {
+          width: "100%",
+          maxWidth: 420,
+          backgroundColor: surfaceColor,
+          borderRadius: FormField.radiusCard,
+          padding: 14,
+          borderWidth: 1,
+          borderColor,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          elevation: 2,
+        },
+        fieldPanel: {
+          borderRadius: FormField.radiusPanel,
+          borderWidth: 1,
+          padding: 12,
+          marginBottom: 12,
+        },
         label: {
-          fontSize: 14,
+          fontSize: FormField.labelSize,
           fontWeight: "600",
           color: textColor,
-          marginBottom: 8,
+          marginBottom: 10,
+          letterSpacing: 0.2,
         },
         passwordInputContainer: { position: "relative" },
         input: {
           borderWidth: 1,
           borderColor,
-          borderRadius: 12,
-          paddingHorizontal: 16,
-          paddingVertical: 14,
+          borderRadius: FormField.radiusInput,
+          paddingHorizontal: FormField.padH,
+          paddingVertical: FormField.padV,
           paddingRight: 50,
-          fontSize: 16,
-          backgroundColor: surfaceSecondaryColor,
+          fontSize: FormField.fontSize,
+          fontWeight: FormField.fontWeight,
+          backgroundColor: surfaceColor,
           color: textColor,
         },
         eyeButton: {
@@ -103,6 +126,8 @@ export default function ResetPasswordScreen() {
       backgroundColor,
       borderColor,
       primaryColor,
+      accentColor,
+      surfaceColor,
       surfaceSecondaryColor,
       textColor,
       textSecondaryColor,
@@ -165,8 +190,17 @@ export default function ResetPasswordScreen() {
               Enter your new password to complete recovery.
             </Text>
 
-            <View style={styles.form}>
-              <View style={styles.inputContainer}>
+            <View style={[styles.authCard, { borderColor }]}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  {
+                    borderColor,
+                    backgroundColor: hexToRgba(accentColor, 0.1),
+                    marginBottom: 16,
+                  },
+                ]}
+              >
                 <Text style={styles.label}>New Password</Text>
                 <View style={styles.passwordInputContainer}>
                   <TextInput
@@ -191,7 +225,16 @@ export default function ResetPasswordScreen() {
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.fieldPanel,
+                  {
+                    borderColor,
+                    backgroundColor: hexToRgba(accentColor, 0.1),
+                    marginBottom: 16,
+                  },
+                ]}
+              >
                 <Text style={styles.label}>Confirm Password</Text>
                 <View style={styles.passwordInputContainer}>
                   <TextInput

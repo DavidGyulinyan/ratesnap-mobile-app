@@ -351,10 +351,10 @@ const styles = StyleSheet.create({
     right: 4,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    backgroundColor: "rgba(63, 63, 70, 0.12)",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(239, 68, 68, 0.3)",
+    borderColor: "rgba(63, 63, 70, 0.25)",
   },
   deleteButtonDisabled: {
     opacity: 0.5,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#ef4444",
+    color: "#404040",
   },
   deleteButtonTextDisabled: {
     opacity: 0.5,

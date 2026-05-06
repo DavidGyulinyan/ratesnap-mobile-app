@@ -1,16 +1,15 @@
 /**
  * Design tokens: colors, radii, and spacing for a consistent UI.
+ * Brand: teal (#00BEAC), highlight (#00ECD6), canvas (#EFEFEF), coral (#F77872).
  */
 
 import { Platform } from "react-native";
 
-const primary = "#4f46e5";
-const primaryDark = "#4338ca";
-const secondary = "#0891b2";
-const accent = "#d97706";
-const success = "#059669";
-const warning = "#d97706";
-const error = "#dc2626";
+const brand = "#00BEAC";
+const brandLight = "#00ECD6";
+const canvas = "#EFEFEF";
+const coral = "#F77872";
+const brandPressed = "#009A8C";
 
 /** Shared layout tokens — use for padding, gaps, and corner radius. */
 export const Layout = {
@@ -25,107 +24,113 @@ export const Layout = {
   spaceXl: 28,
 };
 
+/** Theme hex (#RRGGBB) → rgba for soft panels (same approach as CurrencyConverter). */
+export function hexToRgba(hex: string, alpha: number): string {
+  const normalized = hex.replace("#", "");
+  if (normalized.length !== 6) {
+    return `rgba(0, 0, 0, ${alpha})`;
+  }
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Text inputs and form cards — match CurrencyConverter amount panel / field sizing. */
+export const FormField = {
+  radiusCard: 16,
+  radiusPanel: 14,
+  radiusInput: 12,
+  padH: 14,
+  padV: 12,
+  fontSize: 18,
+  fontWeight: "600" as const,
+  labelSize: 13,
+};
+
 export const Colors = {
   light: {
-    // Primary colors
-    primary: primary,
-    primaryDark: primaryDark,
-    secondary: secondary,
-    colorAccent: accent,
-    
-    // Background colors
-    background: "#f1f4fb",
+    primary: brand,
+    primaryDark: brandPressed,
+    secondary: brandLight,
+    colorAccent: brandLight,
+
+    background: canvas,
     surface: "#ffffff",
-    surfaceSecondary: "#f4f6fb",
+    surfaceSecondary: "#f5f5f5",
     cardBackground: "#ffffff",
-    
-    // Text colors
-    text: "#1e293b",
-    textSecondary: "#64748b",
-    textTertiary: "#94a3b8",
+
+    text: "#1c1c1e",
+    textSecondary: "#636366",
+    textTertiary: "#8e8e93",
     textInverse: "#ffffff",
-    
-    // Interactive colors
-    tint: primary,
-    accent: accent,
-    success: success,
-    warning: warning,
-    error: error,
-    
-    // Border and dividers
-    border: "#e5e9f2",
-    borderLight: "#eef1f8",
-    divider: "#e5e9f2",
-    
-    // Icon colors
-    icon: "#64748b",
-    iconSecondary: "#94a3b8",
+
+    tint: brand,
+    accent: brandLight,
+    success: brand,
+    warning: "#c4a574",
+    error: coral,
+
+    border: "#e0e0e0",
+    borderLight: "#ebebeb",
+    divider: "#e5e5e5",
+
+    icon: "#636366",
+    iconSecondary: "#8e8e93",
     iconInverse: "#ffffff",
-    
-    // Tab colors
-    tabIconDefault: "#64748b",
-    tabIconSelected: primary,
-    tabBackground: "#DAE3EA",
-    
-    // Special backgrounds
-    headerBackground: "#DAE3EA",
-    headerBorder: "#e2e8f0",
-    
-    // Status colors
-    online: "#10b981",
-    offline: "#ef4444",
-    pending: "#f59e0b",
+
+    tabIconDefault: "#8e8e93",
+    tabIconSelected: brand,
+    tabBackground: "#e8e8e8",
+
+    headerBackground: "#f0f0f0",
+    headerBorder: "#e0e0e0",
+
+    online: brand,
+    offline: "#8e8e93",
+    pending: "#c4a574",
   },
   dark: {
-    // Primary colors
-    primary: primary,
-    primaryDark: primaryDark,
-    secondary: secondary,
-    colorAccent: accent,
-    
-    // Background colors
-    background: "#0c1222",
-    surface: "#151d2e",
-    surfaceSecondary: "#1e293b",
-    cardBackground: "#151d2e",
+    primary: brandLight,
+    primaryDark: brand,
+    secondary: brand,
+    colorAccent: brandLight,
+
+    background: "#0f1414",
+    surface: "#1a2020",
+    surfaceSecondary: "#242b2b",
+    cardBackground: "#1a2020",
     modalBackground: "rgba(0, 0, 0, 0.72)",
-    
-    // Text colors
-    text: "#f1f5f9",
-    textSecondary: "#cbd5e1",
-    textTertiary: "#94a3b8",
-    textInverse: "#1e293b",
-    
-    // Interactive colors
-    tint: primary,
-    accent: accent,
-    success: success,
-    warning: warning,
-    error: error,
-    
-    // Border and dividers
-    border: "#334155",
-    borderLight: "#475569",
-    divider: "#334155",
-    
-    // Icon colors
-    icon: "#cbd5e1",
-    iconSecondary: "#94a3b8",
-    iconInverse: "#1e293b",
-    
-    // Tab colors
-    tabIconDefault: "#94a3b8",
-    tabIconSelected: primary,
-    tabBackground: "#1e293b",
-    
-    // Special backgrounds
-    headerBackground: "#1e293b",
-    headerBorder: "#334155",
-    
-    // Status colors
-    online: "#10b981",
-    offline: "#ef4444",
-    pending: "#f59e0b",
+
+    text: "#f2f2f7",
+    textSecondary: "#aeaeb2",
+    textTertiary: "#8e8e93",
+    textInverse: "#0f1414",
+
+    tint: brandLight,
+    accent: brandLight,
+    success: brandLight,
+    warning: "#d4c4a8",
+    error: coral,
+
+    border: "#3a4242",
+    borderLight: "#4a5454",
+    divider: "#3a4242",
+
+    icon: "#aeaeb2",
+    iconSecondary: "#8e8e93",
+    iconInverse: "#0f1414",
+
+    tabIconDefault: "#8e8e93",
+    tabIconSelected: brandLight,
+    tabBackground: "#242b2b",
+
+    headerBackground: "#242b2b",
+    headerBorder: "#3a4242",
+
+    online: brandLight,
+    offline: "#8e8e93",
+    pending: "#d4c4a8",
   },
 };
 

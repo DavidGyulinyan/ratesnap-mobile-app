@@ -105,11 +105,11 @@ export default function AuthPromptModal({
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="arrow-back" size={24} color="#64748b" />
+            <Ionicons name="arrow-back" size={24} color="#71717a" />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="cloud-upload-outline" size={48} color="#3b82f6" />
+            <Ionicons name="cloud-upload-outline" size={48} color="#00BEAC" />
           </View>
 
           <Text style={styles.title}>{title}</Text>
@@ -121,7 +121,7 @@ export default function AuthPromptModal({
               onPress={handleGoogleSignIn}
               disabled={loading}
             >
-              <Ionicons name="logo-google" size={20} color="#4285F4" />
+              <Ionicons name="logo-google" size={20} color="#636366" />
               <Text style={styles.googleButtonText}>{t('signin.continueWithGoogle')}</Text>
             </TouchableOpacity>
 
@@ -140,7 +140,7 @@ export default function AuthPromptModal({
               style={[styles.button, styles.emailButton]}
               onPress={handleContinueWithEmail}
             >
-              <Ionicons name="mail-outline" size={20} color="#3b82f6" />
+              <Ionicons name="mail-outline" size={20} color="#00BEAC" />
               <Text style={styles.emailButtonText}>Create account with Email</Text>
             </TouchableOpacity>
 
@@ -194,13 +194,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#18181b',
     textAlign: 'center',
     marginBottom: 8,
   },
   message: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#71717a',
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 24,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     borderColor: '#d1d5db',
   },
   googleButtonText: {
-    color: '#374151',
+    color: '#404040',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 12,
@@ -238,12 +238,12 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   emailButton: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#EFEFEF',
     borderWidth: 1,
-    borderColor: '#3b82f6',
+    borderColor: '#00BEAC',
   },
   emailButtonText: {
-    color: '#3b82f6',
+    color: '#00BEAC',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 12,
@@ -253,12 +253,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signInText: {
-    color: '#6b7280',
+    color: '#71717a',
     fontSize: 14,
     textAlign: 'center',
   },
   signInLinkText: {
-    color: '#3b82f6',
+    color: '#00BEAC',
     fontWeight: '600',
   },
 });

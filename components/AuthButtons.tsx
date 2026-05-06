@@ -54,7 +54,7 @@ export default function AuthButtons({ onSuccess }: AuthButtonsProps) {
           style={[styles.button, styles.googleButton]}
           onPress={handleGoogleSignIn}
         >
-          <Ionicons name="logo-google" size={20} color="#4285F4" />
+          <Ionicons name="logo-google" size={20} color="#52525b" />
           <ThemedText style={styles.googleButtonText}>{t('auth.continueWithGoogle')}</ThemedText>
         </TouchableOpacity>
 

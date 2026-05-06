@@ -4,14 +4,11 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 interface OnboardingGuideProps {
   onComplete: () => void;
@@ -19,48 +16,54 @@ interface OnboardingGuideProps {
 
 const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
   const { t } = useLanguage();
+  const primaryColor = useThemeColor({}, "primary");
+  const textInverseColor = useThemeColor({}, "textInverse");
   const [currentStep, setCurrentStep] = useState(0);
 
-  const steps = [
+  const steps: {
+    title: string;
+    description: string;
+    icon: keyof typeof Ionicons.glyphMap;
+  }[] = [
     {
       title: t('onboarding.welcome'),
       description: t('onboarding.welcomeDesc'),
-      icon: '💱',
+      icon: "sparkles-outline",
     },
     {
       title: t('onboarding.convert'),
       description: t('onboarding.convertDesc'),
-      icon: '🔄',
+      icon: "swap-horizontal",
     },
     {
       title: t('onboarding.multi'),
       description: t('onboarding.multiDesc'),
-      icon: '📊',
+      icon: "stats-chart-outline",
     },
     {
       title: t('onboarding.save'),
       description: t('onboarding.saveDesc'),
-      icon: '⭐',
+      icon: "bookmark-outline",
     },
     {
       title: t('onboarding.calculator'),
       description: t('onboarding.calculatorDesc'),
-      icon: '🧮',
+      icon: "calculator-outline",
     },
     {
       title: t('onboarding.offline'),
       description: t('onboarding.offlineDesc'),
-      icon: '📱',
+      icon: "phone-portrait-outline",
     },
     {
       title: t('onboarding.alerts'),
       description: t('onboarding.alertsDesc'),
-      icon: '🔔',
+      icon: "notifications-outline",
     },
     {
       title: t('onboarding.ready'),
       description: t('onboarding.readyDesc'),
-      icon: '🚀',
+      icon: "checkmark-done-outline",
     },
   ];
 
@@ -99,7 +102,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
           accessibilityLabel="Previous step"
         >
           {currentStep > 0 ? (
-            <Ionicons name="arrow-back" size={22} color="#64748b" />
+            <Ionicons name="arrow-back" size={22} color="#71717a" />
           ) : (
             <View style={styles.backNavPlaceholder} />
           )}
@@ -114,7 +117,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
 
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{currentStepData.icon}</Text>
+          <Ionicons name={currentStepData.icon} size={52} color={primaryColor} />
         </View>
 
         <Text style={styles.title}>{currentStepData.title}</Text>
@@ -128,18 +131,21 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
               key={index}
               style={[
                 styles.dot,
-                index === currentStep && styles.activeDot,
+                index === currentStep && [styles.activeDot, { backgroundColor: primaryColor }],
               ]}
             />
           ))}
         </View>
 
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-           <Text style={styles.nextButtonText}>
+        <TouchableOpacity
+          style={[styles.nextButton, { backgroundColor: primaryColor, shadowColor: primaryColor }]}
+          onPress={handleNext}
+        >
+           <Text style={[styles.nextButtonText, { color: textInverseColor }]}>
              {currentStep === steps.length - 1 ? t('onboarding.getStarted') : t('onboarding.next')}
            </Text>
            {currentStep < steps.length - 1 && (
-             <Ionicons name="arrow-forward" size={20} color="#fff" />
+             <Ionicons name="arrow-forward" size={20} color={textInverseColor} />
            )}
          </TouchableOpacity>
       </View>
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
   },
   stepIndicator: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#71717a',
     fontWeight: '600',
   },
   stepIndicatorCenter: {
@@ -184,7 +190,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#71717a',
     fontWeight: '500',
   },
   content: {
@@ -197,30 +203,27 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#EFEFEF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 40,
-    shadowColor: '#3b82f6',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
   },
-  icon: {
-    fontSize: 50,
-  },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1f2937',
+    color: '#18181b',
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 32,
   },
   description: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#71717a',
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: 10,
@@ -238,28 +241,25 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#e4e4e7',
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#3b82f6',
     width: 24,
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3b82f6',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
-    shadowColor: '#3b82f6',
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
   },
   nextButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     marginRight: 8,

@@ -26,7 +26,12 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserData } from "@/hooks/useUserData";
-import { useLocationCurrency } from "./LocationDetection";
+import { usePreferredLocalCurrency } from "./LocationDetection";
+import { hexToRgba } from "@/constants/theme";
+import {
+  fiatKeysFromConversionRates,
+  isFiatCurrencyCode,
+} from "@/constants/fiatCurrencyCodes";
 
 interface AlertSettings {
   targetRate: number;
@@ -98,7 +103,7 @@ export default function CurrencyConverter({
     pickedRates: { trackRate },
   } = useUserData();
   const { currency: detectedCurrency, loading: locationLoading } =
-    useLocationCurrency();
+    usePreferredLocalCurrency();
 
   // Theme colors
   const backgroundColor = useThemeColor({}, "background");
@@ -109,7 +114,7 @@ export default function CurrencyConverter({
   const textSecondaryColor = useThemeColor({}, "textSecondary");
   const borderColor = useThemeColor({}, "border");
   const textInverseColor = useThemeColor({}, "textInverse");
-  const shadowColor = "#000000"; // Use black for shadows
+  const accentColor = useThemeColor({}, "accent");
 
   // Enhanced Auto-detect user's location and set default currency
   const detectUserLocation = async () => {
@@ -504,7 +509,9 @@ export default function CurrencyConverter({
         ) {
           const transformedData: Data = JSON.parse(cachedData);
           setCurrenciesData(transformedData);
-          setCurrencyList(Object.keys(transformedData.conversion_rates));
+          setCurrencyList(
+            fiatKeysFromConversionRates(transformedData.conversion_rates)
+          );
           console.log("📦 Loaded cached exchange rates");
 
           // Wait for currency detection/loading before marking complete
@@ -564,7 +571,9 @@ export default function CurrencyConverter({
         await AsyncStorage.setItem("cachedRatesTimestamp", now.toString());
 
         setCurrenciesData(transformedData);
-        setCurrencyList(Object.keys(transformedData.conversion_rates));
+        setCurrencyList(
+          fiatKeysFromConversionRates(transformedData.conversion_rates)
+        );
         console.log("📡 Fresh exchange rates loaded");
 
         // Wait for currency detection/loading before marking complete
@@ -577,8 +586,9 @@ export default function CurrencyConverter({
         const cachedData = await AsyncStorage.getItem("cachedExchangeRates");
         if (cachedData) {
           setCurrenciesData(JSON.parse(cachedData));
+          const parsed = JSON.parse(cachedData);
           setCurrencyList(
-            Object.keys(JSON.parse(cachedData).conversion_rates || {})
+            fiatKeysFromConversionRates(parsed.conversion_rates || {})
           );
           console.log("📦 Using cached data after API error");
         } else {
@@ -888,7 +898,9 @@ export default function CurrencyConverter({
       await AsyncStorage.setItem("cachedRatesTimestamp", Date.now().toString());
 
       setCurrenciesData(transformedData);
-      setCurrencyList(Object.keys(transformedData.conversion_rates));
+      setCurrencyList(
+        fiatKeysFromConversionRates(transformedData.conversion_rates)
+      );
       console.log("📡 Exchange rates refreshed successfully");
     } catch (error) {
       console.error("Exchange rates refresh error:", error);
@@ -896,8 +908,9 @@ export default function CurrencyConverter({
       const cachedData = await AsyncStorage.getItem("cachedExchangeRates");
       if (cachedData) {
         setCurrenciesData(JSON.parse(cachedData));
+        const parsedRefresh = JSON.parse(cachedData);
         setCurrencyList(
-          Object.keys(JSON.parse(cachedData).conversion_rates || {})
+          fiatKeysFromConversionRates(parsedRefresh.conversion_rates || {})
         );
         console.log("📦 Using cached data after refresh error");
       }
@@ -1040,6 +1053,7 @@ export default function CurrencyConverter({
     const mergedList: string[] = [];
 
     history.forEach((entry) => {
+      if (!isFiatCurrencyCode(entry.from)) return;
       if (!uniqueCurrencies.has(entry.from)) {
         uniqueCurrencies.add(entry.from);
         mergedList.push(entry.from);
@@ -1105,7 +1119,7 @@ export default function CurrencyConverter({
 
   return (
     <ScrollView
-      style={[{ flex: 1, padding: inModal ? 0 : 20, backgroundColor }]}
+      style={[{ flex: 1, padding: inModal ? 0 : 14, backgroundColor }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -1120,59 +1134,59 @@ export default function CurrencyConverter({
           },
         ]}
       >
-        <View style={styles.amountSection}>
-          <ThemedText type="defaultSemiBold" style={styles.amountLabel}>
-            {t("converter.amountLabel")}
-          </ThemedText>
-          <View style={styles.amountInputWrapper}>
-            <TextInput
+        <View
+          style={[
+            styles.amountPanel,
+            {
+              borderColor,
+              backgroundColor: hexToRgba(accentColor, 0.1),
+            },
+          ]}
+        >
+          <View style={styles.amountLabelRow}>
+            <View
               style={[
-                {
-                  backgroundColor: surfaceSecondaryColor,
-                  borderColor: borderColor,
-                  color: textColor,
-                },
-                styles.amountInput,
+                styles.amountLabelIconWrap,
+                { backgroundColor: hexToRgba(primaryColor, 0.15) },
               ]}
-              placeholder={t("converter.enterAmountPlaceholder")}
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
-              placeholderTextColor={textSecondaryColor}
-            />
+            >
+              <Ionicons name="cash-outline" size={16} color={primaryColor} />
+            </View>
+            <ThemedText type="defaultSemiBold" style={styles.amountLabel}>
+              {t("converter.amountLabel")}
+            </ThemedText>
           </View>
-
-          <View style={styles.quickAmounts}>
-            {[1, 10, 100, 1000].map((preset) => (
-              <TouchableOpacity
-                key={preset}
-                style={[
-                  {
-                    backgroundColor: surfaceSecondaryColor,
-                    borderColor: borderColor,
-                    shadowColor: shadowColor,
-                  },
-                  styles.quickAmountButton,
-                ]}
-                onPress={() => setAmount(preset.toString())}
-              >
-                <ThemedText
-                  style={[{ color: textColor }, styles.quickAmountText]}
-                >
-                  {preset}
-                </ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <TextInput
+            style={[
+              {
+                backgroundColor: surfaceColor,
+                borderColor,
+                color: textColor,
+              },
+              styles.amountInput,
+            ]}
+            placeholder={t("converter.enterAmountPlaceholder")}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+            placeholderTextColor={textSecondaryColor}
+          />
         </View>
 
-        <View style={styles.currencySelection}>
+        <View
+          style={[
+            styles.currencyPairPanel,
+            {
+              backgroundColor: hexToRgba(primaryColor, 0.06),
+              borderColor: hexToRgba(primaryColor, 0.16),
+            },
+          ]}
+        >
           <TouchableOpacity
             style={[
               {
-                backgroundColor: surfaceSecondaryColor,
-                borderColor: borderColor,
-                shadowColor: shadowColor,
+                backgroundColor: surfaceColor,
+                borderColor,
               },
               styles.currencySelector,
             ]}
@@ -1180,29 +1194,31 @@ export default function CurrencyConverter({
             activeOpacity={0.85}
           >
             <View style={styles.currencyFlagContainer}>
-              <CurrencyFlag currency={fromCurrency} size={28} />
+              <CurrencyFlag currency={fromCurrency} size={24} />
             </View>
             <View style={styles.currencyInfo}>
-              <ThemedText
-                style={[{ color: textSecondaryColor }, styles.currencyLabel]}
-              >
-                {t("converter.fromLabel")}
-              </ThemedText>
               <ThemedText style={[{ color: textColor }, styles.currencyCode]}>
                 {fromCurrency}
               </ThemedText>
             </View>
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={textSecondaryColor}
-            />
+            <View
+              style={[
+                styles.chevronBadge,
+                { backgroundColor: surfaceSecondaryColor },
+              ]}
+            >
+              <Ionicons name="chevron-down" size={16} color={primaryColor} />
+            </View>
           </TouchableOpacity>
 
           <View style={styles.swapRow}>
             <TouchableOpacity
               style={[
-                { backgroundColor: primaryColor, shadowColor: primaryColor },
+                {
+                  backgroundColor: primaryColor,
+                  shadowColor: primaryColor,
+                  borderColor: surfaceColor,
+                },
                 styles.swapButtonModern,
               ]}
               onPress={handleSwap}
@@ -1210,7 +1226,7 @@ export default function CurrencyConverter({
             >
               <Ionicons
                 name="swap-vertical"
-                size={22}
+                size={19}
                 color={textInverseColor}
               />
             </TouchableOpacity>
@@ -1219,9 +1235,8 @@ export default function CurrencyConverter({
           <TouchableOpacity
             style={[
               {
-                backgroundColor: surfaceSecondaryColor,
-                borderColor: borderColor,
-                shadowColor: shadowColor,
+                backgroundColor: surfaceColor,
+                borderColor,
               },
               styles.currencySelector,
             ]}
@@ -1229,71 +1244,100 @@ export default function CurrencyConverter({
             activeOpacity={0.85}
           >
             <View style={styles.currencyFlagContainer}>
-              <CurrencyFlag currency={toCurrency} size={28} />
+              <CurrencyFlag currency={toCurrency} size={24} />
             </View>
             <View style={styles.currencyInfo}>
-              <ThemedText
-                style={[{ color: textSecondaryColor }, styles.currencyLabel]}
-              >
-                {t("converter.toLabel")}
-              </ThemedText>
               <ThemedText style={[{ color: textColor }, styles.currencyCode]}>
                 {toCurrency}
               </ThemedText>
             </View>
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={textSecondaryColor}
-            />
+            <View
+              style={[
+                styles.chevronBadge,
+                { backgroundColor: surfaceSecondaryColor },
+              ]}
+            >
+              <Ionicons name="chevron-down" size={16} color={primaryColor} />
+            </View>
           </TouchableOpacity>
         </View>
 
         <View style={styles.resultSection}>
           <View
             style={[
+              styles.resultCard,
               {
                 backgroundColor: surfaceSecondaryColor,
-                borderColor: primaryColor,
-                shadowColor: shadowColor,
+                borderColor,
               },
-              styles.resultCard,
             ]}
           >
             {amount && parseFloat(amount) > 0 && convertedAmount ? (
               <View style={styles.conversionDisplay}>
-                <View style={styles.amountRow}>
+                <View
+                  style={[
+                    styles.resultHeroBanner,
+                    { backgroundColor: hexToRgba(accentColor, 0.14) },
+                  ]}
+                >
                   <ThemedText
-                    style={[{ color: textColor }, styles.inputAmount]}
+                    type="caption"
+                    style={[
+                      styles.resultPairCaption,
+                      { color: textSecondaryColor },
+                    ]}
                   >
-                    {parseFloat(amount).toLocaleString()} {fromCurrency}
+                    {parseFloat(amount).toLocaleString()} {fromCurrency} →{" "}
+                    {toCurrency}
                   </ThemedText>
-                  <ThemedText
-                    style={[{ color: textSecondaryColor }, styles.equals]}
-                  >
-                    =
-                  </ThemedText>
-                </View>
-                <View style={styles.resultRow}>
                   <ThemedText
                     style={[{ color: primaryColor }, styles.outputAmount]}
                   >
                     {parseFloat(convertedAmount).toLocaleString()} {toCurrency}
                   </ThemedText>
                 </View>
-                <View
-                  style={[{ borderTopColor: borderColor }, styles.rateInfo]}
-                >
-                  <ThemedText
-                    style={[{ color: textSecondaryColor }, styles.rateText]}
+                <View style={styles.ratePillRow}>
+                  <View
+                    style={[
+                      styles.ratePill,
+                      {
+                        backgroundColor: hexToRgba(primaryColor, 0.08),
+                        borderColor: hexToRgba(primaryColor, 0.22),
+                      },
+                    ]}
                   >
-                    1 {fromCurrency} = {getExchangeRate().toFixed(4)}{" "}
-                    {toCurrency}
-                  </ThemedText>
+                    <Ionicons
+                      name="pulse-outline"
+                      size={15}
+                      color={primaryColor}
+                    />
+                    <ThemedText
+                      style={[{ color: textSecondaryColor }, styles.ratePillText]}
+                    >
+                      {tWithParams("converter.exchangeRateResult", {
+                        rateLabel: t("converter.exchangeRate"),
+                        fromCurrency,
+                        rate: getExchangeRate().toFixed(4),
+                        toCurrency,
+                      })}
+                    </ThemedText>
+                  </View>
                 </View>
               </View>
             ) : (
               <View style={styles.placeholderResult}>
+                <View
+                  style={[
+                    styles.placeholderIconWrap,
+                    { backgroundColor: hexToRgba(accentColor, 0.12) },
+                  ]}
+                >
+                  <Ionicons
+                    name="swap-horizontal-outline"
+                    size={28}
+                    color={primaryColor}
+                  />
+                </View>
                 <ThemedText
                   style={[
                     { color: textSecondaryColor },
@@ -1319,7 +1363,7 @@ export default function CurrencyConverter({
             >
               <Ionicons
                 name="bookmark-outline"
-                size={18}
+                size={17}
                 color={textInverseColor}
                 style={styles.saveRateIcon}
               />
@@ -1441,14 +1485,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   converterCard: {
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
-    padding: 20,
+    padding: 14,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   navHeader: {
     padding: 12,
@@ -1468,7 +1512,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: "#e4e4e7",
   },
   headerLogoContainer: {
     marginBottom: 12,
@@ -1476,13 +1520,13 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#1f2937",
+    color: "#18181b",
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    color: "#6b7280",
+    color: "#71717a",
     textAlign: "center",
   },
   featureToggles: {
@@ -1494,29 +1538,29 @@ const styles = StyleSheet.create({
   featureToggle: {
     flex: 1,
     padding: 12,
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#EFEFEF",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: "#e4e4e7",
     alignItems: "center",
   },
   featureToggleActive: {
-    backgroundColor: "#ede9fe",
-    borderColor: "#7c3aed",
+    backgroundColor: "#e4e4e7",
+    borderColor: "#00BEAC",
   },
   featureToggleText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#374151",
+    color: "#404040",
     textAlign: "center",
   },
   mainConverterBox: {
     borderWidth: 2,
-    borderColor: "#7c3aed",
+    borderColor: "#00BEAC",
     borderRadius: 16,
     padding: 20,
     backgroundColor: "#ffffff",
-    shadowColor: "#7c3aed",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -1526,23 +1570,23 @@ const styles = StyleSheet.create({
   converterTitleOld: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#1f2937",
+    color: "#18181b",
     textAlign: "center",
     marginBottom: 16,
   },
   convertedAmountBox: {
     padding: 20,
     borderRadius: 12,
-    backgroundColor: "#eff6ff",
+    backgroundColor: "#f4f4f5",
     borderWidth: 2,
-    borderColor: "#3b82f6",
+    borderColor: "#a1a1aa",
     marginBottom: 20,
     alignItems: "center",
   },
   convertedAmountText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#1e40af",
+    color: "#27272a",
     textAlign: "center",
   },
   amountInputContainer: {
@@ -1554,7 +1598,7 @@ const styles = StyleSheet.create({
   amountInputOld: {
     flex: 1,
     borderWidth: 2,
-    borderColor: "#d1d5db",
+    borderColor: "#d4d4d8",
     borderRadius: 12,
     padding: 15,
     fontSize: 18,
@@ -1562,11 +1606,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   calculatorButton: {
-    backgroundColor: "#7c3aed",
+    backgroundColor: "#00BEAC",
     padding: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#6d28d9",
+    borderColor: "#009A8C",
   },
   calculatorButtonText: {
     color: "white",
@@ -1585,9 +1629,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     borderWidth: 2,
-    borderColor: "#d1d5db",
+    borderColor: "#d4d4d8",
     borderRadius: 12,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#f4f4f5",
     alignItems: "center",
     justifyContent: "center",
     minHeight: 60,
@@ -1601,7 +1645,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   currencyButtonText: {
-    color: "#1f2937",
+    color: "#18181b",
     fontWeight: "600",
     fontSize: 14,
     textAlign: "center",
@@ -1611,12 +1655,12 @@ const styles = StyleSheet.create({
   swapButton: {
     padding: 15,
     marginHorizontal: 15,
-    backgroundColor: "#7c3aed",
+    backgroundColor: "#00BEAC",
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#6d28d9",
+    borderColor: "#009A8C",
   },
   swapButtonText: {
     color: "white",
@@ -1624,19 +1668,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   swapArrows: {
-    color: "#7c3aed",
+    color: "#00BEAC",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
   },
   saveButton: {
-    backgroundColor: "#7c3aed",
+    backgroundColor: "#00BEAC",
     padding: 15,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 2,
-    borderColor: "#6d28d9",
+    borderColor: "#009A8C",
   },
   saveButtonText: {
     color: "white",
@@ -1646,147 +1690,166 @@ const styles = StyleSheet.create({
   disclaimer: {
     textAlign: "center",
     fontSize: 12,
-    color: "#6b7280",
+    color: "#71717a",
     fontStyle: "italic",
   },
-  // Amount Section
-  amountSection: {
-    marginBottom: 24,
-  },
-  amountLabel: {
-    fontSize: 16,
-    fontWeight: "600",
+  amountPanel: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 12,
     marginBottom: 12,
   },
-  amountInputWrapper: {
-    marginBottom: 16,
+  amountLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
+  amountLabelIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  amountLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    letterSpacing: 0.2,
+    flex: 1,
   },
   amountInput: {
     borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    fontSize: 22,
-    fontWeight: "600",
-  },
-
-  // Quick Amounts
-  quickAmounts: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  quickAmountButton: {
-    flex: 1,
     borderRadius: 12,
+    paddingHorizontal: 14,
     paddingVertical: 12,
-    paddingHorizontal: 8,
-    alignItems: "center",
-    borderWidth: 1,
-  },
-  quickAmountText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "600",
   },
 
-  // Currency Selection
-  currencySelection: {
-    marginBottom: 20,
+  currencyPairPanel: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 12,
+    gap: 2,
   },
   currencySelector: {
     width: "100%",
-    borderRadius: 18,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
   },
   currencyFlagContainer: {
-    marginRight: 14,
+    marginRight: 10,
   },
   currencyInfo: {
     flex: 1,
     minWidth: 0,
-  },
-  currencyLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    marginBottom: 2,
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
+    justifyContent: "center",
   },
   currencyCode: {
     fontSize: 18,
     fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  chevronBadge: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   swapRow: {
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 4,
   },
   swapButtonModern: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 3,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.14,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 3,
   },
 
-  // Result Section
   resultSection: {
-    marginBottom: 24,
+    marginBottom: 14,
   },
   resultCard: {
-    borderRadius: 18,
-    padding: 20,
+    borderRadius: 14,
+    padding: 12,
     borderWidth: 1,
-    alignItems: "center",
+    overflow: "hidden",
   },
   conversionDisplay: {
     width: "100%",
+    alignItems: "stretch",
+  },
+  resultHeroBanner: {
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
     alignItems: "center",
+    marginBottom: 10,
   },
-  amountRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  inputAmount: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  equals: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginHorizontal: 12,
-  },
-  resultRow: {
-    marginBottom: 12,
+  resultPairCaption: {
+    fontSize: 12,
+    fontWeight: "500",
+    textAlign: "center",
+    marginBottom: 6,
+    letterSpacing: 0.15,
   },
   outputAmount: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700",
+    letterSpacing: 0.2,
+    textAlign: "center",
   },
-  rateInfo: {
-    paddingTop: 12,
-    borderTopWidth: 1,
+  ratePillRow: {
+    width: "100%",
+    alignItems: "center",
   },
-  rateText: {
-    fontSize: 14,
+  ratePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    maxWidth: "100%",
+  },
+  ratePillText: {
+    flex: 1,
+    fontSize: 12,
     fontWeight: "500",
   },
   placeholderResult: {
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+  },
+  placeholderIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
   },
   placeholderText: {
-    fontSize: 16,
+    fontSize: 14,
     fontStyle: "italic",
+    textAlign: "center",
+    lineHeight: 20,
   },
 
   // Action Buttons
@@ -1796,27 +1859,27 @@ const styles = StyleSheet.create({
   actionButtonsRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
   saveRateButton: {
     flex: 1,
     flexDirection: "row",
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
+    borderRadius: 12,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    gap: 6,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    elevation: 2,
   },
   saveRateIcon: {
     marginRight: 0,
   },
   saveRateText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
   },
 });

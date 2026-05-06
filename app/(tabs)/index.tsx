@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useUserData } from "@/hooks/useUserData";
 import { getAsyncStorage } from "@/lib/storage";
+import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -240,7 +241,7 @@ export default function HomeScreen() {
       if (cachedData) {
         const data = JSON.parse(cachedData);
         setCurrenciesData(data);
-        setCurrencyList(Object.keys(data.conversion_rates || {}));
+        setCurrencyList(fiatKeysFromConversionRates(data.conversion_rates));
         console.log("📦 Loaded cached exchange rates for multi-currency");
       } else {
         // Set default currencies if no cached data
@@ -603,16 +604,22 @@ export default function HomeScreen() {
         >
           {!currenciesData ? (
             <View style={styles.emptyState}>
-              <ThemedText style={styles.emptyStateText}>
+              <ThemedText style={[styles.emptyStateText, { color: textSecondaryColor }]}>
                 {t("converter.loadingRates")}
               </ThemedText>
               <TouchableOpacity
-                style={styles.refreshButton}
+                style={[
+                  styles.refreshButton,
+                  { backgroundColor: primaryColor, shadowColor: primaryColor },
+                ]}
                 onPress={loadExchangeRates}
               >
-                <ThemedText style={styles.refreshButtonText}>
-                  🔄 {t("converter.refreshData")}
-                </ThemedText>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <Ionicons name="refresh-outline" size={18} color={textInverseColor} />
+                  <ThemedText style={[styles.refreshButtonText, { color: textInverseColor }]}>
+                    {t("converter.refreshData")}
+                  </ThemedText>
+                </View>
               </TouchableOpacity>
             </View>
           ) : (
@@ -937,29 +944,24 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#64748b",
     marginBottom: 8,
     textAlign: "center",
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: "#94a3b8",
     textAlign: "center",
   },
   refreshButton: {
-    backgroundColor: "#6366f1",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 16,
-    shadowColor: "#6366f1",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   refreshButtonText: {
-    color: "white",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -989,7 +991,7 @@ const styles = StyleSheet.create({
   rateAlertsTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1e293b",
+    color: "#18181b",
   },
   existingAlerts: {
     marginBottom: 24,
@@ -1009,13 +1011,13 @@ const styles = StyleSheet.create({
   alertArrow: {
     marginHorizontal: 10,
     fontSize: 14,
-    color: "#64748b",
+    color: "#71717a",
   },
   alertText: {
     marginLeft: 8,
     fontSize: 14,
     fontWeight: "600",
-    color: "#6366f1",
+    color: "#00BEAC",
   },
   createAlertSection: {
     marginTop: 20,
@@ -1034,44 +1036,44 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 14,
     backgroundColor: "rgba(248, 250, 252, 0.8)",
-    color: "#1e293b",
+    color: "#18181b",
   },
   conditionButton: {
-    backgroundColor: "#6366f1",
+    backgroundColor: "#00BEAC",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     minWidth: 80,
-    shadowColor: "#6366f1",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 2,
   },
   conditionButtonText: {
-    color: "white",
+    color: "#ffffff",
     fontSize: 12,
     fontWeight: "600",
   },
   createAlertButton: {
-    backgroundColor: "#10b981",
+    backgroundColor: "#00ECD6",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
-    shadowColor: "#10b981",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
   createAlertButtonText: {
-    color: "white",
+    color: "#1c1c1e",
     fontSize: 15,
     fontWeight: "600",
   },
   showMoreAlertsText: {
-    color: "#6366f1",
+    color: "#00BEAC",
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
@@ -1080,7 +1082,7 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#374151",
+    color: "#404040",
     marginBottom: 16,
   },
   alertContent: {
@@ -1090,7 +1092,7 @@ const styles = StyleSheet.create({
   },
   alertDeleteButton: {
     padding: 8,
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    backgroundColor: "rgba(63, 63, 70, 0.12)",
     borderRadius: 6,
     marginLeft: 12,
   },
@@ -1098,14 +1100,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   deleteAllInlineButton: {
-    backgroundColor: "#ef4444",
+    backgroundColor: "#F77872",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 16,
-    shadowColor: "#ef4444",
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -1128,7 +1130,7 @@ const styles = StyleSheet.create({
   currencyPickerButtonText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#1e293b",
+    color: "#18181b",
   },
 
   // Settings button

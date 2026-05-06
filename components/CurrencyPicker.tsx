@@ -13,6 +13,7 @@ import { ThemedText } from "./themed-text";
 import CurrencyFlag from "./CurrencyFlag";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FormField } from "@/constants/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -308,7 +309,7 @@ export default function CurrencyPicker({
         
         {/* Search Input */}
         <TextInput
-          style={[{ backgroundColor: surfaceSecondaryColor, borderColor: borderColor, color: textColor }, styles.searchInput]}
+          style={[{ backgroundColor: surfaceColor, borderColor: borderColor, color: textColor }, styles.searchInput]}
           placeholder={t('picker.searchCurrencies')}
           value={search}
           onChangeText={setSearch}
@@ -414,10 +415,11 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     borderWidth: 1,
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    borderRadius: FormField.radiusInput,
+    paddingVertical: FormField.padV,
+    paddingHorizontal: FormField.padH,
+    fontSize: FormField.fontSize,
+    fontWeight: FormField.fontWeight,
     marginHorizontal: 20,
     marginBottom: 16,
   },
@@ -433,8 +435,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   selectedItem: {
-    backgroundColor: "#f0fdf4",
-    borderBottomColor: "#dcfce7",
+    backgroundColor: "#f4f4f5",
+    borderBottomColor: "#d4d4d8",
   },
   currencyItemContent: {
     flexDirection: "row",
@@ -461,8 +463,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   frequentlyUsedItem: {
-    backgroundColor: "#fefce8",
-    borderBottomColor: "#fef3c7",
+    backgroundColor: "#e4e4e7",
+    borderBottomColor: "#d4d4d8",
   },
   currencyLeftContent: {
     flexDirection: "row",

@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { hexToRgba, FormField } from '@/constants/theme';
 import Logo from '@/components/Logo';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -33,6 +34,7 @@ export default function ForgotPasswordScreen() {
   const surfaceColor = useThemeColor({}, 'surface');
   const surfaceSecondaryColor = useThemeColor({}, 'surfaceSecondary');
   const primaryColor = useThemeColor({}, 'primary');
+  const accentColor = useThemeColor({}, 'accent');
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const borderColor = useThemeColor({}, 'border');
@@ -81,33 +83,44 @@ export default function ForgotPasswordScreen() {
       paddingHorizontal: 20,
     },
 
-    form: {
+    authCard: {
       width: '100%',
-      marginBottom: 32,
+      maxWidth: 400,
+      marginBottom: 24,
+      backgroundColor: surfaceColor,
+      borderRadius: FormField.radiusCard,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: borderColor,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
     },
-    inputContainer: {
-      marginBottom: 20,
+    fieldPanel: {
+      borderRadius: FormField.radiusPanel,
+      borderWidth: 1,
+      padding: 12,
+      marginBottom: 12,
     },
     label: {
-      fontSize: 14,
+      fontSize: FormField.labelSize,
       fontWeight: '600',
       color: textColor,
-      marginBottom: 8,
+      marginBottom: 10,
+      letterSpacing: 0.2,
     },
     input: {
       borderWidth: 1,
       borderColor: borderColor,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      fontSize: 16,
-      backgroundColor: surfaceSecondaryColor,
+      borderRadius: FormField.radiusInput,
+      paddingHorizontal: FormField.padH,
+      paddingVertical: FormField.padV,
+      fontSize: FormField.fontSize,
+      fontWeight: FormField.fontWeight,
+      backgroundColor: surfaceColor,
       color: textColor,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 1,
     },
 
     button: {
@@ -141,21 +154,17 @@ export default function ForgotPasswordScreen() {
 
     successCard: {
       backgroundColor: surfaceColor,
-      borderRadius: 16,
-      padding: 24,
+      borderRadius: FormField.radiusCard,
+      padding: 14,
       marginBottom: 32,
       borderWidth: 1,
       borderColor: borderColor,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
       shadowRadius: 8,
-      elevation: 4,
+      elevation: 2,
       alignItems: 'center',
-    },
-    successIcon: {
-      fontSize: 48,
-      marginBottom: 16,
     },
     successTitle: {
       fontSize: 20,
@@ -190,7 +199,7 @@ export default function ForgotPasswordScreen() {
       fontWeight: '600',
       textAlign: 'center',
     },
-  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor]);
+  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, accentColor, textColor, textSecondaryColor, borderColor]);
 
   const handleResetPassword = async () => {
     const normalizedEmail = email.trim().toLowerCase();
@@ -244,11 +253,12 @@ export default function ForgotPasswordScreen() {
             <Logo size={72} showText={true} textSize={26} />
             <Text style={styles.title}>Check Your Email</Text>
             <Text style={styles.subtitle}>
-              We've sent password reset instructions to {email}
+              {"We've sent password reset instructions to "}
+              {email}
             </Text>
 
             <View style={styles.successCard}>
-              <Text style={styles.successIcon}>📧</Text>
+              <Ionicons name="mail-outline" size={48} color={primaryColor} style={{ marginBottom: 16 }} />
               <Text style={styles.successTitle}>Reset Email Sent!</Text>
               <Text style={styles.successText}>
                 Click the link in the email to reset your password. The link will expire in 1 hour.
@@ -266,7 +276,9 @@ export default function ForgotPasswordScreen() {
               style={styles.resendLink}
               onPress={() => setEmailSent(false)}
             >
-              <Text style={styles.resendText}>Didn't receive the email? Try again</Text>
+              <Text style={styles.resendText}>
+                {"Didn't receive the email? Try again"}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -295,11 +307,22 @@ export default function ForgotPasswordScreen() {
           <Logo size={72} showText={true} textSize={36} />
           <Text style={styles.title}>Reset Password</Text>
           <Text style={styles.subtitle}>
-            Enter your email address and we'll send you a link to reset your password
+            {
+              "Enter your email address and we'll send you a link to reset your password"
+            }
           </Text>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
+          <View style={[styles.authCard, { borderColor }]}>
+            <View
+              style={[
+                styles.fieldPanel,
+                {
+                  borderColor,
+                  backgroundColor: hexToRgba(accentColor, 0.1),
+                  marginBottom: 16,
+                },
+              ]}
+            >
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
