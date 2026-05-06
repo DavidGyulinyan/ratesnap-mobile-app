@@ -1,5 +1,11 @@
 import React from "react";
-import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  Modal,
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { FinancialBackground } from "@/components/FinancialBackground";
@@ -70,8 +76,12 @@ export default function QuickActionModal({
             </TouchableOpacity>
             <ThemedText
               type="defaultSemiBold"
-              style={[styles.title, { color: textColor }]}
-              numberOfLines={1}
+              style={[
+                styles.title,
+                { color: textColor },
+                Platform.OS === "android" ? { includeFontPadding: false } : null,
+              ]}
+              numberOfLines={2}
             >
               {title}
             </ThemedText>
@@ -97,7 +107,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 14,
+    paddingBottom: 14,
+    minHeight: 52,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   closeButton: {
@@ -111,6 +123,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 17,
+    lineHeight: 22,
     textAlign: "center",
     marginHorizontal: 8,
   },
