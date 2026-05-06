@@ -1,4 +1,4 @@
-import React, { useState, type ReactNode } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -13,13 +13,23 @@ import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageDropdown from '@/components/LanguageDropdown';
+
+/** Opens dashboard modals — same tools as Quick Actions, separate from Settings. */
+export type BurgerMenuQuickActions = {
+  openConverter: () => void;
+  openMultiCurrency: () => void;
+  openCharts: () => void;
+  openSavedRates: () => void;
+  openRateAlerts: () => void;
+  openCalculator: () => void;
+};
 
 interface BurgerMenuProps {
   style?: any;
+  quickActions?: BurgerMenuQuickActions;
 }
 
-export default function BurgerMenu({ style }: BurgerMenuProps) {
+export default function BurgerMenu({ style, quickActions }: BurgerMenuProps) {
    const { t } = useLanguage();
    const router = useRouter();
    const { user, signOut } = useAuth();
@@ -59,84 +69,145 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
     icon: keyof typeof Ionicons.glyphMap;
     onPress: () => void;
     subtitle?: string;
-    component?: ReactNode;
     danger?: boolean;
   };
 
-  const menuItems: MenuItem[] = [
-    {
-      id: 'settings',
-      title: t('settings.title'),
-      icon: 'settings-outline',
-      onPress: () => {
-        setIsVisible(false);
-        router.push('/(tabs)/settings');
-      },
+  const closeThen = (fn: () => void) => {
+    setIsVisible(false);
+    fn();
+  };
+
+  const settingsItem: MenuItem = {
+    id: 'settings',
+    title: t('settings.title'),
+    icon: 'settings-outline',
+    onPress: () => {
+      closeThen(() => router.push('/(tabs)/settings'));
     },
-    {
-      id: 'language',
-      title: t('settings.language'),
-      icon: 'language-outline',
-      onPress: () => {},
-      component: (
-        <View style={{ marginTop: 12 }}>
-          <LanguageDropdown
-            compact={false}
-            style={{}}
-          />
-        </View>
-      ),
+  };
+
+  const quickActionItems: MenuItem[] = quickActions
+    ? [
+        {
+          id: 'qa-converter',
+          title: t('quick.action.converter'),
+          icon: 'swap-horizontal',
+          onPress: () => closeThen(quickActions.openConverter),
+        },
+        {
+          id: 'qa-multi',
+          title: t('quick.action.multiCurrency'),
+          icon: 'stats-chart-outline',
+          onPress: () => closeThen(quickActions.openMultiCurrency),
+        },
+        {
+          id: 'qa-charts',
+          title: t('quick.action.charts'),
+          icon: 'trending-up-outline',
+          onPress: () => closeThen(quickActions.openCharts),
+        },
+        {
+          id: 'qa-saved',
+          title: t('quick.action.savedRates'),
+          icon: 'bookmark-outline',
+          onPress: () => closeThen(quickActions.openSavedRates),
+        },
+        {
+          id: 'qa-alerts',
+          title: t('quick.action.rateAlerts'),
+          icon: 'notifications-outline',
+          onPress: () => closeThen(quickActions.openRateAlerts),
+        },
+        {
+          id: 'qa-calculator',
+          title: t('quick.action.calculator'),
+          icon: 'calculator-outline',
+          onPress: () => closeThen(quickActions.openCalculator),
+        },
+      ]
+    : [];
+
+  const guideItem: MenuItem = {
+    id: 'guide',
+    title: t('auth.converter'),
+    icon: 'map-outline',
+    onPress: () => {
+      closeThen(() => router.push('/guide'));
     },
-    ...(user ? [
-      {
-        id: 'converter',
-        title: t('auth.converter'),
-        icon: 'swap-horizontal',
-        onPress: () => {
-          setIsVisible(false);
-          router.push('/guide');
+  };
+
+  const authItems: MenuItem[] = user
+    ? [
+        {
+          id: 'signout',
+          title: t('auth.signout'),
+          icon: 'log-out-outline',
+          onPress: handleSignOut,
+          danger: true,
         },
-      },
-      {
-        id: 'user-info',
-        title: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
-        icon: 'person-outline',
-        subtitle: user.email,
-        onPress: () => {
-          setIsVisible(false);
-          router.push('/(tabs)/settings');
+      ]
+    : [
+        {
+          id: 'signin',
+          title: t('auth.signin'),
+          icon: 'log-in-outline',
+          onPress: () => {
+            closeThen(() => router.push('/signin'));
+          },
         },
-      },
-    ] : []),
-    ...(user ? [
-      {
-        id: 'signout',
-        title: t('auth.signout'),
-        icon: 'log-out-outline',
-        onPress: handleSignOut,
-        danger: true,
-      },
-    ] : [
-      {
-        id: 'signin',
-        title: t('auth.signin'),
-        icon: 'log-in-outline',
-        onPress: () => {
-          setIsVisible(false);
-          router.push('/signin');
+        {
+          id: 'signup',
+          title: t('auth.signup'),
+          icon: 'person-add-outline',
+          onPress: () => {
+            closeThen(() => router.push('/signup'));
+          },
         },
-      },
-      {
-        id: 'signup',
-        title: t('auth.signup'),
-        icon: 'person-add-outline',
-        onPress: () => {
-          setIsVisible(false);
-          router.push('/signup');
-        },
-      },
-    ]),
-  ];
+      ];
+
+  const renderRow = (item: MenuItem) => (
+    <TouchableOpacity
+      key={item.id}
+      activeOpacity={0.88}
+      style={{
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        marginBottom: 10,
+        backgroundColor: item.danger ? addOpacity(errorColor, 0.14) : surfaceSecondaryColor,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: borderColor,
+      }}
+      onPress={item.onPress}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Ionicons
+          name={item.icon}
+          size={22}
+          color={item.danger ? errorColor : primaryColor}
+        />
+        <ThemedText
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: item.danger ? errorColor : textColor,
+            flex: 1,
+          }}
+        >
+          {item.title}
+        </ThemedText>
+      </View>
+      {item.subtitle ? (
+        <ThemedText style={{
+          fontSize: 14,
+          color: textSecondaryColor,
+          marginTop: 4,
+        }}>
+          {item.subtitle}
+        </ThemedText>
+      ) : null}
+    </TouchableOpacity>
+  );
 
   return (
     <>
@@ -171,8 +242,8 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
             backgroundColor: surfaceColor,
             borderTopLeftRadius: 22,
             borderTopRightRadius: 22,
-            maxHeight: '88%',
-            minHeight: '52%',
+            maxHeight: '92%',
+            minHeight: '56%',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: -4 },
             shadowOpacity: 0.18,
@@ -235,50 +306,29 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
               contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
               showsVerticalScrollIndicator={false}
             >
-              {menuItems.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  activeOpacity={0.88}
-                  style={{
-                    paddingVertical: 16,
-                    paddingHorizontal: 20,
-                    marginBottom: 10,
-                    backgroundColor: item.danger ? addOpacity(errorColor, 0.14) : surfaceSecondaryColor,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: borderColor,
-                  }}
-                  onPress={item.onPress}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                    <Ionicons
-                      name={item.icon}
-                      size={22}
-                      color={item.danger ? errorColor : primaryColor}
-                    />
-                    <ThemedText
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '600',
-                        color: item.danger ? errorColor : textColor,
-                        flex: 1,
-                      }}
-                    >
-                      {item.title}
-                    </ThemedText>
-                  </View>
-                  {item.subtitle && (
-                    <ThemedText style={{
-                      fontSize: 14,
+              {renderRow(settingsItem)}
+
+              {quickActionItems.length > 0 ? (
+                <View style={{ marginTop: 4, marginBottom: 6 }}>
+                  <ThemedText
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '700',
                       color: textSecondaryColor,
-                      marginTop: 4,
-                    }}>
-                      {item.subtitle}
-                    </ThemedText>
-                  )}
-                  {item.component}
-                </TouchableOpacity>
-              ))}
+                      letterSpacing: 0.4,
+                      textTransform: 'uppercase',
+                      marginBottom: 10,
+                    }}
+                  >
+                    {t('dashboard.quickActions')}
+                  </ThemedText>
+                  {quickActionItems.map(renderRow)}
+                </View>
+              ) : null}
+
+              {renderRow(guideItem)}
+
+              {authItems.map(renderRow)}
 
               {/* App Info */}
               <View style={{
@@ -289,19 +339,11 @@ export default function BurgerMenu({ style }: BurgerMenuProps) {
                 borderTopColor: borderColor,
               }}>
                 <ThemedText style={{
-                  fontSize: 14,
-                  fontWeight: '600',
-                  color: textSecondaryColor,
-                }}>
-                  ExRatio v1.0
-                </ThemedText>
-                <ThemedText style={{
                   fontSize: 12,
                   color: textSecondaryColor,
-                  marginTop: 4,
                   textAlign: 'center',
                 }}>
-                  {t('app.subtitle')}
+                  ExRatio v1.0
                 </ThemedText>
               </View>
             </ScrollView>

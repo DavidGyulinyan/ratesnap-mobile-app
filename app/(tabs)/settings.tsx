@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getAsyncStorage } from '@/lib/storage';
 import { Layout, hexToRgba } from '@/constants/theme';
@@ -17,10 +17,11 @@ import {
 } from '@/hooks/useUserData';
 import { Ionicons } from '@expo/vector-icons';
 import CurrencyFlag from '@/components/CurrencyFlag';
+import { LANGUAGE_UI } from '@/components/LanguageDropdown';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const router = useRouter();
   const { themePreference, setThemePreference } = useTheme();
   const { savedRates, pickedRates, clearAllData } = useUserData();
@@ -30,6 +31,7 @@ export default function SettingsScreen() {
 
   // State for modals and forms
   const [showThemeSelection, setShowThemeSelection] = useState(false);
+  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showContactSupport, setShowContactSupport] = useState(false);
@@ -761,6 +763,56 @@ ExRatio चुनने के लिए धन्यवाद!`
     );
   };
 
+  const renderLanguageSelection = () => {
+    if (!showLanguageSelection) return null;
+
+    const keys = Object.keys(LANGUAGE_UI) as Language[];
+
+    return (
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setShowLanguageSelection(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
+          </TouchableOpacity>
+          <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>{t('settings.language')}</ThemedText>
+          <View style={{ width: 32 }} />
+        </View>
+
+        {keys.map((langKey) => {
+          const info = LANGUAGE_UI[langKey];
+          return (
+            <TouchableOpacity
+              key={langKey}
+              style={[
+                styles.languageOption,
+                language === langKey && { backgroundColor: primaryColor + '20' },
+              ]}
+              onPress={async () => {
+                await setLanguage(langKey);
+                setShowLanguageSelection(false);
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <ThemedText style={{ fontSize: 22 }}>{info.flag}</ThemedText>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <ThemedText style={styles.settingItemText}>{info.name}</ThemedText>
+                  <ThemedText style={{ fontSize: 13, color: textSecondaryColor }}>{info.fullName}</ThemedText>
+                </View>
+                {language === langKey && (
+                  <Ionicons name="checkmark-circle" size={20} color={primaryColor} />
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  };
 
   // Render notification settings modal
   const renderNotificationSettings = () => {
@@ -1120,6 +1172,23 @@ ExRatio चुनने के लिए धन्यवाद!`
 
             <TouchableOpacity
               style={styles.settingItem}
+              onPress={() => setShowLanguageSelection(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="language-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.language')}</ThemedText>
+              </View>
+              <View style={styles.rowTrailing}>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {LANGUAGE_UI[language].name}
+                </ThemedText>
+                <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingItem}
               onPress={() => setShowNotificationSettings(true)}
               activeOpacity={0.75}
             >
@@ -1353,6 +1422,7 @@ ExRatio चुनने के लिए धन्यवाद!`
 
       {/* Modals */}
       {renderThemeSelection()}
+      {renderLanguageSelection()}
       {renderNotificationSettings()}
       {renderTerms()}
       {renderSavedRatesManagement()}

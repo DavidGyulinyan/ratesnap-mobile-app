@@ -21,7 +21,7 @@ import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 import { hexToRgba } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   Alert,
@@ -169,6 +169,37 @@ export default function HomeScreen() {
     else if (action === "calculator") setShowCalculator(true);
     else if (action === "converter") setShowConverter(true);
   };
+
+  const closeAllQuickModals = useCallback(() => {
+    setShowConverter(false);
+    setShowMultiCurrency(false);
+    setMultiCurrencyShowAllTargets(false);
+    setShowSavedRates(false);
+    setShowRateAlerts(false);
+    setShowCharts(false);
+    setShowCalculator(false);
+  }, []);
+
+  const openQuickFromMenu = useCallback(
+    (open: () => void) => {
+      closeAllQuickModals();
+      setCurrentView("dashboard");
+      open();
+    },
+    [closeAllQuickModals]
+  );
+
+  const burgerQuickActions = useMemo(
+    () => ({
+      openConverter: () => openQuickFromMenu(() => setShowConverter(true)),
+      openMultiCurrency: () => openQuickFromMenu(() => setShowMultiCurrency(true)),
+      openCharts: () => openQuickFromMenu(() => setShowCharts(true)),
+      openSavedRates: () => openQuickFromMenu(() => setShowSavedRates(true)),
+      openRateAlerts: () => openQuickFromMenu(() => setShowRateAlerts(true)),
+      openCalculator: () => openQuickFromMenu(() => setShowCalculator(true)),
+    }),
+    [openQuickFromMenu]
+  );
 
   useEffect(() => {
     loadExchangeRates();
@@ -334,7 +365,7 @@ export default function HomeScreen() {
                 </ThemedText>
               </View>
             </View>
-            <BurgerMenu />
+            <BurgerMenu quickActions={burgerQuickActions} />
           </View>
         </View>
 
