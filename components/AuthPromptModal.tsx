@@ -119,7 +119,7 @@ export default function AuthPromptModal({
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="cloud-upload-outline" size={48} color="#00BEAC" />
+            <Ionicons name="cloud-upload-outline" size={48} color="#F07E25" />
           </View>
 
           <Text style={styles.title}>{title}</Text>
@@ -150,7 +150,7 @@ export default function AuthPromptModal({
               style={[styles.button, styles.emailButton]}
               onPress={handleContinueWithEmail}
             >
-              <Ionicons name="mail-outline" size={20} color="#00BEAC" />
+              <Ionicons name="mail-outline" size={20} color="#F07E25" />
               <Text style={styles.emailButtonText}>Create account with Email</Text>
             </TouchableOpacity>
 
@@ -250,10 +250,10 @@ const styles = StyleSheet.create({
   emailButton: {
     backgroundColor: '#EFEFEF',
     borderWidth: 1,
-    borderColor: '#00BEAC',
+    borderColor: '#F07E25',
   },
   emailButtonText: {
-    color: '#00BEAC',
+    color: '#F07E25',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 12,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   signInLinkText: {
-    color: '#00BEAC',
+    color: '#F07E25',
     fontWeight: '600',
   },
 });

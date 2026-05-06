@@ -1,15 +1,15 @@
 /**
  * Design tokens: colors, radii, and spacing for a consistent UI.
- * Brand: teal (#00BEAC), highlight (#00ECD6), canvas (#EFEFEF), coral (#F77872).
+ * Brand: orange (#F07E25), highlight (#FFB366), warm canvas (#FAF6F2), error (#E04D4D).
  */
 
 import { Platform } from "react-native";
 
-const brand = "#00BEAC";
-const brandLight = "#00ECD6";
-const canvas = "#EFEFEF";
-const coral = "#F77872";
-const brandPressed = "#009A8C";
+const brand = "#F07E25";
+const brandLight = "#FFB366";
+const canvas = "#FAF6F2";
+const coral = "#E04D4D";
+const brandPressed = "#C86418";
 
 /** Shared layout tokens — use for padding, gaps, and corner radius. */
 export const Layout = {
@@ -68,12 +68,12 @@ export const Colors = {
     tint: brand,
     accent: brandLight,
     success: brand,
-    warning: "#c4a574",
+    warning: "#c47d32",
     error: coral,
 
-    border: "#e0e0e0",
-    borderLight: "#ebebeb",
-    divider: "#e5e5e5",
+    border: "#ebe4dc",
+    borderLight: "#f0e8e0",
+    divider: "#ede5dc",
 
     icon: "#636366",
     iconSecondary: "#8e8e93",
@@ -81,14 +81,14 @@ export const Colors = {
 
     tabIconDefault: "#8e8e93",
     tabIconSelected: brand,
-    tabBackground: "#e8e8e8",
+    tabBackground: "#f2ebe4",
 
-    headerBackground: "#f0f0f0",
-    headerBorder: "#e0e0e0",
+    headerBackground: "#f5efe8",
+    headerBorder: "#ebe4dc",
 
     online: brand,
     offline: "#8e8e93",
-    pending: "#c4a574",
+    pending: "#c47d32",
   },
   dark: {
     primary: brandLight,
@@ -96,41 +96,41 @@ export const Colors = {
     secondary: brand,
     colorAccent: brandLight,
 
-    background: "#0f1414",
-    surface: "#1a2020",
-    surfaceSecondary: "#242b2b",
-    cardBackground: "#1a2020",
+    background: "#141210",
+    surface: "#1f1a16",
+    surfaceSecondary: "#2a241e",
+    cardBackground: "#1f1a16",
     modalBackground: "rgba(0, 0, 0, 0.72)",
 
     text: "#f2f2f7",
     textSecondary: "#aeaeb2",
     textTertiary: "#8e8e93",
-    textInverse: "#0f1414",
+    textInverse: "#141210",
 
     tint: brandLight,
     accent: brandLight,
     success: brandLight,
-    warning: "#d4c4a8",
+    warning: "#d4a574",
     error: coral,
 
-    border: "#3a4242",
-    borderLight: "#4a5454",
-    divider: "#3a4242",
+    border: "#3d352c",
+    borderLight: "#4a4036",
+    divider: "#3d352c",
 
     icon: "#aeaeb2",
     iconSecondary: "#8e8e93",
-    iconInverse: "#0f1414",
+    iconInverse: "#141210",
 
     tabIconDefault: "#8e8e93",
     tabIconSelected: brandLight,
-    tabBackground: "#242b2b",
+    tabBackground: "#2a241e",
 
-    headerBackground: "#242b2b",
-    headerBorder: "#3a4242",
+    headerBackground: "#2a241e",
+    headerBorder: "#3d352c",
 
     online: brandLight,
     offline: "#8e8e93",
-    pending: "#d4c4a8",
+    pending: "#d4a574",
   },
 };
 
