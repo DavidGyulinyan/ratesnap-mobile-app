@@ -231,6 +231,10 @@ export function useRateAlerts(): UseRateAlertsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const ALERTS_CACHE_KEY = "rateAlerts.cache.v1";
+  const ALERTS_CACHE_TS_KEY = "rateAlerts.cache.ts.v1";
+  const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
   const refreshAlerts = useCallback(async () => {
     if (!user) {
       setRateAlerts([]);
@@ -243,6 +247,13 @@ export function useRateAlerts(): UseRateAlertsReturn {
       setError(null);
       const alerts = await UserDataService.getRateAlerts();
       setRateAlerts(alerts);
+      try {
+        const storage = getAsyncStorage();
+        await storage.setItem(ALERTS_CACHE_KEY, JSON.stringify(alerts ?? []));
+        await storage.setItem(ALERTS_CACHE_TS_KEY, String(Date.now()));
+      } catch {
+        // ignore cache write errors
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch rate alerts');
     } finally {
@@ -306,7 +317,45 @@ export function useRateAlerts(): UseRateAlertsReturn {
   }, [user]);
 
   useEffect(() => {
-    refreshAlerts();
+    let alive = true;
+    (async () => {
+      // Load cached alerts first so opening the modal doesn't always fetch.
+      try {
+        const storage = getAsyncStorage();
+        const [raw, tsRaw] = await Promise.all([
+          storage.getItem(ALERTS_CACHE_KEY),
+          storage.getItem(ALERTS_CACHE_TS_KEY),
+        ]);
+        if (!alive) return;
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              setRateAlerts(parsed);
+              setLoading(false);
+            }
+          } catch {
+            // ignore parse errors
+          }
+        }
+
+        const ts = tsRaw ? Number(tsRaw) : 0;
+        const stale = !ts || !Number.isFinite(ts) || Date.now() - ts > CACHE_TTL_MS;
+        // Only auto-refresh if cache is stale (avoid refetch on every open).
+        if (user && stale) {
+          void refreshAlerts();
+        } else if (!user) {
+          setLoading(false);
+        }
+      } catch {
+        // If cache read fails, fall back to one refresh for signed-in users.
+        if (user) void refreshAlerts();
+        else setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, [refreshAlerts]);
 
   return {
