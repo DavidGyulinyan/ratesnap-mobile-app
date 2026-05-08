@@ -504,7 +504,7 @@ function PaidLeaveView({
   }, [result, t, onShareableMessageChange]);
 
   return (
-    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
+    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceColor, borderColor }]}>
       <ThemedText
         type="defaultSemiBold"
         numberOfLines={4}
@@ -698,7 +698,7 @@ function MaternityView({
   }, [result, t, onShareableMessageChange]);
 
   return (
-    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
+    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceColor, borderColor }]}>
       <ThemedText
         type="defaultSemiBold"
         numberOfLines={4}
@@ -859,7 +859,7 @@ function SalaryView({
   }, [result, t, onShareableMessageChange]);
 
   return (
-    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
+    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceColor, borderColor }]}>
       <ThemedText
         type="defaultSemiBold"
         numberOfLines={4}
@@ -1047,7 +1047,7 @@ function DepositView({
   }, [result]);
 
   return (
-    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceSecondaryColor, borderColor }]}>
+    <View style={[styles.card, styles.cardClip, { backgroundColor: surfaceColor, borderColor }]}>
       <ThemedText
         type="defaultSemiBold"
         numberOfLines={4}

@@ -22,6 +22,7 @@ import alertCheckerService from "@/lib/alertCheckerService";
 import { getAsyncStorage } from "@/lib/storage";
 import { FormField } from "@/constants/theme";
 import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
+import { formatDateDDMMYY } from "@/lib/dateFormat";
 
 interface RateAlert {
   id: string;
@@ -507,7 +508,7 @@ export default function RateAlertManager({
                 <View style={styles.alertRow}>
                   <ThemedText style={[{ color: textSecondaryColor }, styles.alertLabel]}>{t('rateAlerts.created')}</ThemedText>
                   <ThemedText style={[{ color: textColor }, styles.alertValue]}>
-                    {new Date(alert.created_at).toLocaleDateString()}
+                    {formatDateDDMMYY(alert.created_at)}
                   </ThemedText>
                 </View>
               </View>

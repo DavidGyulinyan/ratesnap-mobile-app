@@ -2,6 +2,7 @@ import * as React from "react";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AM_FINANCE_EN, AM_FINANCE_HY } from './amFinance.i18n';
+import { AM_FREELANCE_EN, AM_FREELANCE_HY } from "./amFreelance.i18n";
 
 export type Language = 'en' | 'hy' | 'ru' | 'es' | 'zh' | 'hi';
 
@@ -16,7 +17,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const translations = {
   en: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': 'Live rates & smart conversion',
     // App & Navigation    // Dashboard
     'dashboard.title': 'Dashboard',
@@ -44,6 +45,22 @@ const translations = {
     'quick.action.calculator.desc': 'Open basic math calculator',
     'quick.action.calculator.hide': 'Hide calculator widget',
     'quick.action.loanCalculator': 'Loan calculator',
+    'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
+
+    'touristCalc.share.title': 'Տուրիստական հաշվիչ',
+    'touristCalc.field.amount': 'Գումար (արտարժույթ)',
+    'touristCalc.field.rate': 'Փոխարժեք (դեպի AMD)',
+    'touristCalc.field.feePct': 'Միջնորդավճար (%)',
+    'touristCalc.field.discountPct': 'Զեղչ (%)',
+    'touristCalc.field.tipPct': 'Թեյավճար (%)',
+    'touristCalc.result.discount': 'Զեղչ',
+    'touristCalc.result.subtotal': 'Ենթագումար',
+    'touristCalc.result.tip': 'Թեյավճար',
+    'touristCalc.result.total': 'Ընդհանուր',
+    'touristCalc.result.fee': 'Միջնորդավճար',
+    'touristCalc.result.net': 'Զուտ գումար',
+    'touristCalc.result.received': 'Ստացվող գումար (AMD)',
+    'touristCalc.invalid': 'Անվավեր տվյալներ',
     
     // Currency Converter
     'converter.title': 'Currency Converter',
@@ -438,9 +455,10 @@ const translations = {
     'quick.action.charts': 'Charts',
     'charts.title': 'Currency rate charts',
     ...AM_FINANCE_EN,
+    ...AM_FREELANCE_EN,
   },
   hy: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': 'Արժույթի գործիքներ',
     // Armenian    
     'dashboard.title': 'Վահանակ',
@@ -467,6 +485,22 @@ const translations = {
     'quick.action.calculator.desc': 'Բացել բազմաֆունկցիոնալ հաշվիչը',
     'quick.action.calculator.hide': 'Թաքցնել հաշվիչը',
     'quick.action.loanCalculator': 'Վարկի հաշվիչ',
+    'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
+
+    'touristCalc.share.title': 'Տուրիստական հաշվիչ',
+    'touristCalc.field.amount': 'Գումար (արտարժույթ)',
+    'touristCalc.field.rate': 'Փոխարժեք (դեպի AMD)',
+    'touristCalc.field.feePct': 'Միջնորդավճար (%)',
+    'touristCalc.field.discountPct': 'Զեղչ (%)',
+    'touristCalc.field.tipPct': 'Թեյավճար (%)',
+    'touristCalc.result.discount': 'Զեղչ',
+    'touristCalc.result.subtotal': 'Ենթագումար',
+    'touristCalc.result.tip': 'Թեյավճար',
+    'touristCalc.result.total': 'Ընդհանուր',
+    'touristCalc.result.fee': 'Միջնորդավճար',
+    'touristCalc.result.net': 'Զուտ գումար',
+    'touristCalc.result.received': 'Ստացվող գումար (AMD)',
+    'touristCalc.invalid': 'Անվավեր տվյալներ',
     
     'converter.title': 'Փոխարկիչ',
     'converter.subtitle': 'Պրոֆեսիոնալ փոխարկիչ՝ լիարժեք գործառույթներով',
@@ -839,9 +873,10 @@ const translations = {
     'signup.signIn': 'Մուտք գործել',
     'signup.selectLanguage': 'Ընտրել լեզու',
     ...AM_FINANCE_HY,
+    ...AM_FREELANCE_HY,
   },
   ru: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': 'Курсы и конвертация',
     // Russian    
     'dashboard.title': 'Панель',
@@ -1211,9 +1246,10 @@ const translations = {
     'rateAlerts.resetFailed': 'Не удалось сбросить оповещение',
     'rateAlerts.reset': 'Сбросить',
     ...AM_FINANCE_EN,
+    ...AM_FREELANCE_EN,
   },
   es: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': 'Tipos y conversión',
     // Spanish    
     'dashboard.title': 'Panel',
@@ -1583,9 +1619,10 @@ const translations = {
     'quick.action.charts': 'Gráficos',
     'charts.title': 'Gráficos de Tipos de Cambio',
     ...AM_FINANCE_EN,
+    ...AM_FREELANCE_EN,
   },
   zh: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': '汇率与换算',
     // Chinese (Simplified)    
     'dashboard.title': '仪表板',
@@ -1953,9 +1990,10 @@ const translations = {
     'quick.action.charts': '图表',
     'charts.title': '汇率图表',
     ...AM_FINANCE_EN,
+    ...AM_FREELANCE_EN,
   },
   hi: {
-    'app.title': 'Fin hub',
+    'app.title': 'Finhub',
     'app.subtitle': 'दरें और रूपांतरण',
     // Hindi    
     'dashboard.title': 'डैशबोर्ड',
@@ -2324,6 +2362,7 @@ const translations = {
     'quick.action.charts': 'चार्ट',
     'charts.title': 'एक्सचेंज रेट चार्ट',
     ...AM_FINANCE_EN,
+    ...AM_FREELANCE_EN,
   },
 };
 

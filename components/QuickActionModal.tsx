@@ -22,6 +22,10 @@ interface QuickActionModalProps {
   children: React.ReactNode;
   /** When set, header shows a share control that shares this text. */
   shareMessage?: string | null;
+  /** When set, header shows a calculator shortcut. */
+  onOpenCalculator?: () => void;
+  /** When set, header shows a converter shortcut. */
+  onOpenConverter?: () => void;
 }
 
 /**
@@ -33,6 +37,8 @@ export default function QuickActionModal({
   title,
   children,
   shareMessage,
+  onOpenCalculator,
+  onOpenConverter,
 }: QuickActionModalProps) {
   const { t } = useLanguage();
   const backgroundColor = useThemeColor({}, "background");
@@ -43,6 +49,8 @@ export default function QuickActionModal({
 
   const trimmedShare = shareMessage?.trim();
   const canShare = Boolean(trimmedShare);
+  const canOpenCalculator = Boolean(onOpenCalculator);
+  const canOpenConverter = Boolean(onOpenConverter);
 
   return (
     <Modal
@@ -95,24 +103,59 @@ export default function QuickActionModal({
             >
               {title}
             </ThemedText>
-            {canShare ? (
-              <TouchableOpacity
-                onPress={() => void shareLines([trimmedShare])}
-                style={[
-                  styles.headerIconButton,
-                  {
-                    backgroundColor: hexToRgba(backgroundColor, 0.55),
-                    borderColor,
-                  },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel={t("common.share")}
-              >
-                <Ionicons name="share-outline" size={20} color={primaryColor} />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.headerSpacer} />
-            )}
+            <View style={styles.headerActions}>
+              {canOpenConverter ? (
+                <TouchableOpacity
+                  onPress={onOpenConverter}
+                  style={[
+                    styles.headerIconButton,
+                    {
+                      backgroundColor: hexToRgba(backgroundColor, 0.55),
+                      borderColor,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("quick.action.converter")}
+                >
+                  <Ionicons name="swap-horizontal-outline" size={20} color={primaryColor} />
+                </TouchableOpacity>
+              ) : null}
+              {canOpenCalculator ? (
+                <TouchableOpacity
+                  onPress={onOpenCalculator}
+                  style={[
+                    styles.headerIconButton,
+                    {
+                      backgroundColor: hexToRgba(backgroundColor, 0.55),
+                      borderColor,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("quick.action.calculator")}
+                >
+                  <Ionicons name="calculator-outline" size={20} color={primaryColor} />
+                </TouchableOpacity>
+              ) : null}
+              {canShare ? (
+                <TouchableOpacity
+                  onPress={() => void shareLines([trimmedShare])}
+                  style={[
+                    styles.headerIconButton,
+                    {
+                      backgroundColor: hexToRgba(backgroundColor, 0.55),
+                      borderColor,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("common.share")}
+                >
+                  <Ionicons name="share-outline" size={20} color={primaryColor} />
+                </TouchableOpacity>
+              ) : null}
+              {!canShare && !canOpenCalculator && !canOpenConverter ? (
+                <View style={styles.headerSpacer} />
+              ) : null}
+            </View>
           </View>
           <View style={styles.body}>{children}</View>
         </View>
@@ -154,6 +197,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 10,
+    minWidth: 36,
   },
   title: {
     flex: 1,

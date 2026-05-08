@@ -149,6 +149,9 @@ export default function CurrencyRateCharts({
   const minRate = values.length ? Math.min(...values) : undefined;
   const maxRate = values.length ? Math.max(...values) : undefined;
 
+  const trendColor =
+    changeAbs !== undefined && changeAbs < 0 ? errorColor : primaryColor;
+
   useEffect(() => {
     if (!inModal || !onShareableMessageChange) return;
     if (!baseCurrency || !targetCurrency || baseCurrency === targetCurrency) {
@@ -288,7 +291,7 @@ export default function CurrencyRateCharts({
       <View style={[styles.card, { backgroundColor: surfaceColor, borderColor }]}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
-            <View style={[styles.accent, { backgroundColor: primaryColor }]} />
+            <View style={[styles.accent, { backgroundColor: trendColor }]} />
             <View style={styles.cardHeaderText}>
               <ThemedText type="defaultSemiBold" style={{ color: textColor }}>
                 {t("charts.title")}
@@ -355,7 +358,7 @@ export default function CurrencyRateCharts({
                     ? textColor
                     : changeAbs >= 0
                       ? textColor
-                      : textSecondaryColor,
+                      : errorColor,
               }}
             >
               {changeAbs === undefined
@@ -429,7 +432,7 @@ export default function CurrencyRateCharts({
                 datasets: [
                   {
                     data: values,
-                    color: () => primaryColor,
+                    color: () => trendColor,
                     strokeWidth: 2,
                   },
                 ],
@@ -444,7 +447,7 @@ export default function CurrencyRateCharts({
               chartConfig={{
                 backgroundGradientFrom: surfaceColor,
                 backgroundGradientTo: surfaceColor,
-                color: () => primaryColor,
+                color: () => trendColor,
                 labelColor: () => textSecondaryColor,
                 decimalPlaces: 4,
                 propsForBackgroundLines: {

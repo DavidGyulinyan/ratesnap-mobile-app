@@ -7,6 +7,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSavedRates } from "@/hooks/useUserData";
 import { useAuth } from "@/contexts/AuthContext";
+import { formatDateDDMMYY } from "@/lib/dateFormat";
 
 interface SavedRate {
   id: string;
@@ -179,7 +180,7 @@ export default function SavedRates({
           {rate.rate.toFixed(4)}
         </ThemedText>
         <ThemedText style={[{ color: textSecondaryColor }, styles.savedRateDate]}>
-          {new Date(rate.created_at).toLocaleDateString()}
+          {formatDateDDMMYY(rate.created_at)}
         </ThemedText>
       </View>
       {showDeleteButtons && (

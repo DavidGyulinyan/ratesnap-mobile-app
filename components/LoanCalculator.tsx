@@ -13,7 +13,6 @@ import QuickActionModal from "@/components/QuickActionModal";
 import { ThemedText } from "@/components/themed-text";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCalculatorHistory } from "@/hooks/useUserData";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 const LOAN_HISTORY_ARROW = "\u2192";
@@ -144,11 +143,6 @@ export interface LoanCalculatorProps {
 
 export default function LoanCalculator({ visible, onClose, onResult }: LoanCalculatorProps) {
   const { user } = useAuth();
-  const {
-    calculatorHistory: supabaseHistory,
-    saveCalculation,
-    clearAllCalculations,
-  } = useCalculatorHistory();
   const { t, tWithParams } = useLanguage();
   const surfaceColor = useThemeColor({}, "surface");
   const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
@@ -159,33 +153,15 @@ export default function LoanCalculator({ visible, onClose, onResult }: LoanCalcu
   const errorColor = useThemeColor({}, "error");
   const loanButtonLabelColor = useThemeColor({}, "textInverse");
 
-  const [loanPrincipal, setLoanPrincipal] = useState("");
-  const [loanRateAnnual, setLoanRateAnnual] = useState("");
-  const [loanTermMonths, setLoanTermMonths] = useState("");
+  // Defaults (same idea as deposit screen): prefill sensible example values.
+  const [loanPrincipal, setLoanPrincipal] = useState("5000000");
+  const [loanRateAnnual, setLoanRateAnnual] = useState("12");
+  const [loanTermMonths, setLoanTermMonths] = useState("36");
   const [loanError, setLoanError] = useState<string | null>(null);
   const [loanMonthly, setLoanMonthly] = useState<number | null>(null);
   const [loanTotalInterest, setLoanTotalInterest] = useState<number | null>(null);
   const [loanTotalPaid, setLoanTotalPaid] = useState<number | null>(null);
-  const [calculationHistory, setCalculationHistory] = useState<string[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
   const [roundingDecimalPlaces] = useState(2);
-
-  useEffect(() => {
-    if (visible && user && supabaseHistory.length > 0) {
-      const formattedHistory = supabaseHistory
-        .filter((record): record is NonNullable<typeof record> => record != null)
-        .map((record) => formatCalculatorHistoryDisplay(record));
-      setCalculationHistory((prev) => {
-        const merged = [...formattedHistory];
-        prev.forEach((localCalc) => {
-          if (!merged.includes(localCalc)) {
-            merged.push(localCalc);
-          }
-        });
-        return merged.slice(0, 15);
-      });
-    }
-  }, [visible, user, supabaseHistory]);
 
   const roundForDisplay = (n: number) => parseFloat(n.toFixed(roundingDecimalPlaces));
 
@@ -199,10 +175,6 @@ export default function LoanCalculator({ visible, onClose, onResult }: LoanCalcu
     const s = raw.replace(/\s/g, "").replace(/,/g, "");
     const n = parseInt(s, 10);
     return Number.isFinite(n) ? n : NaN;
-  };
-
-  const addToHistory = (line: string) => {
-    setCalculationHistory((prev) => [line, ...prev.slice(0, 14)]);
   };
 
   const computeLoan = async () => {
@@ -255,43 +227,11 @@ export default function LoanCalculator({ visible, onClose, onResult }: LoanCalcu
       months: String(months),
       payment: String(paymentR),
     });
-    addToHistory(historyLine);
-
-    if (user) {
-      try {
-        await saveCalculation(historyLine, paymentR, "loan", {
-          roundingDecimalPlaces,
-          principal,
-          annualPct,
-          months,
-        });
-      } catch (e) {
-        console.error("Error saving loan calculation:", e);
-      }
-    }
 
     if (onResult) {
       onResult(paymentR);
     }
   };
-
-  const clearHistory = async () => {
-    try {
-      const success = await clearAllCalculations();
-      if (success) {
-        setCalculationHistory([]);
-      }
-    } catch (error) {
-      console.error("Error clearing calculator history:", error);
-    }
-  };
-
-  const displayHistory =
-    user && supabaseHistory.length > 0
-      ? supabaseHistory
-          .filter((record): record is NonNullable<typeof record> => record != null)
-          .map((record) => formatCalculatorHistoryDisplay(record))
-      : calculationHistory;
 
   const loanShareMessage = useMemo(() => {
     if (
@@ -340,7 +280,7 @@ export default function LoanCalculator({ visible, onClose, onResult }: LoanCalcu
           style={[
             styles.card,
             styles.cardClip,
-            { backgroundColor: surfaceSecondaryColor, borderColor },
+            { backgroundColor: surfaceColor, borderColor },
           ]}
         >
           <ThemedText
@@ -455,82 +395,6 @@ export default function LoanCalculator({ visible, onClose, onResult }: LoanCalcu
               </ThemedText>
             </>
           ) : null}
-
-          <View style={[styles.historyToggleRow, { borderColor }]}>
-            <TouchableOpacity
-              style={[
-                styles.historyIconBtn,
-                {
-                  backgroundColor: showHistory ? surfaceColor : surfaceSecondaryColor,
-                  borderColor: showHistory ? primaryColor : borderColor,
-                },
-              ]}
-              onPress={() => setShowHistory(!showHistory)}
-              accessibilityRole="button"
-              accessibilityLabel={t("calculator.history")}
-            >
-              <Ionicons
-                name="time-outline"
-                size={22}
-                color={showHistory ? primaryColor : textSecondaryColor}
-              />
-            </TouchableOpacity>
-            <ThemedText style={[{ color: textColor }, styles.historyToggleLabel]} numberOfLines={2}>
-              {t("calculator.calculationHistory")}
-            </ThemedText>
-          </View>
-
-          {showHistory ? (
-            <View
-              style={[
-                styles.historyPanel,
-                {
-                  backgroundColor: surfaceColor,
-                  borderColor,
-                },
-              ]}
-            >
-              <View style={styles.historyHeader}>
-                <ThemedText
-                  type="caption"
-                  style={[{ color: textSecondaryColor }, styles.historyPanelHint]}
-                  numberOfLines={3}
-                >
-                  {t("calculator.history")}
-                </ThemedText>
-                {displayHistory.length > 0 ? (
-                  <TouchableOpacity
-                    style={[styles.clearHistoryButton, { backgroundColor: errorColor }]}
-                    onPress={() => void clearHistory()}
-                  >
-                    <ThemedText type="caption" style={styles.clearHistoryButtonText}>
-                      {t("calculator.clear")}
-                    </ThemedText>
-                  </TouchableOpacity>
-                ) : null}
-              </View>
-              <ScrollView style={styles.historyList} nestedScrollEnabled>
-                {displayHistory.length === 0 ? (
-                  <ThemedText
-                    type="caption"
-                    style={[styles.historyEmpty, { color: textSecondaryColor }]}
-                  >
-                    {t("calculator.noCalculations")}
-                  </ThemedText>
-                ) : (
-                  displayHistory.map((calc, index) => (
-                    <ThemedText
-                      key={index}
-                      type="caption"
-                      style={[styles.historyItem, { color: textColor, borderBottomColor: borderColor }]}
-                    >
-                      {typeof calc === "string" ? calc : String(calc ?? "")}
-                    </ThemedText>
-                  ))
-                )}
-              </ScrollView>
-            </View>
-          ) : null}
         </View>
       </ScrollView>
     </QuickActionModal>
@@ -616,68 +480,5 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontStyle: "italic",
   },
-  historyToggleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 16,
-    paddingTop: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    gap: 12,
-  },
-  historyIconBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  historyToggleLabel: {
-    flex: 1,
-    flexShrink: 1,
-    minWidth: 0,
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  historyPanel: {
-    marginTop: 12,
-    padding: 14,
-    borderRadius: 18,
-    borderWidth: 1,
-    maxHeight: 240,
-  },
-  historyHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 10,
-    gap: 8,
-  },
-  historyPanelHint: {
-    flex: 1,
-    minWidth: 0,
-  },
-  clearHistoryButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-    flexShrink: 0,
-  },
-  clearHistoryButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  historyList: {
-    maxHeight: 160,
-  },
-  historyEmpty: {
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  historyItem: {
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    lineHeight: 18,
-  },
+  // History UI removed for simpler UX (can be re-added later if needed)
 });

@@ -14,6 +14,8 @@ import CurrencyRateCharts from "@/components/CurrencyRateCharts";
 import ArmeniaFinanceModal, {
   type FinanceScreen,
 } from "@/components/ArmeniaFinanceModal";
+import ArmeniaFreelanceModal from "@/components/ArmeniaFreelanceModal";
+import TouristCalculator from "@/components/TouristCalculator";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -93,6 +95,8 @@ export default function HomeScreen() {
   const [showLoanCalculator, setShowLoanCalculator] = useState(false);
   const [showConverter, setShowConverter] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
+  const [showTouristCalc, setShowTouristCalc] = useState(false);
+  const [shareTouristCalc, setShareTouristCalc] = useState<string | null>(null);
   const [shareConverter, setShareConverter] = useState<string | null>(null);
   const [shareMulti, setShareMulti] = useState<string | null>(null);
   const [shareSaved, setShareSaved] = useState<string | null>(null);
@@ -102,6 +106,8 @@ export default function HomeScreen() {
   const [showArmeniaFinance, setShowArmeniaFinance] = useState(false);
   const [armeniaFinanceScreen, setArmeniaFinanceScreen] =
     useState<FinanceScreen>("menu");
+  const [shareAmFreelance, setShareAmFreelance] = useState<string | null>(null);
+  const [showArmeniaFreelance, setShowArmeniaFreelance] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currenciesData, setCurrenciesData] = useState<any>(null);
@@ -117,15 +123,19 @@ export default function HomeScreen() {
     setShowSavedRates(false);
     setShowRateAlerts(false);
     setShowCharts(false);
+    setShowTouristCalc(false);
     setShowCalculator(false);
     setShowLoanCalculator(false);
     setShowArmeniaFinance(false);
+    setShowArmeniaFreelance(false);
     setShareConverter(null);
     setShareMulti(null);
     setShareSaved(null);
     setShareAlerts(null);
     setShareCharts(null);
+    setShareTouristCalc(null);
     setShareAmFinance(null);
+    setShareAmFreelance(null);
   }, []);
 
   const openArmeniaFinance = useCallback((screen: FinanceScreen = "menu") => {
@@ -133,6 +143,18 @@ export default function HomeScreen() {
     setCurrentView("dashboard");
     setArmeniaFinanceScreen(screen);
     setShowArmeniaFinance(true);
+  }, [closeAllQuickModals]);
+
+  const openCalculatorShortcut = useCallback(() => {
+    closeAllQuickModals();
+    setCurrentView("dashboard");
+    setShowCalculator(true);
+  }, [closeAllQuickModals]);
+
+  const openConverterShortcut = useCallback(() => {
+    closeAllQuickModals();
+    setCurrentView("dashboard");
+    setShowConverter(true);
   }, [closeAllQuickModals]);
 
   const openQuickFromMenu = useCallback(
@@ -372,6 +394,13 @@ export default function HomeScreen() {
                     active: showCharts,
                     onPress: () => setShowCharts(!showCharts),
                   },
+                  {
+                    id: "tourist" as const,
+                    labelKey: "quick.action.touristCalc",
+                    icon: "airplane-outline" as const,
+                    active: showTouristCalc,
+                    onPress: () => setShowTouristCalc(!showTouristCalc),
+                  },
                 ] as const
               ).map((item) => (
                 <TouchableOpacity
@@ -458,6 +487,12 @@ export default function HomeScreen() {
                     screen: "deposit" as const,
                   },
                   {
+                    id: "amFreelance" as const,
+                    labelKey: "amFreelance.sectionTitle",
+                    icon: "briefcase-outline" as const,
+                    isFreelance: true as const,
+                  },
+                  {
                     id: "loanCalc" as const,
                     labelKey: "amFinance.card.loan",
                     icon: "wallet-outline" as const,
@@ -479,6 +514,10 @@ export default function HomeScreen() {
                   onPress={() => {
                     if ("isLoan" in item && item.isLoan) {
                       openQuickFromMenu(() => setShowLoanCalculator(true));
+                    } else if ("isFreelance" in item && item.isFreelance) {
+                      closeAllQuickModals();
+                      setCurrentView("dashboard");
+                      setShowArmeniaFreelance(true);
                     } else {
                       openArmeniaFinance(item.screen);
                     }
@@ -525,6 +564,7 @@ export default function HomeScreen() {
           }}
           title={t("converter.title")}
           shareMessage={shareConverter}
+          onOpenCalculator={openCalculatorShortcut}
         >
           <CurrencyConverter
             onNavigateToDashboard={() => setShowConverter(false)}
@@ -542,6 +582,8 @@ export default function HomeScreen() {
           }}
           title={t("converter.multiCurrency.section")}
           shareMessage={shareMulti}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
         >
           {!currenciesData ? (
             <View style={styles.emptyState}>
@@ -589,6 +631,8 @@ export default function HomeScreen() {
           }}
           title={t("saved.title")}
           shareMessage={shareSaved}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
         >
           <ScrollView
             style={{ flex: 1, backgroundColor: "transparent" }}
@@ -628,6 +672,8 @@ export default function HomeScreen() {
           }}
           title={t("rateAlerts.title")}
           shareMessage={shareAlerts}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
         >
           <RateAlertManager
             savedRates={savedRates.map((rate) => ({
@@ -656,12 +702,28 @@ export default function HomeScreen() {
           }}
           title={t("charts.title")}
           shareMessage={shareCharts}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
         >
           <CurrencyRateCharts
             currencies={currencyList.length ? currencyList : POPULAR_CURRENCIES}
             inModal
             onShareableMessageChange={setShareCharts}
           />
+        </QuickActionModal>
+
+        <QuickActionModal
+          visible={showTouristCalc}
+          onClose={() => {
+            setShowTouristCalc(false);
+            setShareTouristCalc(null);
+          }}
+          title={t("quick.action.touristCalc")}
+          shareMessage={shareTouristCalc}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
+        >
+          <TouristCalculator onShareableMessageChange={setShareTouristCalc} />
         </QuickActionModal>
 
         <MathCalculator
@@ -684,12 +746,29 @@ export default function HomeScreen() {
           }}
           title={t("amFinance.sectionTitle")}
           shareMessage={shareAmFinance}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
         >
           <ArmeniaFinanceModal
             initialScreen={armeniaFinanceScreen}
             onShareableMessageChange={setShareAmFinance}
           />
         </QuickActionModal>
+
+        <QuickActionModal
+          visible={showArmeniaFreelance}
+          onClose={() => {
+            setShowArmeniaFreelance(false);
+            setShareAmFreelance(null);
+          }}
+          title={t("amFreelance.sectionTitle")}
+          shareMessage={shareAmFreelance}
+          onOpenCalculator={openCalculatorShortcut}
+          onOpenConverter={openConverterShortcut}
+        >
+          <ArmeniaFreelanceModal onShareableMessageChange={setShareAmFreelance} />
+        </QuickActionModal>
+
       </ThemedView>
     );
   };
