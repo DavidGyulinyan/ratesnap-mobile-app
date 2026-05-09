@@ -219,6 +219,12 @@ export default function HomeScreen() {
           onPress: () => go(() => setShowTouristCalc(true)),
         },
         {
+          id: "vacation",
+          label: t("quick.action.vacationCalc"),
+          icon: "calendar-outline",
+          onPress: () => go(() => openArmeniaFinance("paidLeave")),
+        },
+        {
           id: "amFinance",
           label: t("amFinance.sectionTitle"),
           icon: "flag-outline",
@@ -253,7 +259,7 @@ export default function HomeScreen() {
       ];
       return items.filter((item) => item.id !== excludeId);
     },
-    [closeAllQuickModals, t]
+    [closeAllQuickModals, t, openArmeniaFinance]
   );
 
   const burgerQuickActions = useMemo(
@@ -265,6 +271,8 @@ export default function HomeScreen() {
       openRateAlerts: () => openQuickFromMenu(() => setShowRateAlerts(true)),
       openCalculator: () => openQuickFromMenu(() => setShowCalculator(true)),
       openLoanCalculator: () => openQuickFromMenu(() => setShowLoanCalculator(true)),
+      openVacationCalculator: () =>
+        openQuickFromMenu(() => openArmeniaFinance("paidLeave")),
       openArmeniaFinance: () => openQuickFromMenu(() => openArmeniaFinance("menu")),
     }),
     [openQuickFromMenu, openArmeniaFinance]
@@ -490,6 +498,13 @@ export default function HomeScreen() {
                     icon: "airplane-outline" as const,
                     active: showTouristCalc,
                     onPress: () => setShowTouristCalc(!showTouristCalc),
+                  },
+                  {
+                    id: "vacation" as const,
+                    labelKey: "quick.action.vacationCalc",
+                    icon: "calendar-outline" as const,
+                    active: false,
+                    onPress: () => openArmeniaFinance("paidLeave"),
                   },
                 ] as const
               ).map((item) => (

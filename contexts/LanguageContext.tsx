@@ -45,6 +45,7 @@ const translations = {
     'quick.action.calculator.desc': 'Open basic math calculator',
     'quick.action.calculator.hide': 'Hide calculator widget',
     'quick.action.loanCalculator': 'Loan calculator',
+    'quick.action.vacationCalc': 'Vacation pay calculator',
     'quick.toolsMenu': 'Other tools',
     'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
 
@@ -491,6 +492,7 @@ const translations = {
     'quick.action.calculator.desc': 'Բացել բազմաֆունկցիոնալ հաշվիչը',
     'quick.action.calculator.hide': 'Թաքցնել հաշվիչը',
     'quick.action.loanCalculator': 'Վարկի հաշվիչ',
+    'quick.action.vacationCalc': 'Արձակուրդայինի հաշվիչ',
     'quick.toolsMenu': 'Այլ գործիքներ',
     'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
 
@@ -916,6 +918,7 @@ const translations = {
     'quick.action.calculator.desc': 'Открыть базовый математический калькулятор',
     'quick.action.calculator.hide': 'Скрыть виджет калькулятора',
     'quick.action.loanCalculator': 'Кредитный калькулятор',
+    'quick.action.vacationCalc': 'Калькулятор отпускных',
     
     'converter.title': 'Конвертер валют',
     'converter.subtitle': 'Полный набор конвертации валют с расширенными функциями',
@@ -1288,6 +1291,7 @@ const translations = {
     'quick.action.calculator.desc': 'Abrir calculadora matemática básica',
     'quick.action.calculator.hide': 'Ocultar widget de calculadora',
     'quick.action.loanCalculator': 'Calculadora de préstamo',
+    'quick.action.vacationCalc': 'Calculadora de vacaciones',
     
     'converter.title': 'Convertidor de Moneda',
     'converter.subtitle': 'Suite completa de conversión de moneda con funciones avanzadas',
@@ -1661,6 +1665,7 @@ const translations = {
     'quick.action.calculator.desc': '打开基本数学计算器',
     'quick.action.calculator.hide': '隐藏计算器小部件',
     'quick.action.loanCalculator': '贷款计算器',
+    'quick.action.vacationCalc': '假期工资计算器',
     
     'converter.title': '货币转换器',
     'converter.subtitle': '带高级功能的完整货币转换套件',
@@ -2032,6 +2037,7 @@ const translations = {
     'quick.action.calculator.desc': 'बेसिक मैथ कैलकुलेटर खोलें',
     'quick.action.calculator.hide': 'कैलकुलेटर विजेट छुपाएं',
     'quick.action.loanCalculator': 'लोन कैलकुलेटर',
+    'quick.action.vacationCalc': 'छुट्टी वेतन कैलकुलेटर',
     
     'converter.title': 'मुद्रा कन्वर्टर',
     'converter.subtitle': 'उन्नत सुविधाओं के साथ पूर्ण मुद्रा रूपांतरण सूट',
