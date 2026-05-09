@@ -11,6 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import alertCheckerService from "@/lib/alertCheckerService";
+import { clearPersistedFormDraftsAfterSignOut } from "@/lib/amScreensDraft";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -29,6 +30,8 @@ interface AuthContextType {
   signInWithApple: () => Promise<{ error?: AuthError }>;
   resetPassword: (email: string) => Promise<{ error?: AuthError }>;
   resendConfirmationEmail: (email: string) => Promise<{ error?: AuthError }>;
+  /** Increments when local form drafts are cleared (e.g. after sign-out). */
+  formDraftResetEpoch: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [formDraftResetEpoch, setFormDraftResetEpoch] = useState(0);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -85,6 +89,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             console.log("User signed out");
             // Stop alert checking when user signs out
             alertCheckerService.stopChecking();
+          }
+
+          if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+            void clearPersistedFormDraftsAfterSignOut()
+              .catch((e) =>
+                console.warn("clearPersistedFormDraftsAfterSignOut:", e)
+              )
+              .finally(() => {
+                setFormDraftResetEpoch((n) => n + 1);
+              });
           }
         }
       );
@@ -467,6 +481,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     signInWithApple,
     resetPassword,
     resendConfirmationEmail,
+    formDraftResetEpoch,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

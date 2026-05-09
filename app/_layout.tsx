@@ -6,12 +6,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 import 'react-native-url-polyfill/auto';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/hooks/useAuth';
+import { AppLockProvider } from '@/contexts/AppLockContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -53,13 +52,12 @@ function AppContent() {
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const { user } = useAuth();
-
   return (
     <LanguageProvider>
       <ThemeProvider>
-        <AppContent />
+        <AppLockProvider>
+          <AppContent />
+        </AppLockProvider>
       </ThemeProvider>
     </LanguageProvider>
   );

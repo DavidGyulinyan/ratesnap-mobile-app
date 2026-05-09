@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
@@ -7,6 +7,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAppLock } from '@/contexts/AppLockContext';
 import { getAsyncStorage } from '@/lib/storage';
 import { Layout, hexToRgba } from '@/constants/theme';
 import ContactSupportModal from '@/components/ContactSupportModal';
@@ -23,6 +24,7 @@ export default function SettingsScreen() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { themePreference, setThemePreference } = useTheme();
+  const { lockSupported, lockEnabled, prefsReady, enableAppLock, disableAppLock } = useAppLock();
   const { savedRates, pickedRates, clearAllData } = useUserData();
 
   const { deleteRate: deleteSavedRate, deleteAllRates: deleteAllSavedRates } = useSavedRates();
@@ -35,6 +37,7 @@ export default function SettingsScreen() {
   const [showContactSupport, setShowContactSupport] = useState(false);
   const [showSavedRatesManagement, setShowSavedRatesManagement] = useState(false);
   const [showPickedRatesManagement, setShowPickedRatesManagement] = useState(false);
+  const [appLockToggling, setAppLockToggling] = useState(false);
 
   // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
@@ -156,6 +159,24 @@ export default function SettingsScreen() {
         }
       ]
     );
+  };
+
+  const handleAppLockToggle = async (next: boolean) => {
+    if (!lockSupported) {
+      Alert.alert(t('common.error'), t('appLock.webUnsupported'));
+      return;
+    }
+    if (!prefsReady || appLockToggling) return;
+    setAppLockToggling(true);
+    try {
+      if (next) {
+        await enableAppLock();
+      } else {
+        await disableAppLock();
+      }
+    } finally {
+      setAppLockToggling(false);
+    }
   };
 
   // Get terms of use content
@@ -805,7 +826,7 @@ Capital चुनने के लिए धन्यवाद!`
             {
               key: 'enabled',
               label: t('settings.enableNotifications'),
-              icon: (notificationSettings.enabled ? 'notifications-outline' : 'notifications-off-outline') as const,
+              icon: notificationSettings.enabled ? ('notifications-outline' as const) : ('notifications-off-outline' as const),
             },
             { key: 'sound', label: t('settings.sound'), icon: 'volume-high-outline' as const },
             { key: 'vibration', label: t('settings.vibration'), icon: 'phone-portrait-outline' as const },
@@ -1153,6 +1174,28 @@ Capital चुनने के लिए धन्यवाद!`
                 <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
               </View>
             </TouchableOpacity>
+
+            <View style={[styles.settingItem, { alignItems: 'flex-start' }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="finger-print-outline" size={22} color={primaryColor} style={{ marginTop: 2 }} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <ThemedText style={styles.settingItemText}>{t('settings.appLock')}</ThemedText>
+                  <ThemedText
+                    style={[styles.settingValue, { fontSize: 12, marginTop: 6, lineHeight: 17 }]}
+                  >
+                    {lockSupported ? t('settings.appLockHint') : t('appLock.webUnsupported')}
+                  </ThemedText>
+                </View>
+              </View>
+              <Switch
+                value={lockEnabled && lockSupported}
+                onValueChange={handleAppLockToggle}
+                disabled={!lockSupported || !prefsReady || appLockToggling}
+                trackColor={{ false: borderColor, true: primaryColor }}
+                thumbColor={textInverseColor}
+                ios_backgroundColor={borderColor}
+              />
+            </View>
           </View>
         </View>
 

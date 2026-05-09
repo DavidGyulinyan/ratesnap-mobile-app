@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AM_FINANCE_EN, AM_FINANCE_HY } from './amFinance.i18n';
 import { AM_FREELANCE_EN, AM_FREELANCE_HY } from "./amFreelance.i18n";
+import { AM_TRANSPORT_EN, AM_TRANSPORT_HY } from "./amTransport.i18n";
 
 export type Language = 'en' | 'hy' | 'ru' | 'es' | 'zh' | 'hi';
 
@@ -22,6 +23,10 @@ const translations = {
     // App & Navigation    // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.quickActions': 'Quick Actions',
+    'dashboard.reorderCards': 'Sort cards',
+    'dashboard.reorderCardsHint':
+      'Drag the grip (⋮) on a tile to move it. Order is saved automatically.',
+    'dashboard.finishReorder': 'Done',
     'dashboard.converter': 'Converter',
     'dashboard.multiCurrency': 'Multi Currency',
     'dashboard.rateAlerts': 'Rate Alerts',
@@ -45,6 +50,7 @@ const translations = {
     'quick.action.calculator.desc': 'Open basic math calculator',
     'quick.action.calculator.hide': 'Hide calculator widget',
     'quick.action.loanCalculator': 'Loan calculator',
+    'quick.action.vacationCalc': 'Vacation pay calculator',
     'quick.toolsMenu': 'Other tools',
     'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
 
@@ -212,6 +218,9 @@ const translations = {
     'settings.dark': 'Dark',
     'settings.language': 'Language',
     'settings.notifications': 'Notifications',
+    'settings.appLock': 'App lock',
+    'settings.appLockHint':
+      'After the app was in the background, open it again with your device passcode, Face ID, Touch ID, or fingerprint—the same ways you unlock your phone.',
     'settings.dataManagement': 'Data Management',
     'settings.exchangeRateInfo': 'Exchange Rate Information',
     'settings.aboutExchangeRates': 'About Exchange Rates',
@@ -235,6 +244,16 @@ const translations = {
     'settings.sound': 'Sound',
     'settings.vibration': 'Vibration',
     'settings.showPreview': 'Show Preview',
+    'appLock.unlockTitle': 'Unlock Capital',
+    'appLock.unlockSubtitle':
+      'Use the same screen lock you already use on this device—passcode, Face ID, Touch ID, or fingerprint.',
+    'appLock.unlockButton': 'Unlock',
+    'appLock.authPrompt': 'Unlock Capital',
+    'appLock.notAvailable': 'Device authentication is not available.',
+    'appLock.notEnrolled': 'Set up a screen lock, Face ID, Touch ID, or fingerprint on your device first.',
+    'appLock.failed': 'Authentication did not succeed.',
+    'appLock.webUnsupported': 'App lock is only available in the iOS and Android apps.',
+
     'common.enabled': 'Enabled',
     'common.disabled': 'Disabled',
     'common.settings': 'Settings',
@@ -462,6 +481,7 @@ const translations = {
     'charts.title': 'Currency rate charts',
     ...AM_FINANCE_EN,
     ...AM_FREELANCE_EN,
+    ...AM_TRANSPORT_EN,
   },
   hy: {
     'app.title': 'Capital',
@@ -469,6 +489,10 @@ const translations = {
     // Armenian    
     'dashboard.title': 'Վահանակ',
     'dashboard.quickActions': 'Արագ գործողություններ',
+    'dashboard.reorderCards': 'Դասակարգել քարտերը ըստ ցանկության',
+    'dashboard.reorderCardsHint':
+      'Քարշեք աջ անկյունի նշանը՝ քարտը տեղափոխելու համար։ Դասավորությունը պահպանվում է ավտոմատ։',
+    'dashboard.finishReorder': 'Ավարտել',
     'dashboard.converter': 'Փոխարկիչ',
     'dashboard.multiCurrency': 'Բազմարժույթ',
     'dashboard.rateAlerts': 'Դրույքի ծանուցումներ',
@@ -491,6 +515,7 @@ const translations = {
     'quick.action.calculator.desc': 'Բացել բազմաֆունկցիոնալ հաշվիչը',
     'quick.action.calculator.hide': 'Թաքցնել հաշվիչը',
     'quick.action.loanCalculator': 'Վարկի հաշվիչ',
+    'quick.action.vacationCalc': 'Արձակուրդայինի հաշվիչ',
     'quick.toolsMenu': 'Այլ գործիքներ',
     'quick.action.touristCalc': 'Տուրիստական հաշվիչ',
 
@@ -551,6 +576,9 @@ const translations = {
     'settings.dark': 'Մութ',
     'settings.language': 'Լեզու',
     'settings.notifications': 'Ծանուցումներ',
+    'settings.appLock': 'Հավելվածի կողպում',
+    'settings.appLockHint':
+      'Երբ հավելվածը ետևի պլանում է, նորից բացելիս պահանջվում է սարքի կողպումը՝ մատնահետք, Face ID/Touch ID կամ գաղտնաբառ, ինչպես հեռախոսը բացելիս։',
     'settings.dataManagement': 'Տվյալների կառավարում',
     'settings.exchangeRateInfo': 'Տվյալներ փոխարժեքի մասին',
     'settings.aboutExchangeRates': 'Փոխարժեքի մասին',
@@ -567,6 +595,17 @@ const translations = {
     'settings.sound': 'Ձայն',
     'settings.vibration': 'Վիբրացիա',
     'settings.showPreview': 'Ցուցադրել նախադիտում',
+    'appLock.unlockTitle': 'Բացել Capital',
+    'appLock.unlockSubtitle':
+      'Օգտագործեք նույն մեթոդը, ինչ սարքի էկրանը կողպելու համար՝ գաղտնաբառ, Face ID, Touch ID կամ մատնահետք։',
+    'appLock.unlockButton': 'Մուտք',
+    'appLock.authPrompt': 'Հաստատեք՝ Capital-ը բացելու համար',
+    'appLock.notAvailable': 'Այս սարքում սիստեմային հաստատումը հասանելի չէ։',
+    'appLock.notEnrolled':
+      'Նախ սարքի կարգավորումներում միացրեք էկրանի կողպում, մատնահետք կամ Face ID։',
+    'appLock.failed': 'Հաստատումը ձախողվեց։',
+    'appLock.webUnsupported': 'Կողպումը հասանելի է միայն iOS և Android հավելվածներում։',
+
     'common.enabled': 'Միացված է',
     'common.disabled': 'Անջատված',
     'common.settings': 'Կարգավորումներ',
@@ -886,6 +925,7 @@ const translations = {
     'signup.selectLanguage': 'Ընտրել լեզու',
     ...AM_FINANCE_HY,
     ...AM_FREELANCE_HY,
+    ...AM_TRANSPORT_HY,
   },
   ru: {
     'app.title': 'Capital',
@@ -893,6 +933,10 @@ const translations = {
     // Russian    
     'dashboard.title': 'Панель',
     'dashboard.quickActions': 'Быстрые действия',
+    'dashboard.reorderCards': 'Порядок карточек',
+    'dashboard.reorderCardsHint':
+      'Перетащите значок справа, чтобы переместить плитку. Порядок сохраняется автоматически.',
+    'dashboard.finishReorder': 'Готово',
     'dashboard.converter': 'Конвертер',
     'dashboard.multiCurrency': 'Мультивалютный',
     'dashboard.rateAlerts': 'Уведомления о курсах',
@@ -916,6 +960,7 @@ const translations = {
     'quick.action.calculator.desc': 'Открыть базовый математический калькулятор',
     'quick.action.calculator.hide': 'Скрыть виджет калькулятора',
     'quick.action.loanCalculator': 'Кредитный калькулятор',
+    'quick.action.vacationCalc': 'Калькулятор отпускных',
     
     'converter.title': 'Конвертер валют',
     'converter.subtitle': 'Полный набор конвертации валют с расширенными функциями',
@@ -956,6 +1001,9 @@ const translations = {
     'settings.dark': 'Темная',
     'settings.language': 'Язык',
     'settings.notifications': 'Уведомления',
+    'settings.appLock': 'Блокировка приложения',
+    'settings.appLockHint':
+      'После сворачивания для входа потребуется код или биометрия — как при разблокировке телефона.',
     'settings.dataManagement': 'Управление данными',
     'settings.exchangeRateInfo': 'Информация о курсах',
     'settings.aboutExchangeRates': 'О курсах',
@@ -972,6 +1020,16 @@ const translations = {
     'settings.sound': 'Звук',
     'settings.vibration': 'Вибрация',
     'settings.showPreview': 'Показать превью',
+    'appLock.unlockTitle': 'Разблокируйте Capital',
+    'appLock.unlockSubtitle':
+      'Используйте тот же способ, что для разблокировки устройства: PIN, отпечаток или Face ID.',
+    'appLock.unlockButton': 'Разблокировать',
+    'appLock.authPrompt': 'Подтвердите для входа в Capital',
+    'appLock.notAvailable': 'Вход по настройкам устройства недоступен.',
+    'appLock.notEnrolled': 'Сначала включите блокировку экрана или биометрию в настройках телефона.',
+    'appLock.failed': 'Подтверждение не выполнено.',
+    'appLock.webUnsupported': 'Доступно только в приложениях для iOS и Android.',
+
     'common.enabled': 'Включено',
     'common.disabled': 'Отключено',
     'common.settings': 'Настройки',
@@ -1259,6 +1317,7 @@ const translations = {
     'rateAlerts.reset': 'Сбросить',
     ...AM_FINANCE_EN,
     ...AM_FREELANCE_EN,
+    ...AM_TRANSPORT_EN,
   },
   es: {
     'app.title': 'Capital',
@@ -1266,6 +1325,10 @@ const translations = {
     // Spanish    
     'dashboard.title': 'Panel',
     'dashboard.quickActions': 'Acciones Rápidas',
+    'dashboard.reorderCards': 'Ordenar tarjetas',
+    'dashboard.reorderCardsHint':
+      'Arrastra el icono a la derecha para mover la ficha. El orden se guarda solo.',
+    'dashboard.finishReorder': 'Listo',
     'dashboard.converter': 'Convertidor',
     'dashboard.multiCurrency': 'Multi Moneda',
     'dashboard.rateAlerts': 'Alertas de Tipo',
@@ -1288,6 +1351,7 @@ const translations = {
     'quick.action.calculator.desc': 'Abrir calculadora matemática básica',
     'quick.action.calculator.hide': 'Ocultar widget de calculadora',
     'quick.action.loanCalculator': 'Calculadora de préstamo',
+    'quick.action.vacationCalc': 'Calculadora de vacaciones',
     
     'converter.title': 'Convertidor de Moneda',
     'converter.subtitle': 'Suite completa de conversión de moneda con funciones avanzadas',
@@ -1329,6 +1393,9 @@ const translations = {
     'settings.dark': 'Oscuro',
     'settings.language': 'Idioma',
     'settings.notifications': 'Notificaciones',
+    'settings.appLock': 'Bloqueo de la app',
+    'settings.appLockHint':
+      'Tras estar en segundo plano, al abrir de nuevo se pedirá el mismo código o biometría que para desbloquear el teléfono.',
     'settings.dataManagement': 'Gestión de Datos',
     'settings.exchangeRateInfo': 'Información de Tasas',
     'settings.aboutExchangeRates': 'Sobre tasas',
@@ -1345,6 +1412,17 @@ const translations = {
     'settings.sound': 'Sonido',
     'settings.vibration': 'Vibración',
     'settings.showPreview': 'Mostrar Vista Previa',
+    'appLock.unlockTitle': 'Desbloquear Capital',
+    'appLock.unlockSubtitle':
+      'Usa el mismo método que para desbloquear el dispositivo: código, Face ID, huella, etc.',
+    'appLock.unlockButton': 'Desbloquear',
+    'appLock.authPrompt': 'Desbloquear Capital',
+    'appLock.notAvailable': 'La autenticación del dispositivo no está disponible.',
+    'appLock.notEnrolled':
+      'Primero configura bloqueo de pantalla, Face ID o huella en los ajustes del dispositivo.',
+    'appLock.failed': 'La autenticación no tuvo éxito.',
+    'appLock.webUnsupported': 'El bloqueo solo está disponible en las apps para iOS y Android.',
+
     'common.enabled': 'Habilitado',
     'common.disabled': 'Deshabilitado',
     'common.settings': 'Configuración',
@@ -1632,6 +1710,7 @@ const translations = {
     'charts.title': 'Gráficos de Tipos de Cambio',
     ...AM_FINANCE_EN,
     ...AM_FREELANCE_EN,
+    ...AM_TRANSPORT_EN,
   },
   zh: {
     'app.title': 'Capital',
@@ -1639,6 +1718,9 @@ const translations = {
     // Chinese (Simplified)    
     'dashboard.title': '仪表板',
     'dashboard.quickActions': '快速操作',
+    'dashboard.reorderCards': '排序卡片',
+    'dashboard.reorderCardsHint': '拖动右侧图标移动卡片，顺序会自动保存。',
+    'dashboard.finishReorder': '完成',
     'dashboard.converter': '转换器',
     'dashboard.multiCurrency': '多货币',
     'dashboard.rateAlerts': '汇率提醒',
@@ -1661,6 +1743,7 @@ const translations = {
     'quick.action.calculator.desc': '打开基本数学计算器',
     'quick.action.calculator.hide': '隐藏计算器小部件',
     'quick.action.loanCalculator': '贷款计算器',
+    'quick.action.vacationCalc': '假期工资计算器',
     
     'converter.title': '货币转换器',
     'converter.subtitle': '带高级功能的完整货币转换套件',
@@ -1701,6 +1784,9 @@ const translations = {
     'settings.dark': '深色',
     'settings.language': '语言',
     'settings.notifications': '通知',
+    'settings.appLock': '应用锁',
+    'settings.appLockHint':
+      '应用进入后台后再次打开时，需要使用与解锁手机相同的密码或生物识别。',
     'settings.dataManagement': '数据管理',
     'settings.exchangeRateInfo': '汇率信息',
     'settings.aboutExchangeRates': '关于汇率',
@@ -1716,6 +1802,15 @@ const translations = {
     'settings.sound': '声音',
     'settings.vibration': '振动',
     'settings.showPreview': '显示预览',
+    'appLock.unlockTitle': '解锁 Capital',
+    'appLock.unlockSubtitle': '使用与本机相同的锁屏方式：密码、面容 ID、触控 ID 或指纹。',
+    'appLock.unlockButton': '解锁',
+    'appLock.authPrompt': '解锁 Capital',
+    'appLock.notAvailable': '无法使用本机身份验证。',
+    'appLock.notEnrolled': '请先在系统设置中开启锁屏、面容 ID、触控 ID 或指纹。',
+    'appLock.failed': '验证未成功。',
+    'appLock.webUnsupported': '应用锁仅在 iOS 与 Android 应用中可用。',
+
     'common.enabled': '已启用',
     'common.disabled': '已禁用',
     'common.settings': '设置',
@@ -2003,6 +2098,7 @@ const translations = {
     'charts.title': '汇率图表',
     ...AM_FINANCE_EN,
     ...AM_FREELANCE_EN,
+    ...AM_TRANSPORT_EN,
   },
   hi: {
     'app.title': 'Capital',
@@ -2010,6 +2106,10 @@ const translations = {
     // Hindi    
     'dashboard.title': 'डैशबोर्ड',
     'dashboard.quickActions': 'त्वरित कार्य',
+    'dashboard.reorderCards': 'कार्ड क्रमबद्ध करें',
+    'dashboard.reorderCardsHint':
+      'टाइल खिसकाने के लिए दाएँ आइकॉन को खींचें। क्रम अपने आप सेव होता है।',
+    'dashboard.finishReorder': 'हो गया',
     'dashboard.converter': 'कन्वर्टर',
     'dashboard.multiCurrency': 'मल्टी करेंसी',
     'dashboard.rateAlerts': 'रेट अलर्ट्स',
@@ -2032,6 +2132,7 @@ const translations = {
     'quick.action.calculator.desc': 'बेसिक मैथ कैलकुलेटर खोलें',
     'quick.action.calculator.hide': 'कैलकुलेटर विजेट छुपाएं',
     'quick.action.loanCalculator': 'लोन कैलकुलेटर',
+    'quick.action.vacationCalc': 'छुट्टी वेतन कैलकुलेटर',
     
     'converter.title': 'मुद्रा कन्वर्टर',
     'converter.subtitle': 'उन्नत सुविधाओं के साथ पूर्ण मुद्रा रूपांतरण सूट',
@@ -2072,6 +2173,9 @@ const translations = {
     'settings.dark': 'डार्क',
     'settings.language': 'भाषा',
     'settings.notifications': 'नोटिफिकेशन',
+    'settings.appLock': 'ऐप लॉक',
+    'settings.appLockHint':
+      'बैकग्राउंड में जाने के बाद दोबारा खोलने पर फोन अनलॉक जैसा ही पासकोड या बायोमेट्रिक चाहिए।',
     'settings.dataManagement': 'डेटा प्रबंधन',
     'settings.exchangeRateInfo': 'दर जानकारी',
     'settings.aboutExchangeRates': 'टैरिफ के बारे में',
@@ -2088,6 +2192,17 @@ const translations = {
     'settings.sound': 'ध्वनि',
     'settings.vibration': 'कंपन',
     'settings.showPreview': 'पूर्वावलोकन दिखाएं',
+    'appLock.unlockTitle': 'Capital अनलॉक करें',
+    'appLock.unlockSubtitle':
+      'वही तरीका उपयोग करें जो डिवाइस अनलॉक करने के लिए है—पासकोड, फेस आईडी, फिंगरप्रिंट आदि।',
+    'appLock.unlockButton': 'अनलॉक',
+    'appLock.authPrompt': 'Capital अनलॉक करें',
+    'appLock.notAvailable': 'डिवाइस प्रमाणीकरण उपलब्ध नहीं है।',
+    'appLock.notEnrolled':
+      'पहले सिस्टम सेटिंग्स में स्क्रीन लॉक, फेस आईडी या फिंगरप्रिंट सेट करें।',
+    'appLock.failed': 'प्रमाणीकरण सफल नहीं हुआ।',
+    'appLock.webUnsupported': 'ऐप लॉक केवल iOS और Android ऐप्स में उपलब्ध है।',
+
     'common.enabled': 'सक्षम',
     'common.disabled': 'अक्षम',
     'common.settings': 'सेटिंग्स',
@@ -2375,6 +2490,7 @@ const translations = {
     'charts.title': 'एक्सचेंज रेट चार्ट',
     ...AM_FINANCE_EN,
     ...AM_FREELANCE_EN,
+    ...AM_TRANSPORT_EN,
   },
 };
 

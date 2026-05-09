@@ -76,7 +76,7 @@ export default function MultiCurrencyConverter({
   const [hasLoadedData, setHasLoadedData] = useState(false);
 
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, formDraftResetEpoch } = useAuth();
   const { saveConversion, converterHistory, refreshHistory } =
     useConverterHistory();
 
@@ -777,10 +777,17 @@ export default function MultiCurrencyConverter({
     hasLoadedData,
   ]);
 
-  // Load saved state once (avoid refetch on every open).
+  // Load saved state when user or persisted drafts change (e.g. after sign-out).
   useEffect(() => {
-    loadSavedState();
-  }, [user, loadSavedState]);
+    if (formDraftResetEpoch > 0) {
+      setAmount("");
+      setConversionTargets([]);
+      setConversions({});
+      setFromCurrency(fromCurrencyProp || "USD");
+      setHasLoadedData(false);
+    }
+    void loadSavedState();
+  }, [user, loadSavedState, formDraftResetEpoch, fromCurrencyProp]);
 
   // Add new target currency
   const addTargetCurrency = (currency: string) => {

@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import CurrencyFlag from "@/components/CurrencyFlag";
 import CurrencyPicker from "@/components/CurrencyPicker";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 import { getAsyncStorage } from "@/lib/storage";
@@ -32,6 +33,7 @@ export default function TouristCalculator({
   onShareableMessageChange?: (message: string | null) => void;
   currenciesData?: any;
 }) {
+  const { formDraftResetEpoch } = useAuth();
   const { t } = useLanguage();
   const surfaceColor = useThemeColor({}, "surface");
   const surfaceSecondaryColor = useThemeColor({}, "surfaceSecondary");
@@ -60,6 +62,7 @@ export default function TouristCalculator({
 
   useEffect(() => {
     let alive = true;
+    setPrefsHydrated(false);
     (async () => {
       try {
         const storage = getAsyncStorage();
@@ -75,12 +78,24 @@ export default function TouristCalculator({
 
         if (!alive) return;
 
-        if (typeof savedAmount === "string") setAmountStr(savedAmount === "0" ? "" : savedAmount);
-        if (typeof savedDiscount === "string") setDiscountPctStr(savedDiscount === "0" ? "" : savedDiscount);
-        if (typeof savedTip === "string") setTipPctStr(savedTip === "0" ? "" : savedTip);
-        if (typeof savedManualRate === "string") setManualRateStr(savedManualRate === "0" ? "" : savedManualRate);
-        if (typeof savedCurrency === "string" && savedCurrency) setFromCurrency(savedCurrency);
-        if (typeof savedUseManual === "string") setUseManualRate(savedUseManual === "1");
+        setAmountStr(
+          typeof savedAmount === "string" && savedAmount !== "0" ? savedAmount : ""
+        );
+        setDiscountPctStr(
+          typeof savedDiscount === "string" && savedDiscount !== "0" ? savedDiscount : ""
+        );
+        setTipPctStr(
+          typeof savedTip === "string" && savedTip !== "0" ? savedTip : ""
+        );
+        setManualRateStr(
+          typeof savedManualRate === "string" && savedManualRate !== "0"
+            ? savedManualRate
+            : ""
+        );
+        setFromCurrency(
+          typeof savedCurrency === "string" && savedCurrency ? savedCurrency : "USD"
+        );
+        setUseManualRate(typeof savedUseManual === "string" && savedUseManual === "1");
       } catch {
         // ignore
       } finally {
@@ -90,7 +105,7 @@ export default function TouristCalculator({
     return () => {
       alive = false;
     };
-  }, []);
+  }, [formDraftResetEpoch]);
 
   useEffect(() => {
     if (!prefsHydrated) return;

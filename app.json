@@ -22,6 +22,7 @@
         ],
         "NSUserNotificationsUsageDescription": "Capital needs notification access to send you alerts when your saved exchange rates reach your target values.",
         "NSLocationWhenInUseUsageDescription": "Capital needs location access to detect your local currency for better user experience.",
+        "NSFaceIDUsageDescription": "Capital uses Face ID so you can unlock the app with the same security you use for your device.",
         "UNUserNotificationCenterDelegate": true
       }
     },
@@ -72,7 +73,13 @@
           "backgroundColor": "#FAF6F2"
         }
       ],
-      "expo-mail-composer"
+      "expo-mail-composer",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID to unlock the app."
+        }
+      ]
     ],
 
     "experiments": {

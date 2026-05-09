@@ -1,5 +1,6 @@
 import type { SoleProprietorRegimeId, VatMode } from "@/lib/armenia";
-import type { InvoiceCurrency } from "@/lib/invoices";
+import { INVOICES_STORAGE_KEY, type InvoiceCurrency } from "@/lib/invoices";
+import { FREELANCE_REMINDERS_STORAGE_KEY } from "@/lib/freelanceReminders";
 import { getAsyncStorage } from "@/lib/storage";
 
 const AM_FINANCE_KEY = "capital.amFinance.forms.v1";
@@ -35,6 +36,23 @@ export type AmFinanceFormsDraft = {
     compound: boolean;
     contribStr: string;
     taxOnProfit: boolean;
+  };
+  vehicleCustoms: {
+    valueStr: string;
+    engineCcStr: string;
+    /** Model / release calendar year (e.g. 2019). */
+    releaseYearStr: string;
+    isElectric: boolean;
+  };
+  /** Vehicle sale — income tax worksheet (AMD, years, power). */
+  vehicleDeal: {
+    acquisitionYearStr: string;
+    saleYearStr: string;
+    acquisitionStr: string;
+    importStr: string;
+    salePriceStr: string;
+    powerStr: string;
+    powerUnit: "hp" | "kw";
   };
 };
 
@@ -103,6 +121,21 @@ export function defaultAmFinanceDraft(): AmFinanceFormsDraft {
       contribStr: "",
       taxOnProfit: true,
     },
+    vehicleCustoms: {
+      valueStr: "",
+      engineCcStr: "2",
+      releaseYearStr: String(new Date().getFullYear()),
+      isElectric: false,
+    },
+    vehicleDeal: {
+      acquisitionYearStr: "",
+      saleYearStr: String(new Date().getFullYear()),
+      acquisitionStr: "",
+      importStr: "",
+      salePriceStr: "",
+      powerStr: "",
+      powerUnit: "hp",
+    },
   };
 }
 
@@ -163,6 +196,55 @@ function mergeFinance(
     },
     salary: { ...base.salary, ...o.salary },
     deposit: { ...base.deposit, ...o.deposit },
+    vehicleCustoms: {
+      ...base.vehicleCustoms,
+      ...o.vehicleCustoms,
+      isElectric:
+        typeof o.vehicleCustoms?.isElectric === "boolean"
+          ? o.vehicleCustoms.isElectric
+          : base.vehicleCustoms.isElectric,
+      engineCcStr:
+        o.vehicleCustoms?.engineCcStr !== undefined && o.vehicleCustoms?.engineCcStr !== null
+          ? String(o.vehicleCustoms.engineCcStr)
+          : base.vehicleCustoms.engineCcStr,
+      releaseYearStr:
+        o.vehicleCustoms?.releaseYearStr !== undefined && o.vehicleCustoms?.releaseYearStr !== null
+          ? String(o.vehicleCustoms.releaseYearStr)
+          : base.vehicleCustoms.releaseYearStr,
+    },
+    vehicleDeal: {
+      ...base.vehicleDeal,
+      ...o.vehicleDeal,
+      acquisitionYearStr:
+        o.vehicleDeal?.acquisitionYearStr !== undefined &&
+        o.vehicleDeal?.acquisitionYearStr !== null
+          ? String(o.vehicleDeal.acquisitionYearStr)
+          : base.vehicleDeal.acquisitionYearStr,
+      saleYearStr:
+        o.vehicleDeal?.saleYearStr !== undefined && o.vehicleDeal?.saleYearStr !== null
+          ? String(o.vehicleDeal.saleYearStr)
+          : base.vehicleDeal.saleYearStr,
+      acquisitionStr:
+        o.vehicleDeal?.acquisitionStr !== undefined && o.vehicleDeal?.acquisitionStr !== null
+          ? String(o.vehicleDeal.acquisitionStr)
+          : base.vehicleDeal.acquisitionStr,
+      importStr:
+        o.vehicleDeal?.importStr !== undefined && o.vehicleDeal?.importStr !== null
+          ? String(o.vehicleDeal.importStr)
+          : base.vehicleDeal.importStr,
+      salePriceStr:
+        o.vehicleDeal?.salePriceStr !== undefined && o.vehicleDeal?.salePriceStr !== null
+          ? String(o.vehicleDeal.salePriceStr)
+          : base.vehicleDeal.salePriceStr,
+      powerStr:
+        o.vehicleDeal?.powerStr !== undefined && o.vehicleDeal?.powerStr !== null
+          ? String(o.vehicleDeal.powerStr)
+          : base.vehicleDeal.powerStr,
+      powerUnit:
+        o.vehicleDeal?.powerUnit === "kw" || o.vehicleDeal?.powerUnit === "hp"
+          ? o.vehicleDeal.powerUnit
+          : base.vehicleDeal.powerUnit,
+    },
   };
 }
 
@@ -260,4 +342,43 @@ export async function saveLoanCalculatorDraft(
   draft: LoanCalculatorDraft
 ): Promise<void> {
   await getAsyncStorage().setItem(LOAN_CALCULATOR_KEY, JSON.stringify(draft));
+}
+
+/**
+ * AsyncStorage keys cleared on sign-out (sensitive numbers & PII in forms,
+ * invoices, reminders, share-related converter state).
+ */
+const SIGN_OUT_FORM_STORAGE_KEYS: string[] = [
+  AM_FINANCE_KEY,
+  AM_FREELANCE_KEY,
+  LOAN_CALCULATOR_KEY,
+  INVOICES_STORAGE_KEY,
+  FREELANCE_REMINDERS_STORAGE_KEY,
+  "multiCurrencyConverterState",
+  "multiCurrencyConverterState.ts",
+  "touristCalc.amount",
+  "touristCalc.discountPct",
+  "touristCalc.tipPct",
+  "touristCalc.fromCurrency",
+  "touristCalc.manualRate",
+  "touristCalc.useManualRate",
+  "selectedFromCurrency",
+  "selectedToCurrency",
+  "lastConversion",
+  "currencyHistory",
+];
+
+/**
+ * Remove persisted drafts and locally stored financial/sensitive form data
+ * after sign-out (device should not keep salary, deposits, vacation inputs, etc.).
+ */
+export async function clearPersistedFormDraftsAfterSignOut(): Promise<void> {
+  const storage = getAsyncStorage();
+  if (typeof storage.multiRemove === "function") {
+    await storage.multiRemove(SIGN_OUT_FORM_STORAGE_KEYS);
+    return;
+  }
+  await Promise.all(
+    SIGN_OUT_FORM_STORAGE_KEYS.map((k) => storage.removeItem(k))
+  );
 }

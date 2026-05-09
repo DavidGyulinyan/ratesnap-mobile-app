@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   LayoutAnimation,
   Platform,
@@ -19,8 +12,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { AmFinanceDraftContext, useAmFinanceDraft } from "@/components/AmFinanceDraftContext";
 import { ThemedText } from "@/components/themed-text";
 import { hexToRgba } from "@/constants/theme";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import {
@@ -52,19 +47,6 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 
 export type FinanceScreen = "menu" | "paidLeave" | "maternity" | "salary" | "deposit";
 
-const AmFinanceDraftContext = createContext<{
-  draft: AmFinanceFormsDraft;
-  setDraft: React.Dispatch<React.SetStateAction<AmFinanceFormsDraft>>;
-} | null>(null);
-
-function useAmFinanceDraft() {
-  const ctx = useContext(AmFinanceDraftContext);
-  if (!ctx) {
-    throw new Error("useAmFinanceDraft must be used within provider");
-  }
-  return ctx;
-}
-
 function formatAmd(value: number): string {
   return formatAmdSuffix(value);
 }
@@ -83,6 +65,7 @@ export default function ArmeniaFinanceModal({
   initialScreen = "menu",
   onShareableMessageChange,
 }: ArmeniaFinanceModalProps) {
+  const { formDraftResetEpoch } = useAuth();
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, "primary");
   const surfaceColor = useThemeColor({}, "surface");
@@ -103,6 +86,7 @@ export default function ArmeniaFinanceModal({
 
   useEffect(() => {
     let cancelled = false;
+    setDraftHydrated(false);
     void loadAmFinanceDraft().then((d) => {
       if (!cancelled) {
         setDraft(d);
@@ -112,7 +96,7 @@ export default function ArmeniaFinanceModal({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [formDraftResetEpoch]);
 
   useEffect(() => {
     if (!draftHydrated) return;
@@ -217,7 +201,6 @@ export default function ArmeniaFinanceModal({
             onShareableMessageChange={onShareableMessageChange}
           />
         ) : null}
-
         <ThemedText type="caption" style={[styles.disclaimer, { color: textSecondaryColor }]}>
           {t("amFinance.disclaimer")}
         </ThemedText>

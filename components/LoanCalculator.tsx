@@ -14,6 +14,7 @@ import QuickActionModal, {
   type QuickActionModalMenuItem,
 } from "@/components/QuickActionModal";
 import { ThemedText } from "@/components/themed-text";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import {
@@ -165,6 +166,7 @@ export default function LoanCalculator({
   onResult,
   menuItems,
 }: LoanCalculatorProps) {
+  const { formDraftResetEpoch } = useAuth();
   const { t } = useLanguage();
   const surfaceColor = useThemeColor({}, "surface");
   const textColor = useThemeColor({}, "text");
@@ -177,6 +179,7 @@ export default function LoanCalculator({
 
   useEffect(() => {
     let cancelled = false;
+    setDraftHydrated(false);
     void loadLoanCalculatorDraft().then((d) => {
       if (!cancelled) {
         setDraft(d);
@@ -186,7 +189,7 @@ export default function LoanCalculator({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [formDraftResetEpoch]);
 
   useEffect(() => {
     if (!draftHydrated) return;
