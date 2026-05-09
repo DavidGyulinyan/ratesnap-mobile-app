@@ -218,6 +218,9 @@ const translations = {
     'settings.dark': 'Dark',
     'settings.language': 'Language',
     'settings.notifications': 'Notifications',
+    'settings.appLock': 'App lock',
+    'settings.appLockHint':
+      'After the app was in the background, open it again with your device passcode, Face ID, Touch ID, or fingerprint—the same ways you unlock your phone.',
     'settings.dataManagement': 'Data Management',
     'settings.exchangeRateInfo': 'Exchange Rate Information',
     'settings.aboutExchangeRates': 'About Exchange Rates',
@@ -241,6 +244,16 @@ const translations = {
     'settings.sound': 'Sound',
     'settings.vibration': 'Vibration',
     'settings.showPreview': 'Show Preview',
+    'appLock.unlockTitle': 'Unlock Capital',
+    'appLock.unlockSubtitle':
+      'Use the same screen lock you already use on this device—passcode, Face ID, Touch ID, or fingerprint.',
+    'appLock.unlockButton': 'Unlock',
+    'appLock.authPrompt': 'Unlock Capital',
+    'appLock.notAvailable': 'Device authentication is not available.',
+    'appLock.notEnrolled': 'Set up a screen lock, Face ID, Touch ID, or fingerprint on your device first.',
+    'appLock.failed': 'Authentication did not succeed.',
+    'appLock.webUnsupported': 'App lock is only available in the iOS and Android apps.',
+
     'common.enabled': 'Enabled',
     'common.disabled': 'Disabled',
     'common.settings': 'Settings',
@@ -563,6 +576,9 @@ const translations = {
     'settings.dark': 'Մութ',
     'settings.language': 'Լեզու',
     'settings.notifications': 'Ծանուցումներ',
+    'settings.appLock': 'Հավելվածի կողպում',
+    'settings.appLockHint':
+      'Երբ հավելվածը ետևի պլանում է, նորից բացելիս պահանջվում է սարքի կողպումը՝ մատնահետք, Face ID/Touch ID կամ գաղտնաբառ, ինչպես հեռախոսը բացելիս։',
     'settings.dataManagement': 'Տվյալների կառավարում',
     'settings.exchangeRateInfo': 'Տվյալներ փոխարժեքի մասին',
     'settings.aboutExchangeRates': 'Փոխարժեքի մասին',
@@ -579,6 +595,17 @@ const translations = {
     'settings.sound': 'Ձայն',
     'settings.vibration': 'Վիբրացիա',
     'settings.showPreview': 'Ցուցադրել նախադիտում',
+    'appLock.unlockTitle': 'Բացել Capital',
+    'appLock.unlockSubtitle':
+      'Օգտագործեք նույն մեթոդը, ինչ սարքի էկրանը կողպելու համար՝ գաղտնաբառ, Face ID, Touch ID կամ մատնահետք։',
+    'appLock.unlockButton': 'Մուտք',
+    'appLock.authPrompt': 'Հաստատեք՝ Capital-ը բացելու համար',
+    'appLock.notAvailable': 'Այս սարքում սիստեմային հաստատումը հասանելի չէ։',
+    'appLock.notEnrolled':
+      'Նախ սարքի կարգավորումներում միացրեք էկրանի կողպում, մատնահետք կամ Face ID։',
+    'appLock.failed': 'Հաստատումը ձախողվեց։',
+    'appLock.webUnsupported': 'Կողպումը հասանելի է միայն iOS և Android հավելվածներում։',
+
     'common.enabled': 'Միացված է',
     'common.disabled': 'Անջատված',
     'common.settings': 'Կարգավորումներ',
@@ -974,6 +1001,9 @@ const translations = {
     'settings.dark': 'Темная',
     'settings.language': 'Язык',
     'settings.notifications': 'Уведомления',
+    'settings.appLock': 'Блокировка приложения',
+    'settings.appLockHint':
+      'После сворачивания для входа потребуется код или биометрия — как при разблокировке телефона.',
     'settings.dataManagement': 'Управление данными',
     'settings.exchangeRateInfo': 'Информация о курсах',
     'settings.aboutExchangeRates': 'О курсах',
@@ -990,6 +1020,16 @@ const translations = {
     'settings.sound': 'Звук',
     'settings.vibration': 'Вибрация',
     'settings.showPreview': 'Показать превью',
+    'appLock.unlockTitle': 'Разблокируйте Capital',
+    'appLock.unlockSubtitle':
+      'Используйте тот же способ, что для разблокировки устройства: PIN, отпечаток или Face ID.',
+    'appLock.unlockButton': 'Разблокировать',
+    'appLock.authPrompt': 'Подтвердите для входа в Capital',
+    'appLock.notAvailable': 'Вход по настройкам устройства недоступен.',
+    'appLock.notEnrolled': 'Сначала включите блокировку экрана или биометрию в настройках телефона.',
+    'appLock.failed': 'Подтверждение не выполнено.',
+    'appLock.webUnsupported': 'Доступно только в приложениях для iOS и Android.',
+
     'common.enabled': 'Включено',
     'common.disabled': 'Отключено',
     'common.settings': 'Настройки',
@@ -1353,6 +1393,9 @@ const translations = {
     'settings.dark': 'Oscuro',
     'settings.language': 'Idioma',
     'settings.notifications': 'Notificaciones',
+    'settings.appLock': 'Bloqueo de la app',
+    'settings.appLockHint':
+      'Tras estar en segundo plano, al abrir de nuevo se pedirá el mismo código o biometría que para desbloquear el teléfono.',
     'settings.dataManagement': 'Gestión de Datos',
     'settings.exchangeRateInfo': 'Información de Tasas',
     'settings.aboutExchangeRates': 'Sobre tasas',
@@ -1369,6 +1412,17 @@ const translations = {
     'settings.sound': 'Sonido',
     'settings.vibration': 'Vibración',
     'settings.showPreview': 'Mostrar Vista Previa',
+    'appLock.unlockTitle': 'Desbloquear Capital',
+    'appLock.unlockSubtitle':
+      'Usa el mismo método que para desbloquear el dispositivo: código, Face ID, huella, etc.',
+    'appLock.unlockButton': 'Desbloquear',
+    'appLock.authPrompt': 'Desbloquear Capital',
+    'appLock.notAvailable': 'La autenticación del dispositivo no está disponible.',
+    'appLock.notEnrolled':
+      'Primero configura bloqueo de pantalla, Face ID o huella en los ajustes del dispositivo.',
+    'appLock.failed': 'La autenticación no tuvo éxito.',
+    'appLock.webUnsupported': 'El bloqueo solo está disponible en las apps para iOS y Android.',
+
     'common.enabled': 'Habilitado',
     'common.disabled': 'Deshabilitado',
     'common.settings': 'Configuración',
@@ -1730,6 +1784,9 @@ const translations = {
     'settings.dark': '深色',
     'settings.language': '语言',
     'settings.notifications': '通知',
+    'settings.appLock': '应用锁',
+    'settings.appLockHint':
+      '应用进入后台后再次打开时，需要使用与解锁手机相同的密码或生物识别。',
     'settings.dataManagement': '数据管理',
     'settings.exchangeRateInfo': '汇率信息',
     'settings.aboutExchangeRates': '关于汇率',
@@ -1745,6 +1802,15 @@ const translations = {
     'settings.sound': '声音',
     'settings.vibration': '振动',
     'settings.showPreview': '显示预览',
+    'appLock.unlockTitle': '解锁 Capital',
+    'appLock.unlockSubtitle': '使用与本机相同的锁屏方式：密码、面容 ID、触控 ID 或指纹。',
+    'appLock.unlockButton': '解锁',
+    'appLock.authPrompt': '解锁 Capital',
+    'appLock.notAvailable': '无法使用本机身份验证。',
+    'appLock.notEnrolled': '请先在系统设置中开启锁屏、面容 ID、触控 ID 或指纹。',
+    'appLock.failed': '验证未成功。',
+    'appLock.webUnsupported': '应用锁仅在 iOS 与 Android 应用中可用。',
+
     'common.enabled': '已启用',
     'common.disabled': '已禁用',
     'common.settings': '设置',
@@ -2107,6 +2173,9 @@ const translations = {
     'settings.dark': 'डार्क',
     'settings.language': 'भाषा',
     'settings.notifications': 'नोटिफिकेशन',
+    'settings.appLock': 'ऐप लॉक',
+    'settings.appLockHint':
+      'बैकग्राउंड में जाने के बाद दोबारा खोलने पर फोन अनलॉक जैसा ही पासकोड या बायोमेट्रिक चाहिए।',
     'settings.dataManagement': 'डेटा प्रबंधन',
     'settings.exchangeRateInfo': 'दर जानकारी',
     'settings.aboutExchangeRates': 'टैरिफ के बारे में',
@@ -2123,6 +2192,17 @@ const translations = {
     'settings.sound': 'ध्वनि',
     'settings.vibration': 'कंपन',
     'settings.showPreview': 'पूर्वावलोकन दिखाएं',
+    'appLock.unlockTitle': 'Capital अनलॉक करें',
+    'appLock.unlockSubtitle':
+      'वही तरीका उपयोग करें जो डिवाइस अनलॉक करने के लिए है—पासकोड, फेस आईडी, फिंगरप्रिंट आदि।',
+    'appLock.unlockButton': 'अनलॉक',
+    'appLock.authPrompt': 'Capital अनलॉक करें',
+    'appLock.notAvailable': 'डिवाइस प्रमाणीकरण उपलब्ध नहीं है।',
+    'appLock.notEnrolled':
+      'पहले सिस्टम सेटिंग्स में स्क्रीन लॉक, फेस आईडी या फिंगरप्रिंट सेट करें।',
+    'appLock.failed': 'प्रमाणीकरण सफल नहीं हुआ।',
+    'appLock.webUnsupported': 'ऐप लॉक केवल iOS और Android ऐप्स में उपलब्ध है।',
+
     'common.enabled': 'सक्षम',
     'common.disabled': 'अक्षम',
     'common.settings': 'सेटिंग्स',

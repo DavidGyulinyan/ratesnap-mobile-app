@@ -103,7 +103,7 @@ export default function CurrencyConverter({
   const [multiCurrencyShowAllTargets, setMultiCurrencyShowAllTargets] =
     useState<boolean>(false);
 
-  const { user } = useAuth();
+  const { user, formDraftResetEpoch } = useAuth();
   const {
     savedRates: { savedRates, saveRate },
   } = useUserData();
@@ -1120,7 +1120,7 @@ export default function CurrencyConverter({
       setHistory(stored ? JSON.parse(stored) : []);
     };
     loadHistory();
-  }, []);
+  }, [formDraftResetEpoch]);
 
   const mergedCurrencyList = mergeHistoryWithList(history, currencyList);
 
@@ -1130,6 +1130,21 @@ export default function CurrencyConverter({
       loadLastConversion();
     }
   }, [currencyList]);
+
+  useEffect(() => {
+    if (formDraftResetEpoch === 0) return;
+    setAmount("");
+    setHistory([]);
+    setFromCurrency("USD");
+    if (currencyList.length > 0) {
+      const to = currencyList.includes("AMD")
+        ? "AMD"
+        : (currencyList.find((c) => c !== "USD") ?? currencyList[0] ?? "AMD");
+      setToCurrency(to);
+    } else {
+      setToCurrency("AMD");
+    }
+  }, [formDraftResetEpoch, currencyList]);
 
   // Set detected currency as default toCurrency if no saved preferences
   useEffect(() => {

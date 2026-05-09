@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AmFinanceDraftContext, useAmFinanceDraft } from "@/components/AmFinanceDraftContext";
 import { ThemedText } from "@/components/themed-text";
 import { hexToRgba } from "@/constants/theme";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import {
@@ -203,6 +204,7 @@ type Props = {
 };
 
 export default function ArmeniaTransportModal({ initialScreen = "menu", onShareableMessageChange }: Props) {
+  const { formDraftResetEpoch } = useAuth();
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, "primary");
   const surfaceColor = useThemeColor({}, "surface");
@@ -223,6 +225,7 @@ export default function ArmeniaTransportModal({ initialScreen = "menu", onSharea
 
   useEffect(() => {
     let cancelled = false;
+    setDraftHydrated(false);
     void loadAmFinanceDraft().then((d) => {
       if (!cancelled) {
         setDraft(d);
@@ -232,7 +235,7 @@ export default function ArmeniaTransportModal({ initialScreen = "menu", onSharea
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [formDraftResetEpoch]);
 
   useEffect(() => {
     if (!draftHydrated) return;

@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/themed-text";
 import { hexToRgba } from "@/constants/theme";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import {
@@ -82,6 +83,7 @@ export default function ArmeniaFreelanceModal({
   initialScreen = "menu",
   onShareableMessageChange,
 }: Props) {
+  const { formDraftResetEpoch } = useAuth();
   const { t, language } = useLanguage();
   const primaryColor = useThemeColor({}, "primary");
   const surfaceColor = useThemeColor({}, "surface");
@@ -102,6 +104,7 @@ export default function ArmeniaFreelanceModal({
 
   useEffect(() => {
     let cancelled = false;
+    setDraftHydrated(false);
     void loadAmFreelanceDraft().then((d) => {
       if (cancelled) return;
       setDraft(d);
@@ -110,7 +113,7 @@ export default function ArmeniaFreelanceModal({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [formDraftResetEpoch]);
 
   useEffect(() => {
     if (!draftHydrated) return;

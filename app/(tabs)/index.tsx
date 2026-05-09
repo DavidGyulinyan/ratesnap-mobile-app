@@ -179,7 +179,7 @@ function normalizeAmTransportCardOrder(raw: unknown): AmTransportCardId[] {
 export default function HomeScreen() {
   const { t } = useLanguage();
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, signOut, formDraftResetEpoch } = useAuth();
   const {
     savedRates: { savedRates, deleteRate, deleteAllRates, refreshRates },
     rateAlerts: { rateAlerts, refreshAlerts },
@@ -327,6 +327,19 @@ export default function HomeScreen() {
     setShareAmFreelance(null);
     setShareAmTransport(null);
   }, []);
+
+  useEffect(() => {
+    if (formDraftResetEpoch === 0) return;
+    setShareTouristCalc(null);
+    setShareConverter(null);
+    setShareMulti(null);
+    setShareSaved(null);
+    setShareAlerts(null);
+    setShareCharts(null);
+    setShareAmFinance(null);
+    setShareAmFreelance(null);
+    setShareAmTransport(null);
+  }, [formDraftResetEpoch]);
 
   const openArmeniaFinance = useCallback((screen: FinanceScreen = "menu") => {
     closeAllQuickModals();

@@ -102,10 +102,10 @@ export function makeLineItemId(): string {
   return `li_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`;
 }
 
-const INVOICES_KEY = "invoices.v1";
+export const INVOICES_STORAGE_KEY = "invoices.v1";
 
 export async function loadInvoices(): Promise<Invoice[]> {
-  const raw = await getAsyncStorage().getItem(INVOICES_KEY);
+  const raw = await getAsyncStorage().getItem(INVOICES_STORAGE_KEY);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw) as Invoice[];
@@ -116,7 +116,7 @@ export async function loadInvoices(): Promise<Invoice[]> {
 }
 
 export async function saveInvoices(invoices: Invoice[]): Promise<void> {
-  await getAsyncStorage().setItem(INVOICES_KEY, JSON.stringify(invoices));
+  await getAsyncStorage().setItem(INVOICES_STORAGE_KEY, JSON.stringify(invoices));
 }
 
 export async function upsertInvoice(invoice: Invoice): Promise<void> {

@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import { getAsyncStorage } from "@/lib/storage";
 
-const KEY = "freelanceReminders.v1";
+export const FREELANCE_REMINDERS_STORAGE_KEY = "freelanceReminders.v1";
 
 type Stored = {
   monthlyFinance?: string;
@@ -9,7 +9,7 @@ type Stored = {
 
 async function loadStored(): Promise<Stored> {
   try {
-    const raw = await getAsyncStorage().getItem(KEY);
+    const raw = await getAsyncStorage().getItem(FREELANCE_REMINDERS_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as Stored) : {};
   } catch {
     return {};
@@ -17,7 +17,10 @@ async function loadStored(): Promise<Stored> {
 }
 
 async function saveStored(next: Stored): Promise<void> {
-  await getAsyncStorage().setItem(KEY, JSON.stringify(next));
+  await getAsyncStorage().setItem(
+    FREELANCE_REMINDERS_STORAGE_KEY,
+    JSON.stringify(next)
+  );
 }
 
 async function getNotificationsModule(): Promise<any | null> {

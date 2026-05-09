@@ -1,5 +1,6 @@
 import type { SoleProprietorRegimeId, VatMode } from "@/lib/armenia";
-import type { InvoiceCurrency } from "@/lib/invoices";
+import { INVOICES_STORAGE_KEY, type InvoiceCurrency } from "@/lib/invoices";
+import { FREELANCE_REMINDERS_STORAGE_KEY } from "@/lib/freelanceReminders";
 import { getAsyncStorage } from "@/lib/storage";
 
 const AM_FINANCE_KEY = "capital.amFinance.forms.v1";
@@ -341,4 +342,43 @@ export async function saveLoanCalculatorDraft(
   draft: LoanCalculatorDraft
 ): Promise<void> {
   await getAsyncStorage().setItem(LOAN_CALCULATOR_KEY, JSON.stringify(draft));
+}
+
+/**
+ * AsyncStorage keys cleared on sign-out (sensitive numbers & PII in forms,
+ * invoices, reminders, share-related converter state).
+ */
+const SIGN_OUT_FORM_STORAGE_KEYS: string[] = [
+  AM_FINANCE_KEY,
+  AM_FREELANCE_KEY,
+  LOAN_CALCULATOR_KEY,
+  INVOICES_STORAGE_KEY,
+  FREELANCE_REMINDERS_STORAGE_KEY,
+  "multiCurrencyConverterState",
+  "multiCurrencyConverterState.ts",
+  "touristCalc.amount",
+  "touristCalc.discountPct",
+  "touristCalc.tipPct",
+  "touristCalc.fromCurrency",
+  "touristCalc.manualRate",
+  "touristCalc.useManualRate",
+  "selectedFromCurrency",
+  "selectedToCurrency",
+  "lastConversion",
+  "currencyHistory",
+];
+
+/**
+ * Remove persisted drafts and locally stored financial/sensitive form data
+ * after sign-out (device should not keep salary, deposits, vacation inputs, etc.).
+ */
+export async function clearPersistedFormDraftsAfterSignOut(): Promise<void> {
+  const storage = getAsyncStorage();
+  if (typeof storage.multiRemove === "function") {
+    await storage.multiRemove(SIGN_OUT_FORM_STORAGE_KEYS);
+    return;
+  }
+  await Promise.all(
+    SIGN_OUT_FORM_STORAGE_KEYS.map((k) => storage.removeItem(k))
+  );
 }
