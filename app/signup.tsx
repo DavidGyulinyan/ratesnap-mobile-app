@@ -15,8 +15,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { hexToRgba, FormField } from '@/constants/theme';
+import { hexToRgba, FormField, Layout } from '@/constants/theme';
 import Logo from '@/components/Logo';
 import AuthButtons from '@/components/AuthButtons';
 import * as WebBrowser from 'expo-web-browser';
@@ -32,15 +33,22 @@ function SignUpScreen() {
    const [passwordVisible, setPasswordVisible] = useState(false);
    const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
    const [loading, setLoading] = useState(false);
+   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<
+     string | null
+   >(null);
+   const [emailOtp, setEmailOtp] = useState('');
+   const [confirmingOtp, setConfirmingOtp] = useState(false);
+   const [resendingOtp, setResendingOtp] = useState(false);
 
-   const { signUp } = useAuth();
+   const { signUp, confirmSignupWithOtp, resendConfirmationEmail } = useAuth();
    const { t } = useLanguage();
    const router = useRouter();
+   const { effectiveTheme } = useTheme();
 
    const backgroundColor = useThemeColor({}, 'background');
    const surfaceColor = useThemeColor({}, 'surface');
+   const surfaceSecondaryColor = useThemeColor({}, 'surfaceSecondary');
    const primaryColor = useThemeColor({}, 'primary');
-   const accentColor = useThemeColor({}, 'accent');
    const textColor = useThemeColor({}, 'text');
    const textSecondaryColor = useThemeColor({}, 'textSecondary');
    const borderColor = useThemeColor({}, 'border');
@@ -59,71 +67,73 @@ function SignUpScreen() {
     },
     content: {
       flex: 1,
-      paddingHorizontal: 24,
-      paddingTop: 16,
-      paddingBottom: 40,
+      paddingHorizontal: 22,
+      paddingTop: 8,
+      paddingBottom: 36,
       alignItems: 'center',
     },
     topBar: {
       width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 8,
+      marginBottom: 4,
     },
     backNavButton: {
       padding: 8,
       marginLeft: -8,
     },
     title: {
-      fontSize: 28,
-      fontWeight: 'bold',
+      fontSize: 26,
+      fontWeight: '600',
       color: textColor,
-      marginTop: 24,
-      marginBottom: 8,
+      marginTop: 8,
+      marginBottom: 6,
+      textAlign: 'center',
+      letterSpacing: -0.2,
     },
     subtitle: {
-      fontSize: 16,
+      fontSize: 15,
       color: textSecondaryColor,
       textAlign: 'center',
-      marginBottom: 32,
+      marginBottom: 26,
+      lineHeight: 22,
+      paddingHorizontal: 8,
+      opacity: 0.95,
     },
     authCard: {
       width: '100%',
       maxWidth: 400,
       backgroundColor: surfaceColor,
-      borderRadius: FormField.radiusCard,
-      padding: 14,
+      borderRadius: Layout.radiusLg,
+      padding: 20,
       borderWidth: 1,
-      borderColor: borderColor,
+      borderColor: hexToRgba(borderColor, 0.65),
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
-      marginBottom: 8,
-    },
-    fieldPanel: {
-      borderRadius: FormField.radiusPanel,
-      borderWidth: 1,
-      padding: 12,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.04,
+      shadowRadius: 20,
+      elevation: 1,
       marginBottom: 12,
+    },
+    fieldGroup: {
+      marginBottom: 18,
     },
     label: {
       fontSize: FormField.labelSize,
-      fontWeight: '600',
-      color: textColor,
-      marginBottom: 10,
-      letterSpacing: 0.2,
+      fontWeight: '500',
+      color: textSecondaryColor,
+      marginBottom: 8,
+      letterSpacing: 0.15,
     },
     input: {
       borderWidth: 1,
-      borderColor: borderColor,
-      borderRadius: FormField.radiusInput,
+      borderColor: hexToRgba(borderColor, 0.75),
+      borderRadius: Layout.radiusMd,
       paddingHorizontal: FormField.padH,
       paddingVertical: FormField.padV,
-      fontSize: FormField.fontSize,
-      fontWeight: FormField.fontWeight,
-      backgroundColor: surfaceColor,
+      fontSize: FormField.authInputFontSize,
+      fontWeight: '500',
+      backgroundColor: surfaceSecondaryColor,
       color: textColor,
     },
     passwordInputContainer: {
@@ -131,14 +141,14 @@ function SignUpScreen() {
     },
     passwordInput: {
       borderWidth: 1,
-      borderColor: borderColor,
-      borderRadius: FormField.radiusInput,
+      borderColor: hexToRgba(borderColor, 0.75),
+      borderRadius: Layout.radiusMd,
       paddingHorizontal: FormField.padH,
       paddingVertical: FormField.padV,
       paddingRight: 50,
-      fontSize: FormField.fontSize,
-      fontWeight: FormField.fontWeight,
-      backgroundColor: surfaceColor,
+      fontSize: FormField.authInputFontSize,
+      fontWeight: '500',
+      backgroundColor: surfaceSecondaryColor,
       color: textColor,
     },
     eyeButton: {
@@ -152,14 +162,20 @@ function SignUpScreen() {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 12,
-      paddingVertical: 16,
+      borderRadius: Layout.radiusMd,
+      paddingVertical: 15,
       paddingHorizontal: 20,
-      marginBottom: 12,
+      marginTop: 4,
+      marginBottom: 4,
       flexWrap: 'wrap',
     },
     primaryButton: {
       backgroundColor: primaryColor,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 2,
     },
     primaryButtonText: {
       color: '#fff',
@@ -168,6 +184,7 @@ function SignUpScreen() {
       textAlign: 'center',
       flexWrap: 'wrap',
       includeFontPadding: false,
+      letterSpacing: 0.2,
     },
     buttonDisabled: {
       opacity: 0.6,
@@ -175,18 +192,38 @@ function SignUpScreen() {
     footer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 24,
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      marginTop: 20,
+      gap: 4,
     },
     footerText: {
       color: textSecondaryColor,
       fontSize: 14,
+      fontWeight: '400',
     },
     signInLink: {
       color: primaryColor,
       fontSize: 14,
       fontWeight: '600',
     },
-  }), [backgroundColor, surfaceColor, primaryColor, textColor, textSecondaryColor, borderColor]);
+    secondaryButton: {
+      marginTop: 12,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    secondaryButtonText: {
+      color: primaryColor,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    emailPreview: {
+      fontSize: 14,
+      color: textSecondaryColor,
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+  }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor]);
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
@@ -206,11 +243,17 @@ function SignUpScreen() {
 
     setLoading(true);
     try {
-      const { error } = await signUp(email, password, username);
+      const { error, needsEmailConfirmation } = await signUp(
+        email,
+        password,
+        username
+      );
       if (error) {
         Alert.alert(t('auth.signup'), error.message);
+      } else if (needsEmailConfirmation) {
+        setEmailOtp('');
+        setPendingVerificationEmail(email.trim());
       } else {
-
         router.replace('/');
       }
     } catch {
@@ -220,6 +263,49 @@ function SignUpScreen() {
     }
   };
 
+  const handleConfirmOtp = async () => {
+    if (!pendingVerificationEmail) return;
+    const code = emailOtp.trim().replace(/\s+/g, '');
+    if (!code) {
+      Alert.alert(t('common.error'), t('signup.codeMissing'));
+      return;
+    }
+    setConfirmingOtp(true);
+    try {
+      const { error } = await confirmSignupWithOtp(
+        pendingVerificationEmail,
+        code
+      );
+      if (error) {
+        Alert.alert(t('auth.signup'), error.message);
+      } else {
+        router.replace('/');
+      }
+    } finally {
+      setConfirmingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!pendingVerificationEmail || resendingOtp) return;
+    setResendingOtp(true);
+    try {
+      const { error } = await resendConfirmationEmail(pendingVerificationEmail);
+      if (error) {
+        Alert.alert(t('common.error'), error.message);
+      } else {
+        Alert.alert(t('common.ok'), t('signup.resendSent'));
+      }
+    } finally {
+      setResendingOtp(false);
+    }
+  };
+
+  const exitVerificationStep = () => {
+    setPendingVerificationEmail(null);
+    setEmailOtp('');
+  };
+
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
@@ -227,7 +313,7 @@ function SignUpScreen() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle={effectiveTheme === 'dark' ? 'light-content' : 'dark-content'} />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.content}>
             <View style={styles.topBar}>
@@ -237,124 +323,174 @@ function SignUpScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Go back"
               >
-                <Ionicons name="arrow-back" size={24} color={textColor} />
+                <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
               </TouchableOpacity>
             </View>
-            <Logo size={72} showText={true} textSize={26} />
-            <Text style={styles.title}>{t('signup.createAccount')}</Text>
-            <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
+            <Logo size={64} showText textSize={24} />
+            <Text style={styles.title}>
+              {pendingVerificationEmail
+                ? t('signup.verifyTitle')
+                : t('signup.createAccount')}
+            </Text>
+            <Text style={styles.subtitle}>
+              {pendingVerificationEmail
+                ? t('signup.verifySubtitle')
+                : t('signup.subtitle')}
+            </Text>
 
-            <View style={[styles.authCard, { borderColor }]}>
-              <View
-                style={[
-                  styles.fieldPanel,
-                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
-                ]}
-              >
-                <Text style={styles.label}>{t('signup.usernameOptional')}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={username}
-                  onChangeText={setUsername}
-                  placeholder={t('signup.chooseUsername')}
-                  placeholderTextColor={textSecondaryColor}
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.fieldPanel,
-                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
-                ]}
-              >
-                <Text style={styles.label}>{t('auth.email')}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder={t('signup.enterEmail')}
-                  placeholderTextColor={textSecondaryColor}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.fieldPanel,
-                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
-                ]}
-              >
-                <Text style={styles.label}>{t('auth.password')}</Text>
-                <View style={styles.passwordInputContainer}>
-                  <TextInput
-                    style={styles.passwordInput}
-                    value={password}
-                    onChangeText={setPassword}
-                    placeholder={t('signup.createPassword')}
-                    placeholderTextColor={textSecondaryColor}
-                    secureTextEntry={!passwordVisible}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeButton}
-                    onPress={() => setPasswordVisible(!passwordVisible)}
-                  >
-                    <Ionicons
-                      name={passwordVisible ? "eye-off" : "eye"}
-                      size={20}
-                      color={textSecondaryColor}
+            <View style={styles.authCard}>
+              {pendingVerificationEmail ? (
+                <>
+                  <Text style={styles.emailPreview}>{pendingVerificationEmail}</Text>
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>{t('signup.codeLabel')}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={emailOtp}
+                      onChangeText={setEmailOtp}
+                      placeholder={t('signup.codePlaceholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="number-pad"
+                      textContentType="oneTimeCode"
+                      maxLength={12}
                     />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View
-                style={[
-                  styles.fieldPanel,
-                  { borderColor, backgroundColor: hexToRgba(accentColor, 0.1) },
-                ]}
-              >
-                <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
-                <View style={styles.passwordInputContainer}>
-                  <TextInput
-                    style={styles.passwordInput}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    placeholder={t('signup.confirmPassword')}
-                    placeholderTextColor={textSecondaryColor}
-                    secureTextEntry={!confirmPasswordVisible}
-                  />
+                  </View>
                   <TouchableOpacity
-                    style={styles.eyeButton}
-                    onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                    style={[
+                      styles.button,
+                      styles.primaryButton,
+                      (confirmingOtp || resendingOtp) && styles.buttonDisabled,
+                    ]}
+                    onPress={handleConfirmOtp}
+                    disabled={confirmingOtp || resendingOtp}
+                    activeOpacity={0.88}
                   >
-                    <Ionicons
-                      name={confirmPasswordVisible ? "eye-off" : "eye"}
-                      size={20}
-                      color={textSecondaryColor}
-                    />
+                    <Text style={styles.primaryButtonText}>
+                      {confirmingOtp
+                        ? t('signup.verifying')
+                        : t('signup.verifyEmailButton')}
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              </View>
+                  <TouchableOpacity
+                    style={styles.secondaryButton}
+                    onPress={handleResendOtp}
+                    disabled={confirmingOtp || resendingOtp}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={styles.secondaryButtonText}>
+                      {resendingOtp ? t('signup.resending') : t('signup.resendCode')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.secondaryButton}
+                    onPress={exitVerificationStep}
+                    disabled={confirmingOtp || resendingOtp}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={[styles.secondaryButtonText, { fontWeight: '500' }]}>
+                      {t('signup.backToSignUp')}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>{t('signup.usernameOptional')}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={username}
+                      onChangeText={setUsername}
+                      placeholder={t('signup.chooseUsername')}
+                      placeholderTextColor={textSecondaryColor}
+                      autoCapitalize="none"
+                    />
+                  </View>
 
-              <TouchableOpacity
-                style={[styles.button, styles.primaryButton, loading && styles.buttonDisabled]}
-                onPress={handleSignUp}
-                disabled={loading}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {loading ? t('signup.creatingAccount') : t('signup.createAccount')}
-                </Text>
-              </TouchableOpacity>
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>{t('auth.email')}</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder={t('signup.enterEmail')}
+                      placeholderTextColor={textSecondaryColor}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>{t('auth.password')}</Text>
+                    <View style={styles.passwordInputContainer}>
+                      <TextInput
+                        style={styles.passwordInput}
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder={t('signup.createPassword')}
+                        placeholderTextColor={textSecondaryColor}
+                        secureTextEntry={!passwordVisible}
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeButton}
+                        onPress={() => setPasswordVisible(!passwordVisible)}
+                      >
+                        <Ionicons
+                          name={passwordVisible ? "eye-off" : "eye"}
+                          size={20}
+                          color={textSecondaryColor}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.fieldGroup}>
+                    <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
+                    <View style={styles.passwordInputContainer}>
+                      <TextInput
+                        style={styles.passwordInput}
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        placeholder={t('signup.confirmPassword')}
+                        placeholderTextColor={textSecondaryColor}
+                        secureTextEntry={!confirmPasswordVisible}
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeButton}
+                        onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                      >
+                        <Ionicons
+                          name={confirmPasswordVisible ? "eye-off" : "eye"}
+                          size={20}
+                          color={textSecondaryColor}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.button, styles.primaryButton, loading && styles.buttonDisabled]}
+                    onPress={handleSignUp}
+                    disabled={loading}
+                    activeOpacity={0.88}
+                  >
+                    <Text style={styles.primaryButtonText}>
+                      {loading ? t('signup.creatingAccount') : t('signup.createAccount')}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
-            <AuthButtons onSuccess={() => router.push('/')} />
+            {!pendingVerificationEmail && (
+              <AuthButtons onSuccess={() => router.push('/')} />
+            )}
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')}</Text>
-              <TouchableOpacity onPress={() => router.push('/signin')}>
+              <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')} </Text>
+              <TouchableOpacity onPress={() => router.push('/signin')} activeOpacity={0.75}>
                 <Text style={styles.signInLink}>{t('signin.signIn')}</Text>
               </TouchableOpacity>
             </View>

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from './themed-text';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { hexToRgba } from '@/constants/theme';
 
 interface AuthButtonsProps {
   onSuccess?: () => void;
@@ -12,6 +14,56 @@ interface AuthButtonsProps {
 export default function AuthButtons({ onSuccess }: AuthButtonsProps) {
   const { signInWithGoogle, signInWithApple } = useAuth();
   const { t } = useLanguage();
+  const borderColor = useThemeColor({}, 'border');
+  const surfaceColor = useThemeColor({}, 'surface');
+  const textSecondaryColor = useThemeColor({}, 'textSecondary');
+  const textColor = useThemeColor({}, 'text');
+
+  const themed = useMemo(
+    () =>
+      StyleSheet.create({
+        dividerLine: {
+          flex: 1,
+          height: StyleSheet.hairlineWidth * 2,
+          backgroundColor: hexToRgba(borderColor, 0.55),
+        },
+        dividerLabel: {
+          marginHorizontal: 14,
+          fontSize: 12,
+          letterSpacing: 0.25,
+          color: textSecondaryColor,
+          opacity: 0.92,
+        },
+        oauthButton: {
+          backgroundColor: surfaceColor,
+          borderWidth: 1,
+          borderColor: hexToRgba(borderColor, 0.85),
+          borderRadius: 14,
+          paddingVertical: 14,
+          paddingHorizontal: 18,
+          marginBottom: 10,
+        },
+        googleLabel: {
+          color: textColor,
+          fontSize: 15,
+          fontWeight: '500',
+          marginLeft: 10,
+          flex: 1,
+          textAlign: 'center',
+          includeFontPadding: false,
+        },
+        appleLabel: {
+          color: textColor,
+          fontSize: 15,
+          fontWeight: '500',
+          marginLeft: 10,
+          flex: 1,
+          textAlign: 'center',
+          includeFontPadding: false,
+        },
+      }),
+    [borderColor, surfaceColor, textSecondaryColor, textColor]
+  );
 
   const handleGoogleSignIn = async () => {
     try {
@@ -42,26 +94,28 @@ export default function AuthButtons({ onSuccess }: AuthButtonsProps) {
   return (
     <>
       <View style={styles.divider}>
-        <View style={styles.dividerLine} />
-        <ThemedText style={styles.dividerText}>{t('auth.orContinueWith')}</ThemedText>
-        <View style={styles.dividerLine} />
+        <View style={themed.dividerLine} />
+        <ThemedText style={themed.dividerLabel}>{t('auth.orContinueWith')}</ThemedText>
+        <View style={themed.dividerLine} />
       </View>
 
       <View style={styles.socialButtons}>
         <TouchableOpacity
-          style={[styles.button, styles.googleButton]}
+          style={[styles.buttonRow, themed.oauthButton]}
           onPress={handleGoogleSignIn}
+          activeOpacity={0.82}
         >
-          <Ionicons name="logo-google" size={20} color="#52525b" />
-          <ThemedText style={styles.googleButtonText}>{t('auth.continueWithGoogle')}</ThemedText>
+          <Ionicons name="logo-google" size={20} color={textSecondaryColor} />
+          <ThemedText style={themed.googleLabel}>{t('auth.continueWithGoogle')}</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.appleButton]}
+          style={[styles.buttonRow, themed.oauthButton]}
           onPress={handleAppleSignIn}
+          activeOpacity={0.82}
         >
-          <Ionicons name="logo-apple" size={20} color="#000" />
-          <ThemedText style={styles.appleButtonText}>{t('auth.continueWithApple')}</ThemedText>
+          <Ionicons name="logo-apple" size={22} color={textColor} />
+          <ThemedText style={themed.appleLabel}>{t('auth.continueWithApple')}</ThemedText>
         </TouchableOpacity>
       </View>
     </>
@@ -72,62 +126,18 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 32,
+    marginVertical: 26,
     width: '100%',
     maxWidth: 400,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#e5e7eb',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#6b7280',
-    fontSize: 14,
   },
   socialButtons: {
     width: '100%',
     maxWidth: 400,
   },
-  button: {
+  buttonRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 12,
     flexWrap: 'wrap',
-  },
-  googleButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-  },
-  googleButtonText: {
-    color: '#374151',
-    fontSize: 15,
-    fontWeight: '600',
-    marginLeft: 12,
-    flexWrap: 'wrap',
-    includeFontPadding: false,
-    flex: 1,
-    textAlign: 'center',
-  },
-  appleButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-  },
-  appleButtonText: {
-    color: '#000',
-    fontSize: 15,
-    fontWeight: '600',
-    marginLeft: 12,
-    flexWrap: 'wrap',
-    includeFontPadding: false,
-    flex: 1,
-    textAlign: 'center',
   },
 });

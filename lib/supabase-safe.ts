@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import { getAsyncStorage } from './storage';
 
 // Create Supabase client with safe initialization
@@ -25,16 +26,24 @@ export const getSupabaseClient = () => {
       return null;
     }
 
-    // Check if we're in a server-side rendering environment
-    const isServerSide = typeof window === 'undefined';
+    // Only treat as SSR on web when `window` is missing. React Native often has no `window`;
+    // mis-detecting that as SSR disables session persistence and breaks sign-in.
+    const isServerSide =
+      Platform.OS === 'web' && typeof window === 'undefined';
+
+    // On native, OAuth return URLs are handled manually (WebBrowser + exchangeCodeForSession).
+    // detectSessionInUrl here causes a second PKCE exchange on deep link and triggers
+    // "both auth code and code verifier should be non-empty" / Expo Go instability.
+    const detectSessionInUrl =
+      Platform.OS === 'web' && !isServerSide;
 
     supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         storage: getAsyncStorage(),
-        autoRefreshToken: !isServerSide,  // Disable auto-refresh during SSR
-        persistSession: !isServerSide,    // Disable session persistence during SSR
-        detectSessionInUrl: !isServerSide, // Disable URL detection during SSR
-        flowType: isServerSide ? 'implicit' : 'pkce', // Use implicit flow for SSR
+        autoRefreshToken: !isServerSide,
+        persistSession: !isServerSide,
+        detectSessionInUrl,
+        flowType: isServerSide ? 'implicit' : 'pkce',
       },
     });
 

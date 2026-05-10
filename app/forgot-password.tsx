@@ -113,7 +113,7 @@ export default function ForgotPasswordScreen() {
       borderRadius: FormField.radiusInput,
       paddingHorizontal: FormField.padH,
       paddingVertical: FormField.padV,
-      fontSize: FormField.fontSize,
+      fontSize: FormField.authInputFontSize,
       fontWeight: FormField.fontWeight,
       backgroundColor: surfaceColor,
       color: textColor,

@@ -96,7 +96,7 @@ export default function ResetPasswordScreen() {
           paddingHorizontal: FormField.padH,
           paddingVertical: FormField.padV,
           paddingRight: 50,
-          fontSize: FormField.fontSize,
+          fontSize: FormField.authInputFontSize,
           fontWeight: FormField.fontWeight,
           backgroundColor: surfaceColor,
           color: textColor,

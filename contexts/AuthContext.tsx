@@ -8,8 +8,12 @@ import React, {
 import { getSupabaseClient } from "@/lib/supabase-safe";
 import { Session, User, AuthError } from "@supabase/supabase-js";
 import * as WebBrowser from "expo-web-browser";
-import * as AuthSession from "expo-auth-session";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getSupabaseOAuthRedirectUrl,
+  logDevExpoOAuthRedirectHint,
+  parseOAuthReturnUrl,
+} from "@/lib/oauthRedirect";
 import alertCheckerService from "@/lib/alertCheckerService";
 import { clearPersistedFormDraftsAfterSignOut } from "@/lib/amScreensDraft";
 
@@ -23,13 +27,18 @@ interface AuthContextType {
     email: string,
     password: string,
     username?: string
-  ) => Promise<{ error?: AuthError }>;
+  ) => Promise<{ error?: AuthError; needsEmailConfirmation?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error?: AuthError }>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error?: AuthError }>;
   signInWithApple: () => Promise<{ error?: AuthError }>;
   resetPassword: (email: string) => Promise<{ error?: AuthError }>;
   resendConfirmationEmail: (email: string) => Promise<{ error?: AuthError }>;
+  /** After sign-up, confirm the email using the OTP/code from the message (Supabase email template must include the token). */
+  confirmSignupWithOtp: (
+    email: string,
+    token: string
+  ) => Promise<{ error?: AuthError }>;
   /** Increments when local form drafts are cleared (e.g. after sign-out). */
   formDraftResetEpoch: number;
 }
@@ -137,9 +146,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         return { error };
       }
 
+      const needsEmailConfirmation = Boolean(
+        data.user && !data.session
+      );
+
       console.log(
         "Sign up successful, user data:",
-        data.user ? "User created" : "Confirmation pending"
+        data.user ? "User created" : "Confirmation pending",
+        needsEmailConfirmation ? "(email confirmation required)" : ""
       );
 
       // Clear potentially conflicting local storage data on successful sign up
@@ -159,7 +173,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         );
       }
 
-      return {};
+      return { needsEmailConfirmation };
     } catch (error) {
       console.error("Sign up catch error:", error);
       return { error: error as AuthError };
@@ -186,8 +200,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       if (error) {
+        const errCode =
+          typeof (error as { code?: string }).code === "string"
+            ? (error as { code?: string }).code
+            : "";
         // Handle email confirmation error specifically
         if (
+          errCode === "email_not_confirmed" ||
           error.message.includes("Email not confirmed") ||
           error.message.includes("email_not_confirmed") ||
           error.message.includes("not confirmed") ||
@@ -205,6 +224,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         // Handle invalid credentials
         if (
+          errCode === "invalid_credentials" ||
+          errCode === "invalid_grant" ||
           error.message.includes("Invalid login credentials") ||
           error.message.includes("User not found") ||
           error.message.includes("Invalid email or password")
@@ -229,8 +250,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Clear potentially conflicting local storage data on successful authentication
       try {
         const keysToRemove = [
-          "cachedExchangeRates", // Clear cached rates to ensure fresh data for new user
-          "onboardingCompleted", // Reset onboarding for new user context
+          "cachedExchangeRates", // Clear cached rates to ensure fresh data for this account session
+          // Do not remove onboarding flags here — first-login guide is per-user and persists across sign-ins.
           // Keep: 'hasSignedInBefore', 'rememberMe', 'language', 'theme' - these are user preferences
         ];
 
@@ -289,10 +310,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(true);
       console.log("Starting Google sign in");
 
-      const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "exratio-mobile",
-        path: "auth/callback",
-      });
+      const redirectTo = getSupabaseOAuthRedirectUrl();
+      logDevExpoOAuthRedirectHint(redirectTo);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -333,43 +352,59 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         };
       }
 
-      const { params, errorCode } = AuthSession.parse(authResult.url);
-      if (errorCode) {
+      const parsed = parseOAuthReturnUrl(authResult.url);
+      if (parsed.error) {
         return {
           error: {
-            message: `Google sign-in failed: ${errorCode}`,
+            message:
+              parsed.errorDescription?.replace(/\+/g, " ") ??
+              `Google sign-in failed: ${parsed.error}`,
             name: "OAuthError",
           } as AuthError,
         };
       }
 
-      const codeParam = params?.code;
-      const code =
-        typeof codeParam === "string"
-          ? codeParam
-          : Array.isArray(codeParam)
-          ? codeParam[0]
-          : undefined;
-
-      if (!code) {
-        return {
-          error: {
-            message: "Missing authorization code from Google sign-in.",
-            name: "OAuthCodeMissing",
-          } as AuthError,
-        };
+      if (parsed.access_token && parsed.refresh_token) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: parsed.access_token,
+          refresh_token: parsed.refresh_token,
+        });
+        if (sessionError) {
+          return { error: sessionError };
+        }
+        console.log("Google sign in completed successfully (session tokens)");
+        return {};
       }
 
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
-        code
-      );
-
-      if (exchangeError) {
-        return { error: exchangeError };
+      if (parsed.code) {
+        const { error: exchangeError } =
+          await supabase.auth.exchangeCodeForSession(parsed.code);
+        if (exchangeError) {
+          const msg = exchangeError.message ?? "";
+          const { data: existing } = await supabase.auth.getSession();
+          if (
+            existing.session &&
+            (msg.includes("code verifier") || msg.includes("auth code"))
+          ) {
+            console.log(
+              "Google sign in: session already established (duplicate PKCE exchange skipped)"
+            );
+            return {};
+          }
+          return { error: exchangeError };
+        }
+        console.log("Google sign in completed successfully (PKCE code)");
+        return {};
       }
 
-      console.log("Google sign in completed successfully");
-      return {};
+      return {
+        error: {
+          message:
+            "Google sign-in did not return a code or session. Check Supabase Redirect URLs include: " +
+            redirectTo,
+          name: "OAuthCodeMissing",
+        } as AuthError,
+      };
     } catch (error) {
       console.error("Google sign in catch error:", error);
       return { error: error as AuthError };
@@ -390,11 +425,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(true);
       console.log("Starting Apple sign in");
 
-      // Use the correct redirect URI format
-      const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "exratio-mobile",
-        path: "auth/callback",
-      });
+      const redirectTo = getSupabaseOAuthRedirectUrl();
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "apple",
@@ -427,10 +458,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     try {
-      const redirectTo = AuthSession.makeRedirectUri({
-        scheme: "exratio-mobile",
-        path: "auth/callback",
-      });
+      const redirectTo = getSupabaseOAuthRedirectUrl();
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,
@@ -470,6 +498,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const confirmSignupWithOtp = async (email: string, token: string) => {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return {
+        error: { message: "Authentication service not available" } as AuthError,
+      };
+    }
+
+    try {
+      const cleanToken = token.trim().replace(/\s+/g, "");
+      const { error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: cleanToken,
+        type: "signup",
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      return {};
+    } catch (error) {
+      return { error: error as AuthError };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -481,6 +535,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     signInWithApple,
     resetPassword,
     resendConfirmationEmail,
+    confirmSignupWithOtp,
     formDraftResetEpoch,
   };
 

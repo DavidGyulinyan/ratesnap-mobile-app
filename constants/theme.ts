@@ -45,6 +45,8 @@ export const FormField = {
   padH: 14,
   padV: 12,
   fontSize: 18,
+  /** Login/signup inputs: same size drives placeholder text in RN (no separate placeholder size). */
+  authInputFontSize: 15,
   fontWeight: "600" as const,
   labelSize: 13,
 };

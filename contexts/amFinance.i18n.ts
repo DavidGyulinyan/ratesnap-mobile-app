@@ -147,7 +147,7 @@ export const AM_FINANCE_HY: Record<string, string> = {
   "amFinance.maternity.noteComplicatedMultiple":
     "Բարդ ծննդաբերության և մեկից ավելի երեխա ունենալու դեպքում ավելացվող օրերը մոտավոր են — ստուգեք ՀՀ աշխատանքային օրենսգիրքով, գործատուով և սոցապաշտպանության կանոններով։",
   "amFinance.paidLeave.note":
-    "Արձակուրդի վճարը հաշվարկված է վերջին ամսվա աշխատավարձից։ Իրականում կարող է օգտագործվել 12 ամիսների միջինը։",
+    "Մոտավոր հաշվարկ է միջին օրական աշխատավարձից (ֆինանսապես ապահովված արձակուրդի պարզեցված մոդել)՝ բոլոր աշխատողների համար։ Հղիության և ծննդյան արձակուրդը հաշվեք առանձին բաժնում։ Իրականում հաճախ օգտագործվում է 12 ամիսների միջինը։",
   "amFinance.deposit.initial": "Սկզբնական ավանդ (դրամ)",
   "amFinance.deposit.rate": "Տարեկան տոկոսադրույք (%)",
   "amFinance.deposit.months": "Ժամկետ (ամիս)",
@@ -163,8 +163,9 @@ export const AM_FINANCE_HY: Record<string, string> = {
   "amFinance.deposit.chartTitle": "Դինամիկա",
   "amFinance.deposit.useYears": "Տարիներով",
   "amFinance.deposit.useMonths": "Ամիսներով",
-  "amFinance.card.paidLeave": "Արձակուրդայինի հաշվիչ",
-  "amFinance.card.paidLeave.desc": "Միջին օրականից տարեկան արձակուրդի վճար (մոտավոր)",
+  "amFinance.card.paidLeave": "Անաշխատունակության արձակուրդ",
+  "amFinance.card.paidLeave.desc":
+    "Միջին օրականից վճարի գնահատում՝ բոլոր աշխատողների համար (ֆիզ արձակուրդ, մոտավոր)",
   "amFinance.card.maternity": "Հղիության և ծննդյան արձակուրդ",
   "amFinance.card.maternity.desc": "Մոտավոր օգնության գնահատում",
   "amFinance.card.salary": "Աշխատավարձ",

@@ -6,6 +6,7 @@ import { getSupabaseClient } from '@/lib/supabase-safe';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
+import { parseOAuthReturnUrl } from '@/lib/oauthRedirect';
 
 export default function AuthCallbackScreen() {
   const router = useRouter();
@@ -24,8 +25,52 @@ export default function AuthCallbackScreen() {
           throw new Error('Supabase client not available');
         }
 
+        const redirectHomeIfSession = async (): Promise<boolean> => {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            router.replace({ pathname: '/' });
+            return true;
+          }
+          return false;
+        };
+
+        /** AuthContext exchanges the PKCE code after WebBrowser returns; never duplicate here. */
+        const waitForAuthContextSession = async (
+          maxMs = 8000,
+          stepMs = 150
+        ): Promise<boolean> => {
+          const deadline = Date.now() + maxMs;
+          while (Date.now() < deadline) {
+            if (await redirectHomeIfSession()) return true;
+            await new Promise((r) => setTimeout(r, stepMs));
+          }
+          return redirectHomeIfSession();
+        };
+
+        // Google PKCE finishes in AuthContext; this route may open in parallel — only wait + redirect.
+        if (await redirectHomeIfSession()) {
+          return;
+        }
+
         const incomingUrl = await Linking.getInitialURL();
         if (incomingUrl) {
+          const parsed = parseOAuthReturnUrl(incomingUrl);
+          if (parsed.error) {
+            throw new Error(
+              parsed.errorDescription?.replace(/\+/g, ' ') ??
+                `OAuth callback error: ${parsed.error}`
+            );
+          }
+
+          if (parsed.access_token && parsed.refresh_token) {
+            const { error: setErr } = await supabase.auth.setSession({
+              access_token: parsed.access_token,
+              refresh_token: parsed.refresh_token,
+            });
+            if (setErr) throw setErr;
+            if (await redirectHomeIfSession()) return;
+          }
+
           const { queryParams } = Linking.parse(incomingUrl);
           const params = queryParams ?? {};
           const errRaw = params.error;
@@ -56,11 +101,13 @@ export default function AuthCallbackScreen() {
               ? codeParam[0]
               : undefined;
 
-          if (code) {
-            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-            if (exchangeError) {
-              throw exchangeError;
-            }
+          const authCode = code ?? parsed.code;
+
+          if (authCode) {
+            if (await waitForAuthContextSession()) return;
+            throw new Error(
+              'Sign-in did not complete in time. Please return to the app and try Google sign-in again.'
+            );
           } else if (type === 'recovery') {
             const accessTokenParam = params?.access_token;
             const refreshTokenParam = params?.refresh_token;
@@ -101,7 +148,6 @@ export default function AuthCallbackScreen() {
         }
 
         if (data.session) {
-          Alert.alert('Success', 'You have been signed in successfully!');
           router.replace({ pathname: '/' });
         } else {
           setTimeout(async () => {
@@ -116,6 +162,15 @@ export default function AuthCallbackScreen() {
         }
       } catch (err) {
         console.error('🔴 OAuth callback processing error:', err);
+        try {
+          const supabase = getSupabaseClient();
+          if (supabase && (await supabase.auth.getSession()).data.session) {
+            router.replace({ pathname: '/' });
+            return;
+          }
+        } catch {
+          /* ignore */
+        }
         setError(err instanceof Error ? err.message : 'Unknown error');
         Alert.alert('Error', 'Failed to complete authentication');
       } finally {

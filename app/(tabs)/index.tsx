@@ -31,6 +31,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useUserData } from "@/hooks/useUserData";
 import { normalizeDashboardCardOrder } from "@/lib/dashboardCardOrder";
+import { getHasCompletedOnboarding } from "@/lib/onboardingStorage";
 import { getAsyncStorage } from "@/lib/storage";
 import { fiatKeysFromConversionRates } from "@/constants/fiatCurrencyCodes";
 import { hexToRgba } from "@/constants/theme";
@@ -357,20 +358,13 @@ export default function HomeScreen() {
 
   const checkOnboardingStatus = useCallback(async () => {
     try {
-      const onboardingCompleted = await AsyncStorage.getItem(
-        "onboardingCompleted"
-      );
-
-      const shouldShowOnboarding =
-        !onboardingCompleted ||
-        (user &&
-          user.created_at &&
-          Date.now() - new Date(user.created_at).getTime() <
-            24 * 60 * 60 * 1000);
-
-      if (shouldShowOnboarding && user) {
-        setShowOnboarding(true);
+      if (!user?.id) {
+        setShowOnboarding(false);
+        return;
       }
+
+      const done = await getHasCompletedOnboarding(user.id);
+      setShowOnboarding(!done);
     } catch (error) {
       console.error("Failed to check onboarding status:", error);
     }

@@ -6,8 +6,9 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { setOnboardingCompletedForUser } from '@/lib/onboardingStorage';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
@@ -16,6 +17,7 @@ interface OnboardingGuideProps {
 }
 
 const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
+  const { user } = useAuth();
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, "primary");
   const textInverseColor = useThemeColor({}, "textInverse");
@@ -81,11 +83,14 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
   };
 
   const completeOnboarding = async () => {
+    const userId = user?.id;
     try {
-      await AsyncStorage.setItem('onboardingCompleted', 'true');
-      onComplete();
+      if (userId) {
+        await setOnboardingCompletedForUser(userId);
+      }
     } catch (error) {
       console.error('Failed to save onboarding status:', error);
+    } finally {
       onComplete();
     }
   };
