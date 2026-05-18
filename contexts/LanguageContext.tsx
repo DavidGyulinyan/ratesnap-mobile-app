@@ -97,6 +97,7 @@ const translations = {
     'converter.fromLabel': 'From',
     'converter.toLabel': 'To',
     'converter.placeholderResult': 'Enter an amount to see conversion',
+    'converter.recentTitle': 'Recent',
     'converter.saveRateButton': 'Save',
     'converter.chartButton': 'Chart',
     'converter.saveSuccessTitle': 'Success',
@@ -498,7 +499,11 @@ const translations = {
     'signup.codeMissing': 'Please enter the confirmation code.',
     'signup.fillAllFields': 'Please fill in all fields',
     'signup.passwordsDontMatch': 'Passwords do not match',
-    'signup.passwordTooShort': 'Password must be at least 6 characters',
+    'signup.passwordTooShort': 'Password must be at least 8 characters',
+    'signup.passwordRequirements':
+      'Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a symbol (e.g. !@#$%).',
+    'signup.passwordHint':
+      'At least 8 characters with uppercase, lowercase, a number, and a symbol.',
     'signup.alreadyHaveAccount': 'Already have an account?',
     'signup.noVerificationEmail':
       'No confirmation email was sent. This address may already be registered — try Sign in. If your account is new, check Spam/Promotions and wait a few minutes (email sending is limited). In Supabase Dashboard: Authentication → Providers → Email → enable Confirm email.',
@@ -775,6 +780,7 @@ const translations = {
     'converter.fromLabel': 'Որտեղից',
     'converter.toLabel': 'Ուր',
     'converter.placeholderResult': 'Մուտքագրեք գումարը՝ փոխանակումը տեսնելու համար',
+    'converter.recentTitle': 'Վերջին',
     'converter.saveRateButton': 'Պահպանել',
     'converter.chartButton': 'Գրաֆիկ',
     'converter.saveSuccessTitle': 'Հաջողություն',
@@ -1017,7 +1023,11 @@ const translations = {
     'signup.codeMissing': 'Խնդրում ենք մուտքագրել հաստատման կոդը:',
     'signup.fillAllFields': 'Խնդրում ենք լրացնել բոլոր դաշտերը',
     'signup.passwordsDontMatch': 'Գաղտնաբառերը չեն համապատասխանում',
-    'signup.passwordTooShort': 'Գաղտնաբառը պետք է լինի առնվազն 6 նիշ',
+    'signup.passwordTooShort': 'Գաղտնաբառը պետք է լինի առնվազն 8 նիշ',
+    'signup.passwordRequirements':
+      'Գաղտնաբառը պետք է լինի առնվազն 8 նիշ և պարունակի մեծատառ, փոքրատառ, թիվ և նշան (օր. !@#$%)։',
+    'signup.passwordHint':
+      'Առնվազն 8 նիշ՝ մեծատառ, փոքրատառ, թիվ և նշան։',
     'signup.alreadyHaveAccount': 'Արդեն ունե՞ք հաշիվ',
     'signup.noVerificationEmail':
       'Հաստատման նամակ չի ուղարկվել: Այս էլ. հասցեն հնարավոր է արդեն գրանցված լինի՝ փորձեք «Մուտք գործել»: Եթե հաշիվը նոր է, ստուգեք Spam/Գովազդային թղթապանակը և սպասեք մի քանի րոպե (նամակների ուղարկումը սահմանափակ է): Supabase Dashboard → Authentication → Providers → Email → միացրեք Confirm email:',
@@ -1409,7 +1419,11 @@ const translations = {
     'signup.codeMissing': 'Введите код подтверждения.',
     'signup.fillAllFields': 'Пожалуйста, заполните все поля',
     'signup.passwordsDontMatch': 'Пароли не совпадают',
-    'signup.passwordTooShort': 'Пароль должен содержать минимум 6 символов',
+    'signup.passwordTooShort': 'Пароль должен содержать минимум 8 символов',
+    'signup.passwordRequirements':
+      'Пароль должен быть не короче 8 символов и содержать заглавную и строчную буквы, цифру и символ (например !@#$%).',
+    'signup.passwordHint':
+      'Минимум 8 символов: заглавная, строчная, цифра и символ.',
     'signup.alreadyHaveAccount': 'Уже есть аккаунт?',
     'signup.noVerificationEmail':
       'Письмо с подтверждением не отправлено. Возможно, этот email уже зарегистрирован — попробуйте войти. Если аккаунт новый, проверьте Спам и подождите несколько минут (лимит писем). В Supabase: Authentication → Providers → Email → включите подтверждение email.',
@@ -1836,7 +1850,11 @@ const translations = {
     'signup.codeMissing': 'Introduce el código de confirmación.',
     'signup.fillAllFields': 'Por favor completa todos los campos',
     'signup.passwordsDontMatch': 'Las contraseñas no coinciden',
-    'signup.passwordTooShort': 'La contraseña debe tener al menos 6 caracteres',
+    'signup.passwordTooShort': 'La contraseña debe tener al menos 8 caracteres',
+    'signup.passwordRequirements':
+      'La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y símbolo (p. ej. !@#$%).',
+    'signup.passwordHint':
+      'Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo.',
     'signup.alreadyHaveAccount': '¿Ya tienes una cuenta?',
     'signup.noVerificationEmail':
       'No se envió el correo de confirmación. Es posible que este email ya esté registrado — prueba iniciar sesión. Si la cuenta es nueva, revisa Spam/Promociones y espera unos minutos (hay límites de envío). En Supabase: Authentication → Providers → Email → activa Confirmar email.',
@@ -2272,7 +2290,11 @@ const translations = {
     'signup.codeMissing': '请输入确认码。',
     'signup.fillAllFields': '请填写所有字段',
     'signup.passwordsDontMatch': '密码不匹配',
-    'signup.passwordTooShort': '密码必须至少6个字符',
+    'signup.passwordTooShort': '密码必须至少8个字符',
+    'signup.passwordRequirements':
+      '密码至少8个字符，须包含大写字母、小写字母、数字和符号（如 !@#$%）。',
+    'signup.passwordHint':
+      '至少8个字符，含大写、小写、数字和符号。',
     'signup.alreadyHaveAccount': '已有账户？',
     'signup.noVerificationEmail':
       '未发送确认邮件。该邮箱可能已注册，请尝试登录。若是新账户，请检查垃圾邮件/推广邮件并稍等几分钟（发信有限额）。在 Supabase：Authentication → Providers → Email → 开启邮箱确认。',
@@ -2714,7 +2736,11 @@ const translations = {
     'signup.codeMissing': 'कृपया कन्फर्मेशन कोड दर्ज करें।',
     'signup.fillAllFields': 'कृपया सभी फ़ील्ड भरें',
     'signup.passwordsDontMatch': 'पासवर्ड मैच नहीं कर रहे',
-    'signup.passwordTooShort': 'पासवर्ड कम से कम 6 कैरेक्टर का होना चाहिए',
+    'signup.passwordTooShort': 'पासवर्ड कम से कम 8 अक्षर का होना चाहिए',
+    'signup.passwordRequirements':
+      'पासवर्ड कम से कम 8 अक्षर का हो और उसमें बड़ा अक्षर, छोटा अक्षर, संख्या और चिन्ह (जैसे !@#$%) शामिल हों।',
+    'signup.passwordHint':
+      'कम से कम 8 अक्षर — बड़ा, छोटा, संख्या और चिन्ह।',
     'signup.alreadyHaveAccount': 'पहले से खाता है?',
     'signup.noVerificationEmail':
       'पुष्टिकरण ईमेल नहीं भेजा गया। यह ईमेल पहले से पंजीकृत हो सकता है — साइन इन करें। नया खाता हो तो स्पैम/प्रमोशन जाँचें और कुछ मिनट प्रतीक्षा करें (ईमेल सीमा)। Supabase: Authentication → Providers → Email → ईमेल पुष्टि चालू करें।',

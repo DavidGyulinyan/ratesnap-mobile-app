@@ -31,6 +31,11 @@ import {
   isFiatCurrencyCode,
 } from "@/constants/fiatCurrencyCodes";
 import {
+  loadRecentConversions,
+  pushRecentConversion,
+  type RecentConversion,
+} from "@/lib/converterRecentHistory";
+import {
   fetchLiveExchangeRates,
   type CachedExchangeRates,
 } from "@/lib/liveExchangeRates";
@@ -71,6 +76,9 @@ export default function CurrencyConverter({
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [multiCurrencyShowAllTargets, setMultiCurrencyShowAllTargets] =
     useState<boolean>(false);
+  const [recentConversions, setRecentConversions] = useState<RecentConversion[]>(
+    []
+  );
 
   const { user, formDraftResetEpoch } = useAuth();
   const {
@@ -379,53 +387,12 @@ export default function CurrencyConverter({
     );
   };
 
-  const saveLastConversion = async (
-    amount: string,
-    from: string,
-    to: string
-  ): Promise<void> => {
-    await AsyncStorage.setItem(
-      "lastConversion",
-      JSON.stringify({
-        amount,
-        fromCurrency: from,
-        toCurrency: to,
-        timestamp: Date.now(),
-      })
-    );
-  };
-
-  const loadLastConversion = async (): Promise<void> => {
-    try {
-      const stored = await AsyncStorage.getItem("lastConversion");
-      if (stored) {
-        const lastConversion = JSON.parse(stored);
-        // Only restore if it's less than 24 hours old
-        const hoursSinceLastUse =
-          (Date.now() - lastConversion.timestamp) / (1000 * 60 * 60);
-        if (hoursSinceLastUse < 24) {
-          if (lastConversion.amount != null && lastConversion.amount !== "") {
-            const n = Number(lastConversion.amount);
-            if (Number.isFinite(n) && n !== 0) setAmount(String(lastConversion.amount));
-          }
-          if (
-            lastConversion.fromCurrency &&
-            currencyList.includes(lastConversion.fromCurrency)
-          ) {
-            setFromCurrency(lastConversion.fromCurrency);
-          }
-          if (
-            lastConversion.toCurrency &&
-            currencyList.includes(lastConversion.toCurrency)
-          ) {
-            setToCurrency(lastConversion.toCurrency);
-          }
-        }
-      }
-    } catch (error) {
-      console.log("Failed to load last conversion:", error);
-    }
-  };
+  const applyRecentConversion = useCallback((entry: RecentConversion) => {
+    setAmount(entry.amount);
+    setFromCurrency(entry.fromCurrency);
+    setToCurrency(entry.toCurrency);
+    setConvertedAmount(entry.convertedAmount);
+  }, []);
 
   const refreshExchangeRates = async (): Promise<void> => {
     try {
@@ -617,6 +584,39 @@ export default function CurrencyConverter({
     }
   }, [handleConvert, currenciesData, fromCurrency, toCurrency]);
 
+  // Remember last 4 conversions locally (debounced so typing does not flood history).
+  useEffect(() => {
+    if (
+      !convertedAmount ||
+      inputAmountValue == null ||
+      inputAmountValue <= 0 ||
+      !fromCurrency ||
+      !toCurrency
+    ) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      void (async () => {
+        const updated = await pushRecentConversion({
+          amount,
+          fromCurrency,
+          toCurrency,
+          convertedAmount,
+        });
+        setRecentConversions(updated);
+      })();
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [
+    amount,
+    fromCurrency,
+    toCurrency,
+    convertedAmount,
+    inputAmountValue,
+  ]);
+
   const mergeHistoryWithList = (
     history: { from: string; to: string }[],
     list: string[]
@@ -652,19 +652,34 @@ export default function CurrencyConverter({
     loadHistory();
   }, [formDraftResetEpoch]);
 
-  const mergedCurrencyList = mergeHistoryWithList(history, currencyList);
-
-  // Load last conversion when currencies are loaded
   useEffect(() => {
-    if (currencyList.length > 0) {
-      loadLastConversion();
-    }
-  }, [currencyList]);
+    void (async () => {
+      const recent = await loadRecentConversions();
+      setRecentConversions(recent);
+      if (recent.length > 0 && currencyList.length > 0) {
+        const latest = recent[0];
+        const hoursSince =
+          (Date.now() - latest.timestamp) / (1000 * 60 * 60);
+        if (hoursSince < 24) {
+          if (currencyList.includes(latest.fromCurrency)) {
+            setFromCurrency(latest.fromCurrency);
+          }
+          if (currencyList.includes(latest.toCurrency)) {
+            setToCurrency(latest.toCurrency);
+          }
+          if (latest.amount) setAmount(latest.amount);
+        }
+      }
+    })();
+  }, [formDraftResetEpoch, currencyList.length]);
+
+  const mergedCurrencyList = mergeHistoryWithList(history, currencyList);
 
   useEffect(() => {
     if (formDraftResetEpoch === 0) return;
     setAmount("");
     setHistory([]);
+    setRecentConversions([]);
     setFromCurrency("USD");
     if (currencyList.length > 0) {
       const to = currencyList.includes("AMD")
@@ -944,6 +959,61 @@ export default function CurrencyConverter({
           </View>
         </View>
 
+        {recentConversions.length > 0 ? (
+          <View style={styles.recentSection}>
+            <ThemedText
+              type="caption"
+              style={[{ color: textSecondaryColor }, styles.recentTitle]}
+            >
+              {t("converter.recentTitle")}
+            </ThemedText>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.recentScrollContent}
+            >
+              {recentConversions.map((entry) => {
+                const input = parseCanonicalDecimalAmount(entry.amount);
+                const output = parseCanonicalDecimalAmount(entry.convertedAmount);
+                const label =
+                  input != null && output != null
+                    ? `${formatGroupedNumber(input, 4)} ${entry.fromCurrency} → ${formatGroupedNumber(output, 4)} ${entry.toCurrency}`
+                    : `${entry.fromCurrency} → ${entry.toCurrency}`;
+                const isActive =
+                  entry.amount === amount &&
+                  entry.fromCurrency === fromCurrency &&
+                  entry.toCurrency === toCurrency;
+                return (
+                  <TouchableOpacity
+                    key={`${entry.timestamp}-${entry.fromCurrency}-${entry.toCurrency}-${entry.amount}`}
+                    style={[
+                      styles.recentChip,
+                      {
+                        backgroundColor: isActive
+                          ? hexToRgba(primaryColor, 0.14)
+                          : surfaceColor,
+                        borderColor: isActive ? primaryColor : borderColor,
+                      },
+                    ]}
+                    onPress={() => applyRecentConversion(entry)}
+                    activeOpacity={0.85}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.recentChipText,
+                        { color: isActive ? primaryColor : textColor },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {label}
+                    </ThemedText>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        ) : null}
+
         <View style={styles.actionButtons}>
           <View style={styles.actionButtonsRow}>
             <TouchableOpacity
@@ -994,7 +1064,6 @@ export default function CurrencyConverter({
         onClose={() => setShowFromPicker(false)}
         onCurrencySelected={async (currency) => {
           updateFrequentlyUsed(currency);
-          saveLastConversion(amount, currency, toCurrency);
 
           // Track picked rate when currency is selected
           if (currenciesData && toCurrency) {
@@ -1014,7 +1083,6 @@ export default function CurrencyConverter({
         onClose={() => setShowToPicker(false)}
         onCurrencySelected={async (currency) => {
           updateFrequentlyUsed(currency);
-          saveLastConversion(amount, fromCurrency, currency);
 
           // Track picked rate when currency is selected
           if (currenciesData && fromCurrency) {
@@ -1424,6 +1492,29 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     lineHeight: 20,
+  },
+  recentSection: {
+    marginBottom: 12,
+  },
+  recentTitle: {
+    marginBottom: 8,
+    fontWeight: "600",
+    letterSpacing: 0.2,
+  },
+  recentScrollContent: {
+    gap: 8,
+    paddingRight: 4,
+  },
+  recentChip: {
+    maxWidth: 280,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  recentChipText: {
+    fontSize: 12,
+    fontWeight: "500",
   },
 
   // Action Buttons
