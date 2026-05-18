@@ -589,14 +589,20 @@ export function useCalculatorHistory(): UseCalculatorHistoryReturn {
   const clearAllCalculations = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
 
+    let previousHistory: typeof calculatorHistory = [];
+    setCalculatorHistory((prev) => {
+      previousHistory = prev;
+      return [];
+    });
+
     try {
       const success = await UserDataService.clearAllCalculatorHistory();
-      if (success) {
-        setCalculatorHistory([]);
-        return true;
+      if (!success) {
+        setCalculatorHistory(previousHistory);
       }
-      return false;
+      return success;
     } catch (err) {
+      setCalculatorHistory(previousHistory);
       setError(err instanceof Error ? err.message : 'Failed to clear all calculations');
       return false;
     }

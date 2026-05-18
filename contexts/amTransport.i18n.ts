@@ -100,3 +100,54 @@ export const AM_TRANSPORT_HY: Record<string, string> = {
   "amTransport.shareSummary": "Կիսվել",
   "amTransport.clearAllFields": "Մաքրել դաշտերը",
 };
+
+export const AM_TRANSPORT_RU: Record<string, string> = {
+  "amTransport.sectionTitle": "Авто: финансы и таможня",
+  "amTransport.modalTitle": "Авто и таможня",
+  "amTransport.heroSubtitle":
+    "Ориентировочная таможенная оценка и упрощённая справка о подоходном налоге при продаже автомобиля.",
+  "amTransport.disclaimer":
+    "Только для справки. Пошлины, налоги и регистрацию уточняйте в КГД и других официальных источниках.",
+  "amTransport.back": "Назад",
+  "amTransport.open": "Открыть инструменты",
+  "quick.action.amTransport": "Авто и финансы",
+  "amTransport.card.customs": "Оценка таможенного оформления",
+  "amTransport.card.customs.desc": "Пошлина, акциз и НДС от задекларированной стоимости (приблизительно)",
+  "amTransport.card.dealWorksheet": "Продажа — подоходный налог (ориентир)",
+  "amTransport.card.dealWorksheet.desc":
+    "Годы, цена продажи, мощность — при продаже в течение года после покупки часто 1% (мин. 150 драм за л. с.)",
+  "amTransport.deal.acquisitionYear": "Год покупки",
+  "amTransport.deal.saleYear": "Год продажи",
+  "amTransport.deal.acquisition": "Цена покупки (драм)",
+  "amTransport.deal.importExport": "Прочие документированные расходы (драм)",
+  "amTransport.deal.importExportHint":
+    "Необязательно. Используется только для строки прибыли/убытка. Оценка налога основана на цене продажи и мощности двигателя.",
+  "amTransport.deal.salePrice": "Цена продажи по договору (драм)",
+  "amTransport.deal.enginePower": "Мощность двигателя",
+  "amTransport.deal.powerUnitLabel": "Единица",
+  "amTransport.deal.unitHp": "Лошадиные силы (л. с.)",
+  "amTransport.deal.unitKw": "Киловатты (кВт)",
+  "amTransport.deal.powerEquivalent": "≈ {value} {unit}",
+  "amTransport.deal.powerBoth": "{hp} л. с. · {kw} кВт",
+  "amTransport.deal.totalOutlay": "Общие затраты (покупка + прочие расходы)",
+  "amTransport.deal.netVsOutlay": "Прибыль или убыток (продажа − общие затраты)",
+  "amTransport.deal.holdingPeriod": "Лет между покупкой и продажей (по календарю)",
+  "amTransport.deal.holdingExemptTitle": "С продажи обычно не взимается подоходный налог",
+  "amTransport.deal.holdingExemptBody":
+    "Спустя более года с даты покупки доход от продажи личного автомобиля, как правило, не облагается подоходным налогом. Здесь «более года» — когда годы покупки и продажи различаются как минимум на два (в законе учитываются фактические даты).",
+  "amTransport.deal.holdingUncertain":
+    "Покупка и продажа в двух соседних календарных годах. Прошёл ли полный год, зависит от точных дат — уточните в КГД или у налогового консультанта. Цифры ниже относятся только к продаже в течение года после покупки.",
+  "amTransport.deal.holdingTaxableShort":
+    "Покупка и продажа в одном году или годы не указаны: показан случай «в течение года» (1% от продажи, минимум 150 драм × л. с.). Укажите оба года для более точного результата.",
+  "amTransport.deal.invalidYears": "Год продажи не может быть раньше года покупки.",
+  "amTransport.deal.taxOnePercent": "1% от цены продажи",
+  "amTransport.deal.taxMinHp": "Минимальный налог (150 драм × л. с.)",
+  "amTransport.deal.taxTotalQuickSale": "Налог при продаже в течение года после покупки (большее из двух)",
+  "amTransport.deal.taxRateNote":
+    "Распространённое толкование правил: продажа в течение года после приобретения — 1%, не менее 150 драм за л. с.; спустя год — обычно нет подоходного налога для частного продавца (не предпринимателя). В отдельных случаях покупатель может удерживать налог как налоговый агент.",
+  "amTransport.deal.taxNote":
+    "Используются только календарные годы, не точные даты. Введите л. с. или кВт; кВт пересчитываются в л. с. для минимума. Правила и практика меняются — ориентируйтесь на разъяснения КГД и налоговую декларацию.",
+  "amTransport.deal.taxExemptShare": "Подоходный налог с продажи: вероятно не взимается (владение более года)",
+  "amTransport.shareSummary": "Поделиться результатами",
+  "amTransport.clearAllFields": "Очистить всё",
+};

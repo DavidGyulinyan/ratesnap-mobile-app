@@ -177,7 +177,13 @@ export default function ArmeniaFreelanceModal({
       {screen === "soleProp" ? (
         <SolePropView
           t={t}
-          locale={language === "hy" ? "hy-AM" : "en-US"}
+          locale={
+            language === "hy"
+              ? "hy-AM"
+              : language === "ru"
+                ? "ru-RU"
+                : "en-US"
+          }
           primaryColor={primaryColor}
           surfaceColor={surfaceColor}
           surfaceSecondaryColor={surfaceSecondaryColor}
@@ -191,7 +197,13 @@ export default function ArmeniaFreelanceModal({
       {screen === "turnover" ? (
         <TurnoverTaxView
           t={t}
-          locale={language === "hy" ? "hy-AM" : "en-US"}
+          locale={
+            language === "hy"
+              ? "hy-AM"
+              : language === "ru"
+                ? "ru-RU"
+                : "en-US"
+          }
           primaryColor={primaryColor}
           surfaceColor={surfaceColor}
           surfaceSecondaryColor={surfaceSecondaryColor}
@@ -205,7 +217,13 @@ export default function ArmeniaFreelanceModal({
       {screen === "profitTax" ? (
         <ProfitTaxView
           t={t}
-          locale={language === "hy" ? "hy-AM" : "en-US"}
+          locale={
+            language === "hy"
+              ? "hy-AM"
+              : language === "ru"
+                ? "ru-RU"
+                : "en-US"
+          }
           primaryColor={primaryColor}
           surfaceColor={surfaceColor}
           surfaceSecondaryColor={surfaceSecondaryColor}
@@ -219,7 +237,13 @@ export default function ArmeniaFreelanceModal({
       {screen === "vat" ? (
         <VatView
           t={t}
-          locale={language === "hy" ? "hy-AM" : "en-US"}
+          locale={
+            language === "hy"
+              ? "hy-AM"
+              : language === "ru"
+                ? "ru-RU"
+                : "en-US"
+          }
           primaryColor={primaryColor}
           surfaceColor={surfaceColor}
           surfaceSecondaryColor={surfaceSecondaryColor}
