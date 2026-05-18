@@ -50,7 +50,7 @@ export default function ContactSupportModal({
     setLoading(true);
     try {
       const isAvailable = await MailComposer.composeAsync({
-        recipients: ["davidguiyn@gmail.com"],
+        recipients: ["ardifysolutions@gmail.com"],
         subject: "Capital Support Request",
         body: `From: ${user?.email || userEmail || "Anonymous User"}\n\n${message}`,
       });

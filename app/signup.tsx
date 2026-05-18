@@ -23,6 +23,10 @@ import AuthButtons from '@/components/AuthButtons';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { SIGNUP_NO_VERIFICATION_EMAIL } from '@/lib/authErrors';
+import {
+  isPasswordPolicyValid,
+  PASSWORD_POLICY_MESSAGE_KEY,
+} from '@/lib/passwordPolicy';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -224,6 +228,12 @@ function SignUpScreen() {
       textAlign: 'center',
       marginBottom: 16,
     },
+    passwordHint: {
+      marginTop: 6,
+      fontSize: 12,
+      lineHeight: 17,
+      color: textSecondaryColor,
+    },
   }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, borderColor]);
 
   const handleSignUp = async () => {
@@ -237,8 +247,8 @@ function SignUpScreen() {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert(t('common.error'), t('signup.passwordTooShort'));
+    if (!isPasswordPolicyValid(password)) {
+      Alert.alert(t('common.error'), t(PASSWORD_POLICY_MESSAGE_KEY));
       return;
     }
 
@@ -452,6 +462,7 @@ function SignUpScreen() {
                         />
                       </TouchableOpacity>
                     </View>
+                    <Text style={styles.passwordHint}>{t('signup.passwordHint')}</Text>
                   </View>
 
                   <View style={styles.fieldGroup}>
