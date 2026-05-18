@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, type Language } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAppLock } from '@/contexts/AppLockContext';
 import { getAsyncStorage } from '@/lib/storage';
@@ -29,7 +29,7 @@ import {
 } from "@/lib/legal/privacyPolicy";
 export default function SettingsScreen() {
   const { user, signOut, deleteAccount } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const router = useRouter();
   const { themePreference, setThemePreference } = useTheme();
   const { lockSupported, lockEnabled, prefsReady, enableAppLock, disableAppLock } = useAppLock();
@@ -39,6 +39,7 @@ export default function SettingsScreen() {
   const { deletePickedRate } = usePickedRates();
 
   const [showThemeSelection, setShowThemeSelection] = useState(false);
+  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -464,192 +465,10 @@ Capital предоставляет инструменты конвертации
 Если у вас есть вопросы по настоящим Условиям, пожалуйста, свяжитесь с нами по адресу ardifysolutions@gmail.com или через support.capital.am.
 
 Спасибо за выбор Capital!`,
-
-      es: `Términos de Uso de Capital
-
-Fecha de entrada en vigor: 10 de enero de 2025
-
-¡Bienvenido a Capital! Al descargar, instalar o usar nuestra aplicación móvil ("Aplicación"), aceptas estar sujeto a estos Términos de Uso ("Términos"). Si no aceptas estos Términos, por favor no uses la Aplicación.
-
-1. DESCRIPCIÓN DEL SERVICIO
-Capital proporciona herramientas de conversión de divisas e información de tipos de cambio en tiempo real para uso personal e informativo. Nuestros servicios incluyen:
-• Conversión de divisas en tiempo real entre diferentes monedas
-• Datos históricos de tipos de cambio
-• Alertas de tipos y notificaciones
-• Capacidades de conversión de divisas sin conexión
-
-2. ACEPTACIÓN DE TÉRMINOS
-Al acceder y usar Capital, aceptas y acuerdas estar sujeto a los términos y disposiciones de este acuerdo. Estos Términos se aplican a todos los usuarios de la Aplicación.
-
-3. LICENCIA DE USO
-Sujeto a tu cumplimiento de estos Términos, te otorgamos una licencia limitada, no exclusiva, no transferible, no sublicenciable para:
-• Descargar e instalar la Aplicación en tu dispositivo móvil
-• Acceder y usar la Aplicación para fines personales, no comerciales
-• Acceder a las funciones de conversión de divisas y datos de tipos de cambio
-
-4. RESPONSABILIDADES DEL USUARIO
-Aceptas:
-• Usar la Aplicación solo para fines legales
-• No usar la Aplicación para actividades comerciales sin consentimiento previo por escrito
-• No intentar realizar ingeniería inversa, modificar o crear obras derivadas de la Aplicación
-• No interferir con el funcionamiento adecuado de la Aplicación
-• Proporcionar información precisa cuando sea requerida
-
-5. DESCARGO DE RESPONSABILIDAD DE PRECISIÓN
-Los tipos de cambio y cálculos de conversión se proporcionan solo con fines informativos. Aunque nos esforzamos por la precisión, no garantizamos que:
-• Los tipos de cambio sean en tiempo real o precisos
-• Los cálculos de conversión estén libres de errores
-• La Aplicación esté disponible en todo momento
-• Los datos de divisas estén actualizados
-
-6. LIMITACIÓN DE RESPONSABILIDAD
-En la medida máxima permitida por la ley aplicable, Capital y sus desarrolladores no serán responsables de:
-• Cualquier daño directo, indirecto, incidental o consecuente
-• Pérdida de ganancias, datos u oportunidades de negocio
-• Imprecisiones en la información de tipos de cambio
-• Interrupciones del servicio o indisponibilidad
-
-7. PRIVACIDAD DE DATOS
-Tu privacidad es importante para nosotros. Por favor revisa nuestra Política de Privacidad, que también rige tu uso de la Aplicación, para entender nuestras prácticas.
-
-8. MODIFICACIONES A LOS TÉRMINOS
-Nos reservamos el derecho de modificar estos Términos en cualquier momento. Notificaremos a los usuarios sobre cambios significativos a través de la Aplicación o correo electrónico. El uso continuado de la Aplicación después de los cambios constituye aceptación de los nuevos Términos.
-
-9. TERMINACIÓN
-Podemos terminar o suspender tu acceso a la Aplicación inmediatamente, sin previo aviso, por cualquier razón. Tras la terminación, tu derecho a usar la Aplicación cesará inmediatamente.
-
-10. LEY APLICABLE
-Estos Términos se regirán e interpretarán de acuerdo con las leyes locales aplicables, sin tener en cuenta las disposiciones de conflicto de leyes.
-
-11. INFORMACIÓN DE CONTACTO
-Si tienes preguntas sobre estos Términos, por favor contáctanos en ardifysolutions@gmail.com o a través de support.capital.am.
-
-¡Gracias por elegir Capital!`,
-
-      zh: `Capital 使用条款
-
-生效日期：2025年1月10日
-
-欢迎使用 Capital！通过下载、安装或使用我们的移动应用程序（"应用程序"），您同意受本使用条款（"条款"）的约束。如果您不同意这些条款，请不要使用应用程序。
-
-1. 服务描述
-Capital 为个人和信息用途提供实时货币转换工具和汇率信息。我们的服务包括：
-• 不同货币之间的实时货币转换
-• 历史汇率数据
-• 汇率警报和通知
-• 离线货币转换功能
-
-2. 条款接受
-通过访问和使用 Capital，您接受并同意受本协议条款和规定的约束。这些条款适用于应用程序的所有用户。
-
-3. 使用许可
-在您遵守这些条款的前提下，我们授予您有限的、非独占的、不可转让的、不可再许可的许可，以：
-• 在您的移动设备上下载和安装应用程序
-• 出于个人、非商业目的访问和使用应用程序
-• 访问货币转换功能和汇率数据
-
-4. 用户责任
-您同意：
-• 仅将应用程序用于合法目的
-• 未经事先书面同意，不将应用程序用于任何商业活动
-• 不尝试对应用程序进行逆向工程、修改或创建衍生作品
-• 不干扰应用程序的正常运行
-• 在需要时提供准确信息
-
-5. 准确性免责声明
-汇率和转换计算仅供参考。虽然我们力求准确，但我们不保证：
-• 汇率是实时的或准确的
-• 转换计算没有错误
-• 应用程序始终可用
-• 货币数据是最新的
-
-6. 责任限制
-在适用法律允许的最大范围内，Capital 及其开发者不对以下内容承担责任：
-• 任何直接、间接、偶然或后果性损害
-• 利润、数据或商业机会的损失
-• 汇率信息的不准确
-• 服务中断或不可用
-
-7. 数据隐私
-您的隐私对我们很重要。请查看我们的隐私政策，该政策也管理您对应用程序的使用，以了解我们的做法。
-
-8. 条款修改
-我们保留随时修改这些条款的权利。我们将通过应用程序或电子邮件通知用户重大变更。变更后继续使用应用程序即构成对新条款的接受。
-
-9. 终止
-我们可能因任何原因立即终止或暂停您对应用程序的访问，恕不另行通知。终止后，您使用应用程序的权利将立即终止。
-
-10. 适用法律
-这些条款应受适用当地法律管辖并据其解释，不考虑法律冲突条款。
-
-11. 联系信息
-如果您对这些条款有任何疑问，请通过 ardifysolutions@gmail.com 或 support.capital.am 与我们联系。
-
-感谢您选择 Capital！`,
-
-      hi: `Capital उपयोग की शर्तें
-
-प्रभावी दिनांक: 10 जनवरी, 2025
-
-Capital में आपका स्वागत है! हमारे मोबाइल एप्लिकेशन ("एप्लिकेशन") को डाउनलोड, इंस्टॉल या उपयोग करके, आप इन उपयोग की शर्तों ("शर्तें") से बाध्य होने पर सहमत होते हैं। यदि आप इन शर्तों से सहमत नहीं हैं, तो कृपया एप्लिकेशन का उपयोग न करें।
-
-1. सेवा विवरण
-Capital व्यक्तिगत और सूचनात्मक उपयोग के लिए वास्तविक समय मुद्रा रूपांतरण उपकरण और विनिमय दर जानकारी प्रदान करता है। हमारी सेवाएं शामिल हैं:
-• विभिन्न मुद्राओं के बीच वास्तविक समय मुद्रा रूपांतरण
-• ऐतिहासिक विनिमय दर डेटा
-• दर अलर्ट और अधिसूचनाएं
-• ऑफलाइन मुद्रा रूपांतरण क्षमताएं
-
-2. शर्तों की स्वीकृति
-Capital तक पहुंचकर और इसका उपयोग करके, आप इस समझौते की शर्तों और प्रावधानों से बाध्य होने पर सहमत होते हैं। ये शर्तें एप्लिकेशन के सभी उपयोगकर्ताओं पर लागू होती हैं।
-
-3. उपयोग लाइसेंस
-इन शर्तों के आपके अनुपालन के अधीन, हम आपको एक सीमित, गैर-अनन्य, गैर-हस्तांतरणीय, गैर-उपलाइसेंस योग्य लाइसेंस प्रदान करते हैं:
-• अपने मोबाइल डिवाइस पर एप्लिकेशन डाउनलोड और इंस्टॉल करने के लिए
-• व्यक्तिगत, गैर-व्यावसायिक उद्देश्यों के लिए एप्लिकेशन तक पहुंच और उपयोग करने के लिए
-• मुद्रा रूपांतरण सुविधाओं और विनिमय दर डेटा तक पहुंच के लिए
-
-4. उपयोगकर्ता की जिम्मेदारियां
-आप सहमत हैं:
-• एप्लिकेशन का उपयोग केवल वैध उद्देश्यों के लिए करें
-• पूर्व लिखित सहमति के बिना किसी भी व्यावसायिक गतिविधि के लिए एप्लिकेशन का उपयोग न करें
-• एप्लिकेशन के रिवर्स इंजीनियरिंग, संशोधन या व्युत्पन्न कार्य बनाने का प्रयास न करें
-• एप्लिकेशन के उचित कार्य में हस्तक्षेप न करें
-• आवश्यक होने पर सटीक जानकारी प्रदान करें
-
-5. सटीकता अस्वीकरण
-विनिमय दरें और रूपांतरण गणना केवल सूचनात्मक उद्देश्यों के लिए प्रदान की जाती हैं। हालांकि हम सटीकता के लिए प्रयास करते हैं, हम गारंटी नहीं देते कि:
-• विनिमय दरें वास्तविक समय या सटीक हैं
-• रूपांतरण गणना त्रुटि मुक्त हैं
-• एप्लिकेशन हमेशा उपलब्ध होगा
-• मुद्रा डेटा अद्यतित है
-
-6. देयता की सीमा
-लागू कानून द्वारा अनुमत अधिकतम सीमा तक, Capital और इसके डेवलपर्स उत्तरदायी नहीं होंगे:
-• किसी भी प्रत्यक्ष, अप्रत्यक्ष, आकस्मिक या परिणामी हानियों के लिए
-• लाभ, डेटा या व्यावसायिक अवसरों के नुकसान के लिए
-• विनिमय दर जानकारी में अशुद्धियों के लिए
-• सेवा व्यवधान या अनुपलब्धता के लिए
-
-7. डेटा गोपनीयता
-आपकी गोपनीयता हमारे लिए महत्वपूर्ण है। कृपया हमारी गोपनीयता नीति की समीक्षा करें, जो आपके एप्लिकेशन के उपयोग को भी नियंत्रित करती है, ताकि हमारी प्रथाओं को समझा जा सके।
-
-8. शर्तों में संशोधन
-हम किसी भी समय इन शर्तों को संशोधित करने का अधिकार सुरक्षित रखते हैं। हम एप्लिकेशन या ईमेल के माध्यम से महत्वपूर्ण परिवर्तनों के बारे में उपयोगकर्ताओं को सूचित करेंगे। परिवर्तनों के बाद एप्लिकेशन का निरंतर उपयोग नए शर्तों की स्वीकृति का गठन करता है।
-
-9. समाप्ति
-हम किसी भी कारण से, पूर्व सूचना के बिना, तुरंत आपके एप्लिकेशन तक पहुंच को समाप्त या निलंबित कर सकते हैं। समाप्ति के बाद, आपके एप्लिकेशन का उपयोग करने का अधिकार तुरंत समाप्त हो जाएगा।
-
-10. लागू कानून
-ये शर्तें कानूनों के संघर्ष के प्रावधानों की परवाह किए बिना, लागू स्थानीय कानूनों द्वारा शासित और समझी जाएंगी।
-
-11. संपर्क जानकारी
-यदि आपके पास इन शर्तों के बारे में कोई प्रश्न हैं, तो कृपया ardifysolutions@gmail.com या support.capital.am के माध्यम से हमसे संपर्क करें।
-
-Capital चुनने के लिए धन्यवाद!`
     };
+
     const doc = terms[language as keyof typeof terms];
-    return doc ?? terms.hy;
+    return doc ?? terms.en;
   };
 
   const getCurrentPrivacy = () =>
@@ -849,6 +668,61 @@ Capital चुनने के लिए धन्यवाद!`
       marginBottom: Layout.spaceMd,
     },
   }), [backgroundColor, surfaceColor, surfaceSecondaryColor, primaryColor, textColor, textSecondaryColor, textInverseColor, borderColor]);
+
+  const currentLanguageLabel =
+    language === 'en'
+      ? t('settings.languageEnglish')
+      : language === 'ru'
+        ? t('settings.languageRussian')
+        : t('settings.languageArmenian');
+
+  const renderLanguageSelection = () => {
+    if (!showLanguageSelection) return null;
+
+    const options: { key: Language; label: string }[] = [
+      { key: 'hy', label: t('settings.languageArmenian') },
+      { key: 'en', label: t('settings.languageEnglish') },
+      { key: 'ru', label: t('settings.languageRussian') },
+    ];
+
+    return (
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setShowLanguageSelection(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="arrow-back" size={22} color={textSecondaryColor} />
+          </TouchableOpacity>
+          <ThemedText style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]}>
+            {t('settings.language')}
+          </ThemedText>
+          <View style={{ width: 32 }} />
+        </View>
+
+        {options.map((option) => (
+          <TouchableOpacity
+            key={option.key}
+            style={[
+              styles.languageOption,
+              language === option.key && { backgroundColor: primaryColor + '20' },
+            ]}
+            onPress={() => {
+              void setLanguage(option.key);
+              setShowLanguageSelection(false);
+            }}
+          >
+            <ThemedText style={styles.settingItemText}>{option.label}</ThemedText>
+            {language === option.key ? (
+              <Ionicons name="checkmark-circle" size={20} color={primaryColor} />
+            ) : null}
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
 
   const renderThemeSelection = () => {
     if (!showThemeSelection) return null;
@@ -1279,6 +1153,23 @@ Capital चुनने के लिए धन्यवाद!`
 
             <TouchableOpacity
               style={styles.settingItem}
+              onPress={() => setShowLanguageSelection(true)}
+              activeOpacity={0.75}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                <Ionicons name="language-outline" size={22} color={primaryColor} />
+                <ThemedText style={styles.settingItemText}>{t('settings.language')}</ThemedText>
+              </View>
+              <View style={styles.rowTrailing}>
+                <ThemedText style={styles.settingValue} numberOfLines={1}>
+                  {currentLanguageLabel}
+                </ThemedText>
+                <Ionicons name="chevron-forward" size={18} color={textSecondaryColor} />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingItem}
               onPress={() => setShowNotificationSettings(true)}
               activeOpacity={0.75}
             >
@@ -1562,6 +1453,7 @@ Capital चुनने के लिए धन्यवाद!`
       </ScrollView>
 
       {/* Modals */}
+      {renderLanguageSelection()}
       {renderThemeSelection()}
       {renderNotificationSettings()}
       {renderTerms()}

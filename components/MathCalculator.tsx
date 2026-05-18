@@ -23,6 +23,13 @@ import {
   formatEmbeddedNumericTokens,
   formatGroupedNumber,
 } from "@/lib/numberFormat";
+import {
+  appendCalculatorDigit,
+  appendCalculatorOperator,
+  evaluateCalculatorExpression,
+  formatCalculatorExpressionForDisplay,
+  roundCalculatorResult,
+} from "@/lib/calculatorEvaluate";
 
 type CalculatorMode = "basic" | "advanced";
 
@@ -91,12 +98,15 @@ export default function MathCalculator({
   const successColor = useThemeColor({}, "success");
   const textInverseColor = useThemeColor({}, "textInverse");
 
-  const [display, setDisplay] = useState("0");
-  const [previousValue, setPreviousValue] = useState<number | null>(null);
-  const [operation, setOperation] = useState<string | null>(null);
-  const [waitingForOperand, setWaitingForOperand] = useState(false);
-  const [equation, setEquation] = useState<string>("");
-  const [calculationComplete, setCalculationComplete] = useState(false);
+  /** Completed expression segments ending before the current entry (e.g. "12+3"). */
+  const [expression, setExpression] = useState("");
+  /** Number currently being entered (e.g. "4"). */
+  const [entry, setEntry] = useState("");
+  /** If set, entry was converted with % — show this label (e.g. "25") instead of "0.25". */
+  const [percentOperand, setPercentOperand] = useState<string | null>(null);
+  /** Shown equation line after "=" or while typing. */
+  const [equation, setEquation] = useState("");
+  const [justEvaluated, setJustEvaluated] = useState(false);
   
   const [calculationHistory, setCalculationHistory] = useState<string[]>([]);
   const [roundingDecimalPlaces, setRoundingDecimalPlaces] = useState<number>(2);
@@ -154,137 +164,122 @@ export default function MathCalculator({
     }
   };
 
+  type CalcOperator = "+" | "-" | "*" | "/";
+
+  const toCalcOperator = (nextOperation: string): CalcOperator => {
+    if (nextOperation === "/") return "/";
+    if (nextOperation === "*") return "*";
+    if (nextOperation === "-") return "-";
+    return "+";
+  };
+
+  const buildFullExpression = (expr: string, ent: string) => {
+    if (!ent) return expr;
+    return expr ? `${expr}${ent}` : ent;
+  };
+
+  const clearPercentLabel = () => setPercentOperand(null);
+
+  const getEvalExpression = () => buildFullExpression(expression, entry);
+
+  /** What the user sees in the small equation line (may show 25% while eval uses 0.25). */
+  const getDisplayExpressionText = (): string => {
+    if (percentOperand != null) {
+      const base = formatCalculatorExpressionForDisplay(expression);
+      const pct = formatGroupedNumber(
+        parseFloat(percentOperand),
+        roundingDecimalPlaces
+      );
+      return base ? `${base} ${pct}%` : `${pct}%`;
+    }
+    const full = getEvalExpression();
+    if (!full) return "";
+    return formatCalculatorExpressionForDisplay(full);
+  };
+
+  const getLiveResult = (): number | null => {
+    const evaluated = evaluateCalculatorExpression(getEvalExpression());
+    if (evaluated === null) return null;
+    return roundCalculatorResult(evaluated, roundingDecimalPlaces);
+  };
+
   const inputNumber = (num: string) => {
     safeHaptic("light");
-    if (calculationComplete) {
-      setDisplay(num);
-      setEquation(num);
-      setCalculationComplete(false);
-      setPreviousValue(null);
-      setOperation(null);
-      setWaitingForOperand(false);
-    } else if (waitingForOperand) {
-      setDisplay(num);
-      setEquation(prev => {
-        // Add space if the last character is an operator
-        const operators = ['+', '-', '×', '÷'];
-        const lastChar = prev.slice(-1);
-        const needsSpace = operators.includes(lastChar);
-        return prev + (needsSpace ? ' ' : '') + num;
-      });
-      setWaitingForOperand(false);
+    clearPercentLabel();
+    if (justEvaluated) {
+      const nextEntry = appendCalculatorDigit("", num);
+      setExpression("");
+      setEntry(nextEntry);
+      setJustEvaluated(false);
     } else {
-      setDisplay(display === "0" ? num : display + num);
-      setEquation(prev => prev === "0" ? num : prev + num);
+      const nextEntry = appendCalculatorDigit(entry, num);
+      setEntry(nextEntry);
     }
   };
 
   const inputOperation = (nextOperation: string) => {
     safeHaptic("light");
-    const inputValue = parseFloat(display);
-    const operationSymbol = nextOperation === "/" ? "÷" : nextOperation === "*" ? "×" : nextOperation;
+    clearPercentLabel();
+    const op = toCalcOperator(nextOperation);
 
-    if (calculationComplete) {
-      setEquation(display + " " + operationSymbol);
-      setCalculationComplete(false);
-      setPreviousValue(inputValue);
-    } else if (previousValue === null) {
-      setPreviousValue(inputValue);
-      setEquation(prev => prev + " " + operationSymbol);
-    } else if (operation) {
-      const currentValue = previousValue || 0;
-      const newValue = calculate(currentValue, inputValue, operation);
-      const result = parseFloat(newValue.toFixed(roundingDecimalPlaces));
-
-      setDisplay(`${result}`);
-      setPreviousValue(newValue);
-      setEquation(prev => prev + " " + operationSymbol);
-      
-      // Show result immediately in history
-      const intermediateResult = `${currentValue} ${operation === "/" ? "÷" : operation === "*" ? "×" : operation} ${inputValue} = ${result}`;
-      addToHistory(intermediateResult);
+    if (justEvaluated) {
+      const nextExpr = appendCalculatorOperator(entry, op);
+      setExpression(nextExpr);
+      setEntry("");
+      setJustEvaluated(false);
+      return;
     }
 
-    setWaitingForOperand(true);
-    setOperation(nextOperation);
-  };
-
-  const calculate = (
-    firstValue: number,
-    secondValue: number,
-    operation: string
-  ): number => {
-    switch (operation) {
-      case "+":
-        return firstValue + secondValue;
-      case "-":
-        return firstValue - secondValue;
-      case "*":
-        return firstValue * secondValue;
-      case "/":
-        return firstValue / secondValue;
-      case "%":
-        return (firstValue * secondValue) / 100;
-      case "=":
-        return secondValue;
-      default:
-        return secondValue;
-    }
+    const combined = buildFullExpression(expression, entry);
+    const nextExpr = appendCalculatorOperator(combined, op);
+    setExpression(nextExpr);
+    setEntry("");
   };
 
   const performCalculation = async () => {
     safeHaptic("success");
-    const inputValue = parseFloat(display);
+    const full = getEvalExpression();
+    const evaluated = evaluateCalculatorExpression(full);
 
-    if (previousValue !== null && operation) {
-      const newValue = calculate(previousValue, inputValue, operation);
-      const result = parseFloat(newValue.toFixed(roundingDecimalPlaces));
+    if (evaluated === null) {
+      safeHaptic("error");
+      return;
+    }
 
-      const fullEquation = `${equation} = ${result}`;
-      setEquation(fullEquation);
-      setDisplay(`${result}`);
-      setPreviousValue(null);
-      setOperation(null);
-      setWaitingForOperand(true);
-      setCalculationComplete(true);
+    const result = roundCalculatorResult(evaluated, roundingDecimalPlaces);
+    const resultText = String(result);
+    const displayExpr = getDisplayExpressionText();
+    const fullEquation = `${displayExpr} = ${formatGroupedNumber(result, roundingDecimalPlaces)}`;
 
-      // Add to local history
-      addToHistory(fullEquation);
+    clearPercentLabel();
 
-      // Save to user history if authenticated
-      if (user && fullEquation && fullEquation.trim() !== '') {
-        try {
-          const calculationType = operation === '%' ? 'percentage' :
-                                ['+', '-', '*', '/'].includes(operation) ? 'basic' : 'advanced';
+    setExpression("");
+    setEntry(resultText);
+    setEquation(fullEquation);
+    setJustEvaluated(true);
 
-          await saveCalculation(fullEquation, result, calculationType, {
-            roundingDecimalPlaces,
-            operation,
-            previousValue,
-            inputValue
-          });
-        } catch (error) {
-          console.error('Error saving calculation to history:', error);
-        }
+    addToHistory(fullEquation);
+
+    if (user && fullEquation.trim() !== "") {
+      try {
+        await saveCalculation(fullEquation, result, "basic", {
+          roundingDecimalPlaces,
+          expression: full,
+        });
+      } catch (error) {
+        console.error("Error saving calculation to history:", error);
       }
+    }
 
-      // Pass result to parent if callback provided
-      if (onResult) {
-        onResult(result);
-      }
+    if (onResult) {
+      onResult(result);
+    }
 
-      // Automatically add to converter after calculation
-      if (onAddToConverter) {
-        onAddToConverter(result);
-        // Only close if auto-close is enabled
-        if (autoCloseAfterCalculation) {
-          onClose();
-          // Reset calculator state
-          clear();
-        }
-      } else {
-        // If no converter callback, don't close automatically
-        // This allows users to do multiple calculations
+    if (onAddToConverter) {
+      onAddToConverter(result);
+      if (autoCloseAfterCalculation) {
+        onClose();
+        clear();
       }
     }
   };
@@ -292,49 +287,38 @@ export default function MathCalculator({
   // Tip & discount helpers
   const roundForDisplay = (n: number) => parseFloat(n.toFixed(roundingDecimalPlaces));
 
+  const applyUnaryResult = (full: string, out: number) => {
+    const resultText = String(out);
+    clearPercentLabel();
+    setExpression("");
+    setEntry(resultText);
+    setEquation(full);
+    setJustEvaluated(true);
+    addToHistory(full);
+  };
+
   const applySqrt = () => {
     safeHaptic("light");
-    const currentValue = parseFloat(display);
+    const currentValue = parseFloat(entry);
     if (isNaN(currentValue) || currentValue < 0) return;
     const out = roundForDisplay(Math.sqrt(currentValue));
-    const full = `√(${currentValue}) = ${out}`;
-    setEquation(full);
-    setDisplay(String(out));
-    setPreviousValue(null);
-    setOperation(null);
-    setWaitingForOperand(true);
-    setCalculationComplete(true);
-    addToHistory(full);
+    applyUnaryResult(`√(${currentValue}) = ${out}`, out);
   };
 
   const applyReciprocal = () => {
     safeHaptic("light");
-    const currentValue = parseFloat(display);
+    const currentValue = parseFloat(entry);
     if (isNaN(currentValue) || currentValue === 0) return;
     const out = roundForDisplay(1 / currentValue);
-    const full = `1/${currentValue} = ${out}`;
-    setEquation(full);
-    setDisplay(String(out));
-    setPreviousValue(null);
-    setOperation(null);
-    setWaitingForOperand(true);
-    setCalculationComplete(true);
-    addToHistory(full);
+    applyUnaryResult(`1/${currentValue} = ${out}`, out);
   };
 
   const splitBy = (parts: number) => {
     safeHaptic("light");
-    const currentValue = parseFloat(display);
+    const currentValue = parseFloat(entry);
     if (isNaN(currentValue) || parts <= 0) return;
     const out = roundForDisplay(currentValue / parts);
-    const full = `${currentValue} ÷ ${parts} = ${out}`;
-    setEquation(full);
-    setDisplay(String(out));
-    setPreviousValue(null);
-    setOperation(null);
-    setWaitingForOperand(true);
-    setCalculationComplete(true);
-    addToHistory(full);
+    applyUnaryResult(`${currentValue} ÷ ${parts} = ${out}`, out);
   };
 
   // History functions
@@ -344,90 +328,81 @@ export default function MathCalculator({
 
   const clear = () => {
     safeHaptic("light");
-    setDisplay("0");
+    setExpression("");
+    setEntry("");
     setEquation("");
-    setPreviousValue(null);
-    setOperation(null);
-    setWaitingForOperand(false);
-    setCalculationComplete(false);
+    setJustEvaluated(false);
+    clearPercentLabel();
   };
 
   const inputDecimal = () => {
     safeHaptic("light");
-    if (calculationComplete) {
-      setDisplay("0.");
-      setEquation("0.");
-      setCalculationComplete(false);
-    } else if (waitingForOperand) {
-      setDisplay("0.");
-      setEquation(prev => prev + "0.");
-      setWaitingForOperand(false);
-    } else if (display.indexOf(".") === -1) {
-      setDisplay(display + ".");
-      setEquation(prev => prev + ".");
+    clearPercentLabel();
+    if (justEvaluated) {
+      setExpression("");
+      setEntry("0.");
+      setJustEvaluated(false);
+    } else {
+      const nextEntry = appendCalculatorDigit(entry, ".");
+      setEntry(nextEntry);
     }
   };
 
   const inputPercentage = () => {
     safeHaptic("light");
-    if (calculationComplete) {
-      const percentageValue = parseFloat(display) / 100;
-      setDisplay(percentageValue.toString());
-      setEquation(percentageValue.toString());
-      setCalculationComplete(false);
-    } else if (waitingForOperand) {
-      const percentageValue = parseFloat(display) / 100;
-      setDisplay(percentageValue.toString());
-      setEquation(prev => prev + "%");
-      setWaitingForOperand(false);
-    } else {
-      const percentageValue = parseFloat(display) / 100;
-      setDisplay(percentageValue.toString());
-      setEquation(prev => prev + "%");
+    const currentValue = parseFloat(entry);
+    if (isNaN(currentValue) || entry === "") return;
+    setPercentOperand(entry);
+    const nextEntry = String(currentValue / 100);
+    if (justEvaluated) {
+      setExpression("");
+      setJustEvaluated(false);
     }
+    setEntry(nextEntry);
   };
 
   const toggleSign = () => {
     safeHaptic("light");
-    const currentValue = parseFloat(display);
-    const toggledValue = -currentValue;
-    setDisplay(toggledValue.toString());
-    setEquation(toggledValue.toString());
-    setCalculationComplete(false);
-    setPreviousValue(null);
-    setOperation(null);
-    setWaitingForOperand(false);
+    clearPercentLabel();
+    const currentValue = parseFloat(entry);
+    if (isNaN(currentValue)) return;
+    const nextEntry = String(-currentValue);
+    if (justEvaluated) {
+      setExpression("");
+      setJustEvaluated(false);
+    }
+    setEntry(nextEntry);
   };
 
   const deleteLastDigit = () => {
     safeHaptic("light");
-    if (calculationComplete) {
-      return; // Don't allow deletion after calculation is complete
+    if (justEvaluated) {
+      return;
     }
-    
-    if (display.length > 1) {
-      const newDisplay = display.slice(0, -1);
-      const newEquation = equation.slice(0, -1);
-      setDisplay(newDisplay);
-      setEquation(newEquation);
-    } else {
-      setDisplay("0");
-      setEquation("0");
+
+    clearPercentLabel();
+    if (entry.length > 1) {
+      setEntry(entry.slice(0, -1));
+      return;
     }
+
+    if (expression.length > 0) {
+      const trimmed = expression.slice(0, -1);
+      const lastOperand = trimmed.match(/([0-9]+\.?[0-9]*|\.[0-9]+)$/)?.[1] ?? "";
+      const exprWithoutOperand = trimmed.slice(0, trimmed.length - lastOperand.length);
+      setExpression(exprWithoutOperand);
+      setEntry(lastOperand);
+      return;
+    }
+
+    setEntry("");
   };
 
   const clearEntry = () => {
     safeHaptic("light");
-    setDisplay("0");
-    if (!operation) {
-      setEquation("");
-      setPreviousValue(null);
-      setOperation(null);
-      setWaitingForOperand(false);
-    } else {
-      setWaitingForOperand(true);
-    }
-    setCalculationComplete(false);
+    setEntry("");
+    setJustEvaluated(false);
+    clearPercentLabel();
   };
 
   const renderButton = (
@@ -628,7 +603,7 @@ export default function MathCalculator({
         delayLongPress={onLongPress ? 320 : undefined}
         activeOpacity={0.8}
         disabled={
-          calculationComplete &&
+          justEvaluated &&
           ![
             "equals",
             "clear",
@@ -646,24 +621,29 @@ export default function MathCalculator({
   };
 
   const getEquationPreviewText = () => {
-    if (calculationComplete) {
+    if (justEvaluated) {
       return formatEmbeddedNumericTokens(equation, roundingDecimalPlaces);
     }
-    if (equation && operation && !waitingForOperand && previousValue !== null) {
-      const currentValue = parseFloat(display);
-      if (!isNaN(currentValue)) {
-        const previewResult = calculate(previousValue, currentValue, operation);
-        const result = parseFloat(previewResult.toFixed(roundingDecimalPlaces));
-        return `${formatEmbeddedNumericTokens(equation, roundingDecimalPlaces)} = ${formatGroupedNumber(result, roundingDecimalPlaces)}`;
-      }
-    }
-    if (equation && (operation || waitingForOperand)) {
-      return formatEmbeddedNumericTokens(equation, roundingDecimalPlaces);
-    }
-    return "";
+
+    const displayExpr = getDisplayExpressionText();
+    if (!displayExpr) return "";
+
+    return formatEmbeddedNumericTokens(displayExpr, roundingDecimalPlaces);
   };
 
-  const getMainValueText = () => formatCalculatorMainDisplay(display);
+  const getMainValueText = () => {
+    if (justEvaluated) {
+      return formatCalculatorMainDisplay(entry || "0");
+    }
+
+    const live = getLiveResult();
+    const hasOperatorChain = /[+\-*/]/.test(expression);
+    if (live !== null && (hasOperatorChain || percentOperand != null)) {
+      return formatCalculatorMainDisplay(String(live));
+    }
+
+    return formatCalculatorMainDisplay(entry || "0");
+  };
 
   const getDisplayFontSize = () => {
     const textLength = getMainValueText().length;
@@ -1046,7 +1026,7 @@ export default function MathCalculator({
                   { backgroundColor: successColor, borderColor: successColor },
                 ]}
                 onPress={() => {
-                  const result = parseFloat(display);
+                  const result = parseFloat(entry);
                   if (!isNaN(result) && result !== 0) {
                     onAddToConverter(result);
                     onClose();
